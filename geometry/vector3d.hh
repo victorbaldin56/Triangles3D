@@ -53,6 +53,13 @@ struct Vector3D {
   Vector3D<T> operator-() const {
     return Vector3D<T>{*this}*=static_cast<T>(-1);
   }
+
+  Vector3D<T>& normalize() {
+    T n = norm();
+    x_/=n;
+    y_/=n;
+    z_/=n;
+  }
 };
 
 template <typename T>
