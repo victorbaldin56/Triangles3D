@@ -13,3 +13,5 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(geometry_tests geometry_tests.cc)
 target_link_libraries(geometry_tests geometry;gtest_main)
+
+add_test(NAME geometry_test COMMAND geometry_tests)
