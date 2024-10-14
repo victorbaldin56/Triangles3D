@@ -1,0 +1,16 @@
+# Build directories
+build/*
+release/*
+relwithdebinfo/*
+
+# Objects / executables / libraries
+*.out
+*.o
+*.a
+*.so
+*.obj
+*.exe
+*.dll
+
+# Generated tests / data
+*.dat
