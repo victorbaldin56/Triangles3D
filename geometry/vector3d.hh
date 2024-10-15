@@ -19,7 +19,7 @@ struct Vector3D {
     return std::sqrt(norm2());
   }
 
-  bool isClose(const Vector3D<T>& other) const {
+  bool equal(const Vector3D<T>& other) const {
     return numeric::isClose(x_, other.x_) &&
            numeric::isClose(y_, other.y_) &&
            numeric::isClose(z_, other.z_);

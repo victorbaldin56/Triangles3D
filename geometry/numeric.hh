@@ -10,7 +10,7 @@ namespace numeric {
 // T stands for any floating point type
 template <typename T>
 bool isClose(T x, T y) {
-  return std::fabs(x - y) < 1e-4;
+  return std::fabs(x - y) <= 1e-4;
 }
 
 }
