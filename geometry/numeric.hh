@@ -9,8 +9,30 @@ namespace numeric {
 
 // T stands for any floating point type
 template <typename T>
-bool isClose(T x, T y) {
-  return std::fabs(x - y) <= 1e-4;
+class Limits {
+ public:
+  static T tolerance();
+};
+
+template <>
+class Limits<float> {
+ public:
+  static float tolerance() {
+    return 1e-4;
+  }
+};
+
+template <>
+class Limits<double> {
+ public:
+  static double tolerance() {
+    return 1e-7;
+  }
+};
+
+template <typename T>
+bool equal(T x, T y) {
+  return std::fabs(x - y) <= Limits<T>::tolerance();
 }
 
 }

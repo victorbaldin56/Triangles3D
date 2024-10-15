@@ -9,7 +9,11 @@ namespace geometry {
 
 template <typename T>
 struct Vector3D {
-  T x_, y_, z_;
+  T x_ = NAN, y_ = NAN, z_ = NAN;
+
+  bool valid() const {
+    return std::isfinite(x_) && std::isfinite(y_) && std::isfinite(z_);
+  }
 
   T norm2() const {
     return x_*x_ + y_*y_ + z_*z_;
@@ -20,9 +24,9 @@ struct Vector3D {
   }
 
   bool equal(const Vector3D<T>& other) const {
-    return numeric::isClose(x_, other.x_) &&
-           numeric::isClose(y_, other.y_) &&
-           numeric::isClose(z_, other.z_);
+    return numeric::equal(x_, other.x_) &&
+           numeric::equal(y_, other.y_) &&
+           numeric::equal(z_, other.z_);
   }
 
   Vector3D<T>& operator+=(const Vector3D<T>& rhs) {
