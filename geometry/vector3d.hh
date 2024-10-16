@@ -95,7 +95,7 @@ template <typename T>
 Vector3D<T> crossProduct(const Vector3D<T>& a, const Vector3D<T>& b) {
   return {a.y_*b.z_ - a.z_*b.y_,
           a.z_*b.x_ - a.x_*b.z_,
-          a.x_*b.y_ - a.y_*b.z_};
+          a.x_*b.y_ - a.y_*b.x_};
 }
 
 template <typename T>

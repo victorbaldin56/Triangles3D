@@ -11,11 +11,31 @@ TEST(Vector3D, add) {
   ASSERT_TRUE((v1 + v2).equal({3, 5.1, 8}));
 }
 
-TEST(Plane, getIntersectionLine) {
+TEST(Vector3D, crossProduct) {
+  Vector3D<float> a{1, 0, 0};
+  Vector3D<float> b{0, 1, 0};
+  ASSERT_TRUE(crossProduct(a, b).equal({0, 0, 1}));
+  ASSERT_TRUE(crossProduct(b, a).equal({0, 0, -1}));
+}
+
+TEST(Line3D, equal) {
+  Line3D<float> l1{{0, 0, 1}, {7, 8, 9}};
+  Line3D<float> l2{{0, 0, -10000}, {7, 8, 9}};
+  ASSERT_TRUE(l1.equal(l2));
+}
+
+TEST(Plane, constructor) {
   Plane<float> p1{{16, 7, 8}, {7.8, 19100, 89}, {100, 2.2, 4.3}};
-  Plane<float> p2{{16, 7, 8}, {7.8, 19100, 89}, {0, 0, 0}};
+  Plane<float> p2{{0, 0, 0}, {1, 0, 0}, {-1000, 0, 0}};
+  ASSERT_TRUE(p1.valid());
+  ASSERT_FALSE(p2.valid());
+}
+
+TEST(Plane, getIntersectionLine) {
+  Plane<float> p1{{16, 7, 8}, {7.8, 19, 89}, {100, 2.2, 4.3}};
+  Plane<float> p2{{16, 7, 8}, {7.8, 19, 89}, {0, 0, 0}};
   Line3D<float> intersection = p1.getIntersectionLine(p2);
-  Line3D<float> intersection_ref{{8.2, 19093, 81}, {7.8, 19100, 89}};
+  Line3D<float> intersection_ref{{8.2, 12, 81}, {7.8, 19, 89}};
 
   ASSERT_TRUE(intersection.valid());
   ASSERT_TRUE(intersection.equal(intersection_ref));

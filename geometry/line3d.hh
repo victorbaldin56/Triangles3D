@@ -12,7 +12,9 @@ class Line3D {
  public:
   Line3D() {}
   Line3D(const Vector3D<T>& direction, const Vector3D<T>& origin)
-    : direction_{direction}, origin_{origin} {}
+    : direction_{direction}, origin_{origin} {
+    direction_.normalize();
+  }
 
   // getters
  public:
@@ -52,7 +54,8 @@ class Line3D {
   }
 
   bool equal(const Line3D<T>& other) {
-    return collinear(direction_, other.direction_) && collinear(origin_ - other.origin_, direction_);
+    return collinear(direction_, other.direction_) &&
+           collinear(origin_ - other.origin_, direction_);
   }
 };
 
