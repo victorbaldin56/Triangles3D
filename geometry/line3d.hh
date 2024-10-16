@@ -38,7 +38,17 @@ class Line3D {
   }
 
   Vector3D<T>& getIntersectionPoint(const Line3D<T>& other) const {
+    T triple_product = tripleProduct(origin_ - other.origin_,
+                                     direction_, other.direction_);
 
+    // skew lines
+    if (!numeric::equal(triple_product, static_cast<T>(0))) {
+      return false;
+    }
+
+    Vector3D<T> dir_cross = crossProduct(direction_, other.direction_);
+    Vector3D<T> origin_cross = crossProduct(origin_ - other.origin_);
+    return origin_ + direction_*dot(dir_cross, origin_cross)/norm2(dir_cross);
   }
 
   bool equal(const Line3D<T>& other) {
