@@ -63,6 +63,11 @@ struct Vector3D {
     x_/=n;
     y_/=n;
     z_/=n;
+    return *this;
+  }
+
+  static Vector3D<T> zeroVector() {
+    return {0, 0, 0};
   }
 };
 
@@ -98,6 +103,11 @@ T tripleProduct(const Vector3D<T>& a,
                 const Vector3D<T>& b,
                 const Vector3D<T>& c) {
   return dot(a, crossProduct(b, c));
+}
+
+template <typename T>
+bool collinear(const Vector3D<T>& a, const Vector3D<T>& b) {
+  return crossProduct(a, b).equal(Vector3D<T>::zeroVector());
 }
 
 }

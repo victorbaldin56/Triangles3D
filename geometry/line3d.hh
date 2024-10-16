@@ -11,7 +11,7 @@ class Line3D {
 
  public:
   Line3D() {}
-  Line3D(const Vector3D<T>& direction, const Vector3D<T> origin)
+  Line3D(const Vector3D<T>& direction, const Vector3D<T>& origin)
     : direction_{direction}, origin_{origin} {}
 
   // getters
@@ -47,12 +47,12 @@ class Line3D {
     }
 
     Vector3D<T> dir_cross = crossProduct(direction_, other.direction_);
-    Vector3D<T> origin_cross = crossProduct(origin_ - other.origin_);
+    Vector3D<T> origin_cross = crossProduct(origin_, other.origin_);
     return origin_ + direction_*dot(dir_cross, origin_cross)/norm2(dir_cross);
   }
 
   bool equal(const Line3D<T>& other) {
-    return direction_.equal(other.direction_) && origin_.equal(other.origin_);
+    return collinear(direction_, other.direction_) && collinear(origin_ - other.origin_, direction_);
   }
 };
 

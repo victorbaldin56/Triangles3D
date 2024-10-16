@@ -42,11 +42,12 @@ class Plane {
     T c1 = (d_ - other.d_*normal_dot)/denom;
     T c2 = (other.d_ - d_*normal_dot)/denom;
 
-    return Line3D<T>{crossProduct(n_, other.d_), c1*n_ + c2*other.n_};
+    return Line3D<T>{crossProduct(n_, other.n_), c1*n_ + c2*other.n_};
   }
 
   bool equal(const Plane<T>& other) const {
-    return n_.equal(other.n_) && numeric::equal(d_, other.d_);
+    return (n_.equal(other.n_) && numeric::equal(d_, other.d_)) ||
+           (n_.equal(-other.n_) && numeric::equal(d_, -other.d_));
   }
 };
 
