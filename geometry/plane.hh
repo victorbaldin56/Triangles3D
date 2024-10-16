@@ -9,7 +9,7 @@ namespace geometry {
 template <typename T>
 class Plane {
   Vector3D<T> n_;
-  T           d_;
+  T d_;
 
   // constructors
  public:

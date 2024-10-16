@@ -11,11 +11,24 @@ TEST(Vector3D, add) {
   ASSERT_TRUE((v1 + v2).equal({3, 5.1, 8}));
 }
 
+TEST(Vector3D, dot) {
+  Vector3D<float> a{1, 2, 3};
+  Vector3D<float> b{5, 6, 7};
+  ASSERT_TRUE(numeric::equal(dot(a, b), 38.f));
+}
+
 TEST(Vector3D, crossProduct) {
   Vector3D<float> a{1, 0, 0};
   Vector3D<float> b{0, 1, 0};
   ASSERT_TRUE(crossProduct(a, b).equal({0, 0, 1}));
   ASSERT_TRUE(crossProduct(b, a).equal({0, 0, -1}));
+}
+
+TEST(Vector3D, normalize) {
+  Vector3D<float> v{1000, 99, 9.7};
+  auto n = v.normalize();
+  ASSERT_TRUE(n.equal(1/std::sqrt(dot(v, v))*v));
+  ASSERT_TRUE(numeric::equal(n.norm(), 1.f));
 }
 
 TEST(Line3D, equal) {
@@ -29,6 +42,8 @@ TEST(Plane, constructor) {
   Plane<float> p2{{0, 0, 0}, {1, 0, 0}, {-1000, 0, 0}};
   ASSERT_TRUE(p1.valid());
   ASSERT_FALSE(p2.valid());
+
+  ASSERT_TRUE(numeric::equal(p1.normal().norm(), 1.f));
 }
 
 TEST(Plane, getIntersectionLine) {

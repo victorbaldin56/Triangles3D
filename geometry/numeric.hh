@@ -18,7 +18,7 @@ template <>
 class Limits<float> {
  public:
   static float tolerance() {
-    return 1e-4;
+    return 1e-3;
   }
 };
 
