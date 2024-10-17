@@ -2,6 +2,7 @@
 #define TRIANGLES_3D_GEOMETRY_VECTOR_3D_HH_
 
 #include <cmath>
+#include <type_traits>
 
 #include "numeric.hh"
 
@@ -9,6 +10,9 @@ namespace geometry {
 
 template <typename T>
 struct Vector3D {
+  static_assert(std::is_floating_point<T>(),
+                "Only floating-point type can be used.");
+
   T x_ = NAN, y_ = NAN, z_ = NAN;
 
   bool valid() const {
