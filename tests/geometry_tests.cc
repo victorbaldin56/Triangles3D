@@ -50,7 +50,7 @@ TEST(Plane, getIntersectionLine) {
   Plane<float> p1{{16, 7, 8}, {7.8, 19, 89}, {100, 2.2, 4.3}};
   Plane<float> p2{{16, 7, 8}, {7.8, 19, 89}, {0, 0, 0}};
   Line3D<float> intersection = p1.getIntersectionLine(p2);
-  Line3D<float> intersection_ref{{8.2, 12, 81}, {7.8, 19, 89}};
+  Line3D<float> intersection_ref{{-8.2, 12, 81}, {7.8, 19, 89}};
 
   ASSERT_TRUE(intersection.valid());
   ASSERT_TRUE(intersection.equal(intersection_ref));
