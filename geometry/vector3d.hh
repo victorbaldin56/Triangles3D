@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <type_traits>
+#include <iostream>
 
 #include "numeric.hh"
 
@@ -112,6 +113,18 @@ T tripleProduct(const Vector3D<T>& a,
 template <typename T>
 bool collinear(const Vector3D<T>& a, const Vector3D<T>& b) {
   return crossProduct(a, b).equal(Vector3D<T>::zeroVector());
+}
+
+template <typename T>
+std::istream& operator>>(std::istream& is, Vector3D<T>& v) {
+  is >> v.x_ >> v.y_ >> v.z_;
+  return is;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Vector3D<T>& v) {
+  os << v.x_ << v.y_ << v.z_;
+  return os;
 }
 
 }

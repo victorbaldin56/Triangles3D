@@ -56,6 +56,18 @@ struct Triangle3D {
   }
 };
 
+template <typename T>
+std::istream& operator>>(std::istream& is, Triangle3D<T>& t) {
+  is >> t.a_ >> t.b_ >> t.c_;
+  return is;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Triangle3D<T>& t) {
+  os << t.a_ << t.b_ << t.c_;
+  return os;
+}
+
 }
 
 #endif // TRIANGLES_3D_GEOMETRY_TRIANGLE_3D_HH_
