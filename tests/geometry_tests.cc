@@ -2,6 +2,7 @@
 
 #include "vector3d.hh"
 #include "plane.hh"
+#include "triangle3d.hh"
 
 using namespace geometry;
 
@@ -54,6 +55,13 @@ TEST(Plane, getIntersectionLine) {
 
   ASSERT_TRUE(intersection.valid());
   ASSERT_TRUE(intersection.equal(intersection_ref));
+}
+
+TEST(Triangle3D, intersects) {
+  Triangle3D<float> t1{{2, 4, 5}, {1, 2, 3}, {9, 19, 1000}};
+  Triangle3D<float> t2{{0, 0, 0}, {2, 4, 5}, {8, 8, 52}};
+
+  ASSERT_TRUE(t1.intersects(t2));
 }
 
 int main(int argc, char** argv) {

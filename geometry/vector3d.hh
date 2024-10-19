@@ -55,6 +55,13 @@ struct Vector3D {
     return *this;
   }
 
+  Vector3D<T>& operator/=(T scalar) {
+    x_/=scalar;
+    y_/=scalar;
+    z_/=scalar;
+    return *this;
+  }
+
   Vector3D<T> operator+() const {
     return *this;
   }
@@ -89,6 +96,16 @@ Vector3D<T> operator-(Vector3D<T> a, const Vector3D<T>& b) {
 template <typename T>
 Vector3D<T> operator*(T scalar, Vector3D<T> v) {
   return v*=scalar;
+}
+
+template <typename T>
+Vector3D<T> operator*(const Vector3D<T>& v, T scalar) {
+  return scalar*v;
+}
+
+template <typename T>
+Vector3D<T> operator/(Vector3D<T> v, T scalar) {
+  return v/=scalar;
 }
 
 template <typename T>

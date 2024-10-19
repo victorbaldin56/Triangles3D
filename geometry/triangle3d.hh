@@ -20,7 +20,7 @@ struct Triangle3D {
   }
 
   T area() const {
-    return norm(crossProduct(a_ - b_, a_ - c_))/2;
+    return crossProduct(a_ - b_, a_ - c_).norm()/2;
   }
 
   bool inside(const Vector3D<T>& point) const {
