@@ -1,6 +1,7 @@
 #include <vector>
 
 #include "triangle3d.hh"
+#include "octree.hh"
 
 int main() {
   std::size_t count = 0;
