@@ -1,6 +1,8 @@
 #ifndef TRIANGLES_3D_GEOMETRY_TRIANGLE_3D_HH_
 #define TRIANGLES_3D_GEOMETRY_TRIANGLE_3D_HH_
 
+#include <algorithm>
+
 #include "plane.hh"
 #include "segment3d.hh"
 
@@ -9,6 +11,8 @@ namespace geometry {
 template <typename T>
 struct Triangle3D {
   Vector3D<T> a_, b_, c_;
+
+  using NumType = T; // for interface
 
   bool intersectsLine(const Line3D<T>& line) const {
     Segment3D<T> ab = {a_, b_};
@@ -22,6 +26,13 @@ struct Triangle3D {
   T area() const {
     return crossProduct(a_ - b_, a_ - c_).norm()/2;
   }
+
+  T minX() const { return std::min({a_.x_, b_.x_, c_.x_}); }
+  T maxX() const { return std::max({a_.x_, b_.x_, c_.x_}); }
+  T minY() const { return std::min({a_.y_, b_.y_, c_.y_}); }
+  T maxY() const { return std::max({a_.y_, b_.y_, c_.y_}); }
+  T minZ() const { return std::min({a_.z_, b_.z_, c_.z_}); }
+  T maxZ() const { return std::max({a_.z_, b_.z_, c_.z_}); }
 
   bool inside(const Vector3D<T>& point) const {
     Triangle3D<T> t1 = {a_, b_, point};

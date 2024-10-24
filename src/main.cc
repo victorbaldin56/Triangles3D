@@ -12,5 +12,6 @@ int main() {
     std::cin >> t;
   }
 
+  geometry::Octree<geometry::Triangle3D<float>> octree{triangles};
   return 0;
 }
