@@ -12,7 +12,7 @@ To build you need the following installed:
 TO build:
 1. Clone repo:
 ```sh
-git clone https://github.com/victorbaldin56/Triangles3D.git
+git clone --recursive https://github.com/victorbaldin56/Triangles3D.git
 ```
 2. Generate build files:
 ```sh
