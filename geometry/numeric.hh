@@ -9,10 +9,7 @@ namespace numeric {
 
 // T stands for any floating point type
 template <typename T>
-class Limits {
- public:
-  static T tolerance();
-};
+class Limits {};
 
 template <>
 class Limits<float> {
