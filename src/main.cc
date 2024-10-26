@@ -12,6 +12,7 @@ int main() {
     std::cin >> t;
   }
 
-  geometry::Octree<geometry::Triangle3D<float>> octree{triangles};
+  // we dont need to copy triangles vector
+  geometry::Octree<geometry::Triangle3D<float>> octree{std::move(triangles)};
   return 0;
 }

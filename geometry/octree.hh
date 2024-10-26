@@ -22,9 +22,31 @@ class Octree {
   using CIterator = typename Container::const_iterator;
 
  private:
-  std::vector<std::pair<FigureT, std::size_t>> items_;
-  const Container* cont_;
+  const Container cont_;
 
+
+ public:
+  // copy-constructs the underlying container
+  explicit Octree(const Container& cont = Container{}) : cont_{cont} {
+    constructTree();
+  }
+
+  // move-constructs the underlying container
+  explicit Octree(Container&& cont) noexcept : cont_{cont} {
+    constructTree();
+  }
+
+  std::set<std::size_t> getIntersectingFigures() const {
+    std::set<std::size_t> res;
+    root_->getIntersectingFigures(res);
+    return res;
+  }
+
+  ~Octree() {
+    delete root_;
+  }
+
+ private:
   struct Parallelepiped {
     NumType x_min_, x_max_;
     NumType y_min_, y_max_;
@@ -60,7 +82,7 @@ class Octree {
                        min_init, max_init,
                        min_init, max_init};
 
-    for (auto& f : *cont_) {
+    for (auto& f : cont_) {
       NumType x_min = f.minX();
       NumType x_max = f.maxX();
       NumType y_min = f.minY();
@@ -79,24 +101,9 @@ class Octree {
     return res;
   }
 
-  void constructTree(const Parallelepiped& edges) {
-    root_ = new Node{edges};
-  }
-
- public:
-  explicit Octree(const Container& cont = Container{}) : cont_{&cont} {
+  void constructTree() {
     Parallelepiped edges = getEdges();
-    constructTree(edges);
-  }
-
-  std::set<std::size_t> getIntersectingFigures() const {
-    std::set<std::size_t> res;
-    root_->getIntersectingFigures(res);
-    return res;
-  }
-
-  ~Octree() {
-    delete root_;
+    root_ = new Node{edges};
   }
 };
 
