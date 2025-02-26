@@ -38,4 +38,4 @@ To build:
 Input:
 
 * $N$ - the number of triangles
-* $3N$ points, coordinates are single-precision doubleing point numbers.
+* $3N$ points, coordinates are single-precision floating point numbers.
