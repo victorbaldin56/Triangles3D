@@ -64,6 +64,90 @@ TEST(Triangle3D, intersects) {
   ASSERT_TRUE(t1.intersects(t2));
 }
 
+TEST(Triangle3D, Intersects_SimpleCase) {
+  Triangle3D<double> t1{{0.3, 0.7, 1.2}, {1.5, 0.4, 2.1}, {0.8, 1.9, 3.4}};
+  Triangle3D<double> t2{{0.3, 0.7, 1.2}, {1.5, 0.4, 2.1}, {0.8, 1.9, 3.4}};
+
+  ASSERT_TRUE(t1.intersects(t2));  // Identical triangles should intersect
+}
+
+TEST(Triangle3D, Intersects_EdgeCase) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {1.1, 0.2, 0.3}, {0.1, 1.2, 0.3}};
+  Triangle3D<double> t2{{1.1, 0.2, 0.3}, {0.1, 1.2, 0.3}, {1.1, 1.2, 0.3}};
+
+  ASSERT_TRUE(t1.intersects(t2));  // Triangles share an edge
+}
+
+TEST(Triangle3D, Intersects_NoIntersection) {
+  Triangle3D<double> t1{{0.5, 0.5, 0.5}, {1.5, 0.5, 0.5}, {0.5, 1.5, 0.5}};
+  Triangle3D<double> t2{{2.2, 2.2, 2.2}, {3.3, 2.2, 2.2}, {2.2, 3.3, 2.2}};
+
+  ASSERT_FALSE(t1.intersects(t2));  // Triangles are far apart
+}
+
+TEST(Triangle3D, Intersects_CoplanarButSeparate) {
+  Triangle3D<double> t1{{0.2, 0.3, 0.4}, {1.2, 0.3, 0.4}, {0.2, 1.3, 0.4}};
+  Triangle3D<double> t2{{2.2, 0.3, 0.4}, {3.2, 0.3, 0.4}, {2.2, 1.3, 0.4}};
+
+  ASSERT_FALSE(t1.intersects(t2));  // Coplanar but separate triangles
+}
+
+TEST(Triangle3D, Intersects_OnePointInCommon) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {1.1, 0.2, 0.3}, {0.1, 1.2, 0.3}};
+  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {-1.1, 0.2, 0.3}, {0.1, -1.2, 0.3}};
+
+  ASSERT_TRUE(t1.intersects(t2));  // Triangles share one vertex
+}
+
+TEST(Triangle3D, Intersects_IntersectingAtEdge) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};
+  Triangle3D<double> t2{{1.1, 1.2, 0.3}, {3.1, 1.2, 0.3}, {1.1, 3.2, 0.3}};
+
+  ASSERT_TRUE(t1.intersects(t2));  // Triangles intersect along an edge
+}
+
+TEST(Triangle3D, Intersects_IntersectingAtSinglePoint) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};
+  Triangle3D<double> t2{{1.1, 1.2, 1.3}, {1.1, 1.2, -1.3}, {2.2, 2.2, 0.3}};
+
+  ASSERT_TRUE(t1.intersects(t2));  // Triangles intersect at a single point
+}
+
+TEST(Triangle3D, Intersects_OneInsideTheOther) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};
+  Triangle3D<double> t2{{0.5, 0.6, 0.3}, {1.5, 0.6, 0.3}, {0.5, 1.6, 0.3}};
+
+  ASSERT_TRUE(t1.intersects(t2));  // One triangle is entirely inside the other
+}
+
+TEST(Triangle3D, Intersects_NonCoplanarIntersection) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};
+  Triangle3D<double> t2{{1.1, 1.2, -1.3}, {1.1, 1.2, 1.3}, {2.2, 2.2, 0.3}};
+
+  ASSERT_TRUE(t1.intersects(t2));  // Non-coplanar triangles intersecting
+}
+
+TEST(Triangle3D, Intersects_NonCoplanarNoIntersection) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};
+  Triangle3D<double> t2{{3.3, 3.4, 1.5}, {4.4, 3.4, 1.5}, {3.3, 4.4, 1.5}};
+
+  ASSERT_FALSE(t1.intersects(t2));  // Non-coplanar triangles with no intersection
+}
+
+TEST(Triangle3D, Intersects_DegenerateTriangle) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}};  // Degenerate triangle (a point)
+  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {1.1, 0.2, 0.3}, {0.1, 1.2, 0.3}};
+
+  ASSERT_TRUE(t1.intersects(t2));  // Degenerate triangle intersects at a point
+}
+
+TEST(Triangle3D, Intersects_DegenerateTriangleNoIntersection) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}};  // Degenerate triangle (a point)
+  Triangle3D<double> t2{{1.1, 1.2, 1.3}, {2.2, 2.2, 2.3}, {3.3, 3.3, 3.3}};
+
+  ASSERT_FALSE(t1.intersects(t2));  // Degenerate triangle does not intersect
+}
+
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

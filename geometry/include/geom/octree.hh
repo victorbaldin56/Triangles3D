@@ -12,12 +12,10 @@
 namespace geometry {
 
 // TODO: без рекурсии
-// TODO: аллокатор
 // TODO: минимизировать raw pointers use
 template <typename FigureT, typename Container = std::vector<FigureT>>
 class Octree {
  public:
-  using NumType   = typename FigureT::NumType;
   using Iterator  = typename Container::iterator;
   using CIterator = typename Container::const_iterator;
 

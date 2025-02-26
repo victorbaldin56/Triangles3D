@@ -12,7 +12,20 @@ template <typename T>
 struct Triangle3D {
   Vector3D<T> a_, b_, c_;
 
-  using NumType = T; // for interface
+  Segment3D<T> toSegment() const {
+    auto max_x = std::max({a_.x_, b_.x_, c_.x_});
+    auto min_x = std::min({a_.x_, b_.x_, c_.x_});
+
+    if (a_.x_ != max_x && a_.x_ != min_x) {
+      return {b_, c_};
+    }
+    if (b_.x_ != max_x && b_.x_ != min_x) {
+      return {a_, c_};
+    }
+    if (c_.x_ != max_x && c_.x_ != min_x) {
+      return {a_, b_};
+    }
+  }
 
   bool intersectsLine(const Line3D<T>& line) const {
     Segment3D<T> ab = {a_, b_};
@@ -34,7 +47,7 @@ struct Triangle3D {
   T minZ() const { return std::min({a_.z_, b_.z_, c_.z_}); }
   T maxZ() const { return std::max({a_.z_, b_.z_, c_.z_}); }
 
-  bool inside(const Vector3D<T>& point) const {
+  bool contains(const Vector3D<T>& point) const {
     Triangle3D<T> t1 = {a_, b_, point};
     Triangle3D<T> t2 = {b_, c_, point};
     Triangle3D<T> t3 = {a_, c_, point};
@@ -42,28 +55,41 @@ struct Triangle3D {
   }
 
   bool intersectsInPlane(const Triangle3D<T>& other) const {
-    return inside(other.a_) || inside(other.b_) || inside(other.c_);
+    return contains(other.a_) || contains(other.b_) || contains(other.c_);
   }
 
   bool intersects(const Triangle3D<T>& other) const {
-    Plane<T> this_p{a_, b_, c_};
-    Plane<T> other_p{other.a_, other.b_, other.c_};
+    auto copy(*this);
+    auto other_copy(other);
+    Plane<T> this_p{copy.a_, copy.b_, copy.c_};
+    Plane<T> other_p{other_copy.a_, other_copy.b_, other_copy.c_};
+
+    if (!other_p.valid()) {
+      if (!this_p.valid()) {
+        Segment3D<T> this_seg = copy.toSegment();
+        Segment3D<T> other_seg = other_copy.toSegment();
+      }
+      std::swap(other_copy, copy);
+      std::swap(other_p, this_p);
+    }
 
     // planes are coincident with doubleing point tolerance
     if (this_p.equal(other_p)) {
-      return intersectsInPlane(other);
+      return copy.intersectsInPlane(other);
     }
 
-    Line3D<T> intersection_line = this_p.getIntersectionLine(other_p);
+    Segment3D<T> ab = {copy.a_, copy.b_};
+    Segment3D<T> bc = {copy.b_, copy.c_};
+    Segment3D<T> ac = {copy.a_, copy.c_};
 
-    // planes are parallel
-    if (!intersection_line.valid()) {
-      return false;
-    }
+    Vector3D<T> abi = other_p.getIntersectionPoint(ab);
+    Vector3D<T> bci = other_p.getIntersectionPoint(bc);
+    Vector3D<T> aci = other_p.getIntersectionPoint(ac);
 
-    // main case: planes have intersection line
-    return intersectsLine(intersection_line) &&
-           other.intersectsLine(intersection_line);
+    return
+        abi.valid() && other_copy.contains(abi)
+        || bci.valid() && other_copy.contains(bci)
+        || aci.valid() && other_copy.contains(aci);
   }
 };
 

@@ -3,6 +3,7 @@
 
 #include "vector3d.hh"
 #include "line3d.hh"
+#include "segment3d.hh"
 
 namespace geometry {
 
@@ -43,6 +44,18 @@ class Plane {
     T c2 = (other.d_ - d_*normal_dot)/denom;
 
     return Line3D<T>{crossProduct(n_, other.n_), c1*n_ + c2*other.n_};
+  }
+
+  Vector3D<T> getIntersectionPoint(const Line3D<T>& line) const {
+    return
+        line.origin()
+            + (d_ - dot(line.origin(), n_) / dot(line.direction(), n_))
+                * line.direction();
+  }
+
+  Vector3D<T> getIntersectionPoint(const Segment3D<T>& seg) const {
+    Line3D<T> l(seg.begin_, seg.end_ - seg.begin_);
+    return getIntersectionPoint(l);
   }
 
   bool equal(const Plane<T>& other) const {
