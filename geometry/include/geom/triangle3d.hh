@@ -68,12 +68,13 @@ struct Triangle3D {
       if (!this_p.valid()) {
         Segment3D<T> this_seg = copy.toSegment();
         Segment3D<T> other_seg = other_copy.toSegment();
+        return this_seg.intersects(other_seg);
       }
       std::swap(other_copy, copy);
       std::swap(other_p, this_p);
     }
 
-    // planes are coincident with doubleing point tolerance
+    // planes are coincident with floating point tolerance
     if (this_p.equal(other_p)) {
       return copy.intersectsInPlane(other);
     }
@@ -86,10 +87,9 @@ struct Triangle3D {
     Vector3D<T> bci = other_p.getIntersectionPoint(bc);
     Vector3D<T> aci = other_p.getIntersectionPoint(ac);
 
-    return
-        abi.valid() && other_copy.contains(abi)
-        || bci.valid() && other_copy.contains(bci)
-        || aci.valid() && other_copy.contains(aci);
+    return other_copy.contains(abi)
+           || other_copy.contains(bci)
+           || other_copy.contains(aci);
   }
 };
 

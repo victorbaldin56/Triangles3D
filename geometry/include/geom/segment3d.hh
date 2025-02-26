@@ -13,9 +13,9 @@ struct Segment3D {
 
   Line3D<T> line() const { return Line3D<T>(end_ - begin_, begin_); }
 
-  bool intersectsLine(const Line3D<T>& line) const {
+  bool intersectsLine(const Line3D<T>& l) const {
     Line3D<T> this_line = line();
-    Vector3D<T> intersection_point = this_line.getIntersectionPoint(line);
+    Vector3D<T> intersection_point = this_line.getIntersectionPoint(l);
 
     if (!intersection_point.valid()) {
       return false;
@@ -30,9 +30,7 @@ struct Segment3D {
     T z_min = std::min(begin_.z_, end_.z_),
       z_max = std::max(begin_.z_, end_.z_);
 
-    return x_min <= intersection_point.x_ && intersection_point.x_ <= x_max &&
-           y_min <= intersection_point.y_ && intersection_point.y_ <= y_max &&
-           z_min <= intersection_point.z_ && intersection_point.z_ <= z_max;
+    return getRange().contains(intersection_point);
   }
 
   bool intersects(const Segment3D<T>& other) const {
