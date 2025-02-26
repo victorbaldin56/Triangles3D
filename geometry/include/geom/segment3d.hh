@@ -2,6 +2,7 @@
 #define TRIANGLES_3D_GEOMETRY_SEGMENT_3D_HH_
 
 #include "line3d.hh"
+#include "range3d.hh"
 
 namespace geometry {
 
@@ -36,6 +37,12 @@ struct Segment3D {
 
   bool intersects(const Segment3D<T>& other) const {
     return intersectsLine(other.line()) && other.intersectsLine(line());
+  }
+
+  Range3D<T> getRange() const {
+    return {std::min(begin_.x_, end_.x_), std::max(begin_.x_, end_.x_),
+            std::min(begin_.y_, end_.y_), std::max(begin_.y_, end_.y_),
+            std::min(begin_.z_, end_.z_), std::max(begin_.z_, end_.z_)};
   }
 };
 

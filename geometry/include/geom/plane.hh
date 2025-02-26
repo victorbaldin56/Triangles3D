@@ -55,7 +55,12 @@ class Plane {
 
   Vector3D<T> getIntersectionPoint(const Segment3D<T>& seg) const {
     Line3D<T> l(seg.begin_, seg.end_ - seg.begin_);
-    return getIntersectionPoint(l);
+    auto p = getIntersectionPoint(l);
+    auto range = seg.getRange();
+    if (range.contains(p)) {
+      return p;
+    }
+    return Vector3D<T>();
   }
 
   bool equal(const Plane<T>& other) const {
