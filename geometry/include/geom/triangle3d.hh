@@ -49,7 +49,7 @@ struct Triangle3D {
     Plane<T> this_p{a_, b_, c_};
     Plane<T> other_p{other.a_, other.b_, other.c_};
 
-    // planes are coincident with floating point tolerance
+    // planes are coincident with doubleing point tolerance
     if (this_p.equal(other_p)) {
       return intersectsInPlane(other);
     }
