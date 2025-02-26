@@ -44,7 +44,7 @@ class Line3D {
                                      direction_, other.direction_);
 
     // skew lines
-    if (!numeric::equal(triple_product, static_cast<T>(0))) {
+    if (!comparator::isClose(triple_product, static_cast<T>(0))) {
       return Vector3D<T>{};
     }
 

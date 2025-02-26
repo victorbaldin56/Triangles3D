@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <iostream>
 
-#include "numeric.hh"
+#include "comparator.hh"
 
 namespace geometry {
 
@@ -29,9 +29,9 @@ struct Vector3D {
   }
 
   bool equal(const Vector3D<T>& other) const {
-    return numeric::equal(x_, other.x_) &&
-           numeric::equal(y_, other.y_) &&
-           numeric::equal(z_, other.z_);
+    return comparator::isClose(x_, other.x_) &&
+           comparator::isClose(y_, other.y_) &&
+           comparator::isClose(z_, other.z_);
   }
 
   Vector3D<T>& operator+=(const Vector3D<T>& rhs) {

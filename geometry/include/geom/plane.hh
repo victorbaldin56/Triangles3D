@@ -46,8 +46,8 @@ class Plane {
   }
 
   bool equal(const Plane<T>& other) const {
-    return (n_.equal(other.n_) && numeric::equal(d_, other.d_)) ||
-           (n_.equal(-other.n_) && numeric::equal(d_, -other.d_));
+    return (n_.equal(other.n_) && comparator::isClose(d_, other.d_)) ||
+           (n_.equal(-other.n_) && comparator::isClose(d_, -other.d_));
   }
 };
 

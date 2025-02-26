@@ -38,7 +38,7 @@ struct Triangle3D {
     Triangle3D<T> t1 = {a_, b_, point};
     Triangle3D<T> t2 = {b_, c_, point};
     Triangle3D<T> t3 = {a_, c_, point};
-    return numeric::equal(area(), t1.area() + t2.area() + t3.area());
+    return comparator::isClose(area(), t1.area() + t2.area() + t3.area());
   }
 
   bool intersectsInPlane(const Triangle3D<T>& other) const {
@@ -49,7 +49,7 @@ struct Triangle3D {
     Plane<T> this_p{a_, b_, c_};
     Plane<T> other_p{other.a_, other.b_, other.c_};
 
-    // planes are coincident with floating point tolerance
+    // planes are coincident with doubleing point tolerance
     if (this_p.equal(other_p)) {
       return intersectsInPlane(other);
     }
