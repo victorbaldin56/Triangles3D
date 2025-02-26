@@ -1,7 +1,7 @@
 #include <vector>
 
-#include "triangle3d.hh"
-#include "octree.hh"
+#include "geom/triangle3d.hh"
+#include "geom/octree.hh"
 
 int main() {
   std::size_t count = 0;

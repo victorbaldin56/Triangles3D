@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "vector3d.hh"
-#include "plane.hh"
-#include "triangle3d.hh"
+#include "geom/vector3d.hh"
+#include "geom/plane.hh"
+#include "geom/triangle3d.hh"
 
 using namespace geometry;
 
@@ -15,7 +15,7 @@ TEST(Vector3D, add) {
 TEST(Vector3D, dot) {
   Vector3D<float> a{1, 2, 3};
   Vector3D<float> b{5, 6, 7};
-  ASSERT_TRUE(numeric::equal(dot(a, b), 38.f));
+  ASSERT_TRUE(comparator::isClose(dot(a, b), 38.f));
 }
 
 TEST(Vector3D, crossProduct) {
@@ -29,7 +29,7 @@ TEST(Vector3D, normalize) {
   Vector3D<float> v{1000, 99, 9.7};
   auto n = v.normalize();
   ASSERT_TRUE(n.equal(1/std::sqrt(dot(v, v))*v));
-  ASSERT_TRUE(numeric::equal(n.norm(), 1.f));
+  ASSERT_TRUE(comparator::isClose(n.norm(), 1.f));
 }
 
 TEST(Line3D, equal) {
@@ -44,7 +44,7 @@ TEST(Plane, constructor) {
   ASSERT_TRUE(p1.valid());
   ASSERT_FALSE(p2.valid());
 
-  ASSERT_TRUE(numeric::equal(p1.normal().norm(), 1.f));
+  ASSERT_TRUE(comparator::isClose(p1.normal().norm(), 1.f));
 }
 
 TEST(Plane, getIntersectionLine) {
