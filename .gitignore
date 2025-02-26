@@ -1,10 +1,12 @@
 # Build directories
 build/*
 release/*
-relwithdebinfo/*
+
+# Python
+__pycache__/
+.venv/
 
 # Objects / executables / libraries
-*.out
 *.o
 *.a
 *.so
@@ -14,3 +16,9 @@ relwithdebinfo/*
 
 # Generated tests / data
 *.dat
+
+# Conan
+CMakeUserPresets.json
+
+# Doxygen
+html/
