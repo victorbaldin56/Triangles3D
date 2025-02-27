@@ -1,5 +1,6 @@
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain
+import pip
 
 class Triangles3DRecipe(ConanFile):
   name = "triangles3d"
@@ -12,6 +13,7 @@ class Triangles3DRecipe(ConanFile):
   def requirements(self):
     if self.options.testing:
       self.test_requires("gtest/1.15.0")
+      pip.main(['install', 'trimesh==4.6.3', 'numpy==2.2.0'])
 
   def generate(self):
     # Customize CMakeToolchain in the generate() method

@@ -24,10 +24,8 @@ class Line3D {
 
  public:
   bool valid() const noexcept { return direction_.valid() && origin_.valid(); }
-  bool contains(const Vector3D<T>& p,
-                T abs_tol = comparator::absoluteTolerance<T>(),
-                T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
-    return collinear(p - origin_, direction_, abs_tol, rel_tol);
+  bool contains(const Vector3D<T>& p) const noexcept {
+    return collinear(p - origin_, direction_);
   }
 
   Vector3D<T> getIntersectionPoint(const Line3D<T>& other) const noexcept {
@@ -40,11 +38,9 @@ class Line3D {
            direction_ * dot(dir_cross, origin_cross) / dir_cross.norm2();
   }
 
-  bool isClose(const Line3D<T>& other,
-               T abs_tol = comparator::absoluteTolerance<T>(),
-               T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
-    return collinear(direction_, other.direction_, abs_tol, rel_tol) &&
-           collinear(origin_ - other.origin_, direction_, abs_tol, rel_tol);
+  bool isClose(const Line3D<T>& other) const noexcept {
+    return collinear(direction_, other.direction_) &&
+           collinear(origin_ - other.origin_, direction_);
   }
 };
 

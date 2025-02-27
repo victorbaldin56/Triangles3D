@@ -53,18 +53,13 @@ struct Triangle3D {
         area(), t1.area() + t2.area() + t3.area(), abs_tol, rel_tol);
   }
 
-  bool intersectsInPlane(
-      const Triangle3D<T>& other,
-      T abs_tol = comparator::absoluteTolerance<T>(),
-      T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
-    return contains(other.a_, abs_tol, rel_tol) ||
-           contains(other.b_, abs_tol, rel_tol) ||
-           contains(other.c_, abs_tol, rel_tol);
+  bool intersectsInPlane(const Triangle3D<T>& other) const noexcept {
+    return contains(other.a_) ||
+           contains(other.b_) ||
+           contains(other.c_);
   }
 
-  bool intersects(const Triangle3D<T>& other,
-                  T abs_tol = comparator::absoluteTolerance<T>(),
-                  T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
+  bool intersects(const Triangle3D<T>& other) const noexcept {
     auto copy(*this);
     auto other_copy(other);
     auto this_p = Plane<T>(copy.a_, copy.b_, copy.c_);
@@ -74,15 +69,15 @@ struct Triangle3D {
       if (!this_p.valid()) {
         auto this_seg = copy.toSegment();
         auto other_seg = other_copy.toSegment();
-        return this_seg.intersects(other_seg, abs_tol, rel_tol);
+        return this_seg.intersects(other_seg);
       }
       std::swap(other_copy, copy);
       std::swap(other_p, this_p);
     }
 
     // planes are coincident with floating point tolerance
-    if (this_p.isClose(other_p, abs_tol, rel_tol)) {
-      return copy.intersectsInPlane(other, abs_tol, rel_tol);
+    if (this_p.isClose(other_p)) {
+      return copy.intersectsInPlane(other);
     }
 
     auto ab = Segment3D<T>{copy.a_, copy.b_};
@@ -93,9 +88,9 @@ struct Triangle3D {
     auto bci = other_p.getIntersectionPoint(bc);
     auto aci = other_p.getIntersectionPoint(ac);
 
-    return other_copy.contains(abi, abs_tol, rel_tol) ||
-           other_copy.contains(bci, abs_tol, rel_tol) ||
-           other_copy.contains(aci, abs_tol, rel_tol);
+    return other_copy.contains(abi) ||
+           other_copy.contains(bci) ||
+           other_copy.contains(aci);
   }
 };
 
