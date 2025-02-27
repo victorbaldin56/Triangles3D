@@ -21,10 +21,12 @@ struct Vector3D {
   T norm2() const noexcept { return x_ * x_ + y_ * y_ + z_ * z_; }
   T norm() const noexcept { return std::sqrt(norm2()); }
 
-  bool equal(const Vector3D<T>& other) const noexcept {
-    return comparator::isClose(x_, other.x_) &&
-           comparator::isClose(y_, other.y_) &&
-           comparator::isClose(z_, other.z_);
+  bool isClose(const Vector3D<T>& other,
+               T abs_tol = comparator::absTolerance<T>(),
+               T rel_tol = comparator::relTolerance<T>()) const noexcept {
+    return comparator::isClose(x_, other.x_, abs_tol, rel_tol) &&
+           comparator::isClose(y_, other.y_, abs_tol, rel_tol) &&
+           comparator::isClose(z_, other.z_, abs_tol, rel_tol);
   }
 
   Vector3D<T>& operator+=(const Vector3D<T>& rhs) noexcept {
@@ -116,7 +118,7 @@ T tripleProduct(const Vector3D<T>& a, const Vector3D<T>& b,
 
 template <typename T>
 bool collinear(const Vector3D<T>& a, const Vector3D<T>& b) noexcept {
-  return crossProduct(a, b).equal(Vector3D<T>::zeroVector());
+  return crossProduct(a, b).isClose(Vector3D<T>::zeroVector());
 }
 
 template <typename T>

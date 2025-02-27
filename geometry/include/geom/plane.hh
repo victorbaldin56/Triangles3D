@@ -46,19 +46,37 @@ class Plane {
                line.direction();
   }
 
-  Vector3D<T> getIntersectionPoint(const Segment3D<T>& seg) const noexcept {
+  Vector3D<T> getIntersectionPoint(
+      const Segment3D<T>& seg,
+      T abs_tol = comparator::absTolerance<T>(),
+      T rel_tol = comparator::relTolerance<T>()) const noexcept {
     Line3D<T> l = seg.line();
+    if (!l.valid()) {
+      if (contains(seg.begin_)) {
+        return seg.begin_;  // segment decays to point
+      }
+    }
     auto p = getIntersectionPoint(l);
     auto range = seg.getRange();
-    if (range.contains(p)) {
+    if (range.contains(p, abs_tol, rel_tol)) {
       return p;
     }
     return Vector3D<T>();
   }
 
-  bool equal(const Plane<T>& other) const noexcept {
-    return (n_.equal(other.n_) && comparator::isClose(d_, other.d_)) ||
-           (n_.equal(-other.n_) && comparator::isClose(d_, -other.d_));
+  bool contains(const Vector3D<T>& p,
+                T abs_tol = comparator::absTolerance<T>(),
+                T rel_tol = comparator::relTolerance<T>()) const noexcept {
+    return comparator::isClose(dot(p, n_), d_, abs_tol, rel_tol);
+  }
+
+  bool isClose(const Plane<T>& other,
+               T abs_tol = comparator::absTolerance<T>(),
+               T rel_tol = comparator::relTolerance<T>()) const noexcept {
+    return (n_.isClose(other.n_, abs_tol, rel_tol) &&
+            comparator::isClose(d_, other.d_, abs_tol, rel_tol)) ||
+           (n_.isClose(-other.n_, abs_tol, rel_tol) &&
+            comparator::isClose(d_, -other.d_, abs_tol, rel_tol));
   }
 };
 

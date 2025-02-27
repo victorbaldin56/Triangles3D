@@ -13,7 +13,7 @@ inline T absTolerance() noexcept {
 template <typename T>
 inline T relTolerance() noexcept {
   return std::numeric_limits<T>::is_exact ? static_cast<T>(0)
-                                          : static_cast<T>(1e-3);
+                                          : static_cast<T>(1e-5);
 }
 
 template <typename T>

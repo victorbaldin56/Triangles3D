@@ -10,13 +10,15 @@ struct Range3D {
   T min_y, max_y;  // min_y >= max_y means empty range
   T min_z, max_z;  // min_z >= max_z means empty range
 
-  bool contains(const Vector3D<T>& p) noexcept {
-    return comparator::isLessClose(min_x, p.x_) &&
-           comparator::isLessClose(p.x_, max_x) &&
-           comparator::isLessClose(min_y, p.y_) &&
-           comparator::isLessClose(p.y_, max_y) &&
-           comparator::isLessClose(min_z, p.z_) &&
-           comparator::isLessClose(p.z_, max_z);
+  bool contains(const Vector3D<T>& p,
+                T abs_tol = comparator::absTolerance<T>(),
+                T rel_tol = comparator::relTolerance<T>()) const noexcept {
+    return comparator::isLessClose(min_x, p.x_, abs_tol, rel_tol) &&
+           comparator::isLessClose(p.x_, max_x, abs_tol, rel_tol) &&
+           comparator::isLessClose(min_y, p.y_, abs_tol, rel_tol) &&
+           comparator::isLessClose(p.y_, max_y, abs_tol, rel_tol) &&
+           comparator::isLessClose(min_z, p.z_, abs_tol, rel_tol) &&
+           comparator::isLessClose(p.z_, max_z, abs_tol, rel_tol);
   }
 };
 

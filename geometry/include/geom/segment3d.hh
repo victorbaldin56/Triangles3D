@@ -12,18 +12,24 @@ struct Segment3D {
 
   Line3D<T> line() const noexcept { return Line3D<T>(end_ - begin_, begin_); }
 
-  bool intersectsLine(const Line3D<T>& l) const noexcept {
+  bool intersectsLine(
+      const Line3D<T>& l,
+      T abs_tol = comparator::absTolerance<T>(),
+      T rel_tol = comparator::relTolerance<T>()) const noexcept {
     Line3D<T> this_line = line();
     Vector3D<T> intersection_point = this_line.getIntersectionPoint(l);
 
     if (!intersection_point.valid()) {
       return false;
     }
-    return getRange().contains(intersection_point);
+    return getRange().contains(intersection_point, abs_tol, rel_tol);
   }
 
-  bool intersects(const Segment3D<T>& other) const noexcept {
-    return intersectsLine(other.line()) && other.intersectsLine(line());
+  bool intersects(const Segment3D<T>& other,
+                  T abs_tol = comparator::absTolerance<T>(),
+                  T rel_tol = comparator::relTolerance<T>()) const noexcept {
+    return intersectsLine(other.line(), abs_tol, rel_tol) &&
+           other.intersectsLine(line(), abs_tol, rel_tol);
   }
 
   /**

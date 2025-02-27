@@ -29,18 +29,15 @@ class Line3D {
     T triple_product =
         tripleProduct(origin_ - other.origin_, direction_, other.direction_);
 
-    // skew lines
-    if (!comparator::isClose(triple_product, static_cast<T>(0))) {
-      return Vector3D<T>{};
-    }
-
     Vector3D<T> dir_cross = crossProduct(direction_, other.direction_);
     Vector3D<T> origin_cross = crossProduct(origin_, other.origin_);
     return origin_ +
            direction_ * dot(dir_cross, origin_cross) / dir_cross.norm2();
   }
 
-  bool equal(const Line3D<T>& other) noexcept {
+  bool isClose(const Line3D<T>& other,
+               T abs_tol = comparator::absTolerance<T>(),
+               T rel_tol = comparator::relTolerance<T>()) const noexcept {
     return collinear(direction_, other.direction_) &&
            collinear(origin_ - other.origin_, direction_);
   }
