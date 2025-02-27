@@ -12,7 +12,7 @@ class Line3D {
   Line3D() {}
   Line3D(const Vector3D<T>& direction, const Vector3D<T>& origin)
       : direction_{direction}, origin_{origin} {
-    direction_.normalize();
+    direction_.normalize();  // same reason as for Plane3D
   }
 
   // getters

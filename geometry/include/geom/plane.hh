@@ -15,7 +15,10 @@ class Plane {
  public:
   Plane() {}
   Plane(const Vector3D<T>& a, const Vector3D<T>& b, const Vector3D<T>& c)
-      : n_{crossProduct(a - b, a - c).normalize()}, d_{dot(n_, a)} {}
+      : n_{crossProduct(a - b, a - c).normalize()},
+        // normalization applied here to make easier comparison between planes
+        // and make plane with zero normal vector invalid in place
+        d_{dot(n_, a)} {}
 
   // getters
  public:
