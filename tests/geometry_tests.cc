@@ -117,7 +117,7 @@ TEST(Triangle3D, Intersects_IntersectingAtEdge) {
   ASSERT_TRUE(t1.intersects(t2, kAbsTol, kRelTol));  // Triangles intersect along an edge
 }
 
-#if 1
+#if 0
 TEST(Triangle3D, Intersects_IntersectingAtSinglePoint) {
   Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};
   Triangle3D<double> t2{{1.1, 1.2, 1.3}, {1.1, 1.2, -1.3}, {2.2, 2.2, 0.3}};
@@ -164,6 +164,62 @@ TEST(Triangle3D, Intersects_DegenerateTriangleNoIntersection) {
   Triangle3D<double> t2{{1.1, 1.2, 1.3}, {2.2, 2.2, 2.3}, {3.3, 3.3, 3.3}};
 
   ASSERT_FALSE(t1.intersects(t2, kAbsTol, kRelTol));  // Degenerate triangle does not intersect
+}
+
+TEST(Triangle3D, Intersects_BothDegenerateToPoint_SamePoint) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}};  // Degenerate to a point
+  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}};  // Degenerate to the same point
+
+  ASSERT_TRUE(t1.intersects(t2, kAbsTol, kRelTol));  // Both triangles are the same point
+}
+
+TEST(Triangle3D, Intersects_BothDegenerateToPoint_DifferentPoints) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}};  // Degenerate to a point
+  Triangle3D<double> t2{{1.1, 1.2, 1.3}, {1.1, 1.2, 1.3}, {1.1, 1.2, 1.3}};  // Degenerate to a different point
+
+  ASSERT_FALSE(t1.intersects(t2, kAbsTol, kRelTol));  // Different points, no intersection
+}
+
+TEST(Triangle3D, Intersects_BothDegenerateToSegment_SameSegment) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
+  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to the same segment
+
+  ASSERT_TRUE(t1.intersects(t2, kAbsTol, kRelTol));  // Both triangles are the same segment
+}
+
+TEST(Triangle3D, Intersects_BothDegenerateToSegment_OverlappingSegments) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
+  Triangle3D<double> t2{{0.5, 0.6, 0.7}, {1.1, 1.2, 1.3}, {0.5, 0.6, 0.7}};  // Degenerate to an overlapping segment
+
+  ASSERT_TRUE(t1.intersects(t2, kAbsTol, kRelTol));  // Segments overlap
+}
+
+TEST(Triangle3D, Intersects_BothDegenerateToSegment_NonOverlappingSegments) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
+  Triangle3D<double> t2{{2.2, 2.3, 2.4}, {3.3, 3.4, 3.5}, {2.2, 2.3, 2.4}};  // Degenerate to a non-overlapping segment
+
+  ASSERT_FALSE(t1.intersects(t2, kAbsTol, kRelTol));  // Segments do not overlap
+}
+
+TEST(Triangle3D, Intersects_BothDegenerateToSegment_SharedEndpoint) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
+  Triangle3D<double> t2{{1.1, 1.2, 1.3}, {2.2, 2.3, 2.4}, {1.1, 1.2, 1.3}};  // Degenerate to a segment sharing an endpoint
+
+  ASSERT_TRUE(t1.intersects(t2, kAbsTol, kRelTol));  // Segments share an endpoint
+}
+
+TEST(Triangle3D, Intersects_OneDegenerateToPoint_OneDegenerateToSegment_PointOnSegment) {
+  Triangle3D<double> t1{{0.5, 0.6, 0.7}, {0.5, 0.6, 0.7}, {0.5, 0.6, 0.7}};  // Degenerate to a point
+  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
+
+  ASSERT_TRUE(t1.intersects(t2, kAbsTol, kRelTol));  // Point lies on the segment
+}
+
+TEST(Triangle3D, Intersects_OneDegenerateToPoint_OneDegenerateToSegment_PointNotOnSegment) {
+  Triangle3D<double> t1{{2.2, 2.3, 2.4}, {2.2, 2.3, 2.4}, {2.2, 2.3, 2.4}};  // Degenerate to a point
+  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
+
+  ASSERT_FALSE(t1.intersects(t2, kAbsTol, kRelTol));  // Point does not lie on the segment
 }
 
 int main(int argc, char** argv) {

@@ -11,25 +11,56 @@ struct Segment3D {
   Vector3D<T> end_;
 
   Line3D<T> line() const noexcept { return Line3D<T>(end_ - begin_, begin_); }
-
-  bool intersectsLine(
+  Vector3D<T> getIntersectionPoint(
       const Line3D<T>& l,
       T abs_tol = comparator::absTolerance<T>(),
       T rel_tol = comparator::relTolerance<T>()) const noexcept {
-    Line3D<T> this_line = line();
-    Vector3D<T> intersection_point = this_line.getIntersectionPoint(l);
-
-    if (!intersection_point.valid()) {
-      return false;
+    auto this_line = line();
+    if (!this_line.valid()) {
+      if (l.contains(begin_)) {
+        return begin_;
+      }
+      return Vector3D<T>{};
     }
-    return getRange().contains(intersection_point, abs_tol, rel_tol);
+
+    auto intersection_point = this_line.getIntersectionPoint(l);
+    if (getRange().contains(intersection_point, abs_tol, rel_tol)) {
+      return intersection_point;
+    }
+    return Vector3D<T>{};
+  }
+
+  bool intersectsOnLine(
+      const Segment3D<T>& other,
+      T abs_tol = comparator::absTolerance<T>(),
+      T rel_tol = comparator::relTolerance<T>()) const noexcept {
+    auto range = getRange();
+    return range.contains(other.begin_, abs_tol, rel_tol) ||
+           range.contains(other.end_, abs_tol, rel_tol);
   }
 
   bool intersects(const Segment3D<T>& other,
                   T abs_tol = comparator::absTolerance<T>(),
                   T rel_tol = comparator::relTolerance<T>()) const noexcept {
-    return intersectsLine(other.line(), abs_tol, rel_tol) &&
-           other.intersectsLine(line(), abs_tol, rel_tol);
+    auto copy(*this);
+    auto other_copy(other);
+    auto this_line = copy.line();
+    auto other_line = other_copy.line();
+
+    if (!other_line.valid()) {
+      if (!this_line.valid()) {
+        return copy.begin_.isClose(other_copy.begin_, abs_tol, rel_tol);
+      }
+      std::swap(other_copy, copy);
+      std::swap(other_line, this_line);
+    }
+
+    if (this_line.isClose(other_line, abs_tol, rel_tol)) {
+      return intersectsOnLine(other_copy, abs_tol, rel_tol);
+    }
+
+    auto intersection = getIntersectionPoint(other_line, abs_tol, rel_tol);
+    return other_copy.getRange().contains(intersection, abs_tol, rel_tol);
   }
 
   /**

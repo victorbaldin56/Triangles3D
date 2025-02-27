@@ -117,7 +117,9 @@ T tripleProduct(const Vector3D<T>& a, const Vector3D<T>& b,
 }
 
 template <typename T>
-bool collinear(const Vector3D<T>& a, const Vector3D<T>& b) noexcept {
+bool collinear(const Vector3D<T>& a, const Vector3D<T>& b,
+               T abs_tol = comparator::absTolerance<T>(),
+               T rel_tol = comparator::relTolerance<T>()) noexcept {
   return crossProduct(a, b).isClose(Vector3D<T>::zeroVector());
 }
 

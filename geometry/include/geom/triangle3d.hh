@@ -29,15 +29,6 @@ struct Triangle3D {
   }
 
   bool isDegenerate() const noexcept { return Plane<T>(a_, b_, c_).valid(); }
-
-  bool intersectsLine(const Line3D<T>& line) const noexcept {
-    Segment3D<T> ab = {a_, b_};
-    Segment3D<T> bc = {b_, c_};
-    Segment3D<T> ac = {a_, c_};
-    return ab.intersectsLine(line) || bc.intersectsLine(line) ||
-           ac.intersectsLine(line);
-  }
-
   T area() const { return crossProduct(a_ - b_, a_ - c_).norm() / 2; }
 
   /**

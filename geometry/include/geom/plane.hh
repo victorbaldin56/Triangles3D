@@ -55,6 +55,7 @@ class Plane {
       if (contains(seg.begin_)) {
         return seg.begin_;  // segment decays to point
       }
+      return Vector3D<T>{};
     }
     auto p = getIntersectionPoint(l);
     auto range = seg.getRange();
