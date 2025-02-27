@@ -44,8 +44,8 @@ struct Triangle3D {
   }
 
   bool contains(const Vector3D<T>& point,
-                T abs_tol = comparator::absTolerance<T>(),
-                T rel_tol = comparator::relTolerance<T>()) const noexcept {
+                T abs_tol = comparator::absoluteTolerance<T>(),
+                T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     Triangle3D<T> t1 = {a_, b_, point};
     Triangle3D<T> t2 = {b_, c_, point};
     Triangle3D<T> t3 = {a_, c_, point};
@@ -55,16 +55,16 @@ struct Triangle3D {
 
   bool intersectsInPlane(
       const Triangle3D<T>& other,
-      T abs_tol = comparator::absTolerance<T>(),
-      T rel_tol = comparator::relTolerance<T>()) const noexcept {
+      T abs_tol = comparator::absoluteTolerance<T>(),
+      T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     return contains(other.a_, abs_tol, rel_tol) ||
            contains(other.b_, abs_tol, rel_tol) ||
            contains(other.c_, abs_tol, rel_tol);
   }
 
   bool intersects(const Triangle3D<T>& other,
-                  T abs_tol = comparator::absTolerance<T>(),
-                  T rel_tol = comparator::relTolerance<T>()) const noexcept {
+                  T abs_tol = comparator::absoluteTolerance<T>(),
+                  T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     auto copy(*this);
     auto other_copy(other);
     auto this_p = Plane<T>(copy.a_, copy.b_, copy.c_);

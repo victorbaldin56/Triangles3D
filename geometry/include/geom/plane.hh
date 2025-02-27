@@ -48,8 +48,8 @@ class Plane {
 
   Vector3D<T> getIntersectionPoint(
       const Segment3D<T>& seg,
-      T abs_tol = comparator::absTolerance<T>(),
-      T rel_tol = comparator::relTolerance<T>()) const noexcept {
+      T abs_tol = comparator::absoluteTolerance<T>(),
+      T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     Line3D<T> l = seg.line();
     if (!l.valid()) {
       if (contains(seg.begin_)) {
@@ -66,14 +66,14 @@ class Plane {
   }
 
   bool contains(const Vector3D<T>& p,
-                T abs_tol = comparator::absTolerance<T>(),
-                T rel_tol = comparator::relTolerance<T>()) const noexcept {
+                T abs_tol = comparator::absoluteTolerance<T>(),
+                T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     return comparator::isClose(dot(p, n_), d_, abs_tol, rel_tol);
   }
 
   bool isClose(const Plane<T>& other,
-               T abs_tol = comparator::absTolerance<T>(),
-               T rel_tol = comparator::relTolerance<T>()) const noexcept {
+               T abs_tol = comparator::absoluteTolerance<T>(),
+               T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     return (n_.isClose(other.n_, abs_tol, rel_tol) &&
             comparator::isClose(d_, other.d_, abs_tol, rel_tol)) ||
            (n_.isClose(-other.n_, abs_tol, rel_tol) &&

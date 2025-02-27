@@ -1,101 +1,194 @@
 #pragma once
 
 #include <array>
-#include <numeric>
+#include <iterator>
+#include <list>
+#include <memory>
 #include <set>
-#include <utility>
-#include <vector>
+#include <stack>
+#include <type_traits>
 
-#include "vector3d.hh"
+#include "range3d.hh"
+#include "triangle3d.hh"
 
 namespace geometry {
 
-// TODO: без рекурсии
-// TODO: минимизировать raw pointers use
-template <typename FigureT, typename Container = std::vector<FigureT>>
-class Octree {
- public:
-  using Iterator = typename Container::iterator;
-  using CIterator = typename Container::const_iterator;
+template <typename T>
+class Octree final {
+  struct Node;
+
+  using pNode = std::shared_ptr<Node>;
+  using InternalContainer = std::list<std::pair<Triangle3D<T>, std::size_t>>;
 
  private:
-  const Container cont_;
+  struct Node final {
+    Range3D<T> coords_;
+    InternalContainer triangles_;
+    pNode parent_;
+    std::array<pNode, 8> children_;
+    mutable std::stack<pNode> node_stack_;
+    bool valid_;
 
- public:
-  // copy-constructs the underlying container
-  explicit Octree(const Container& cont = Container{}) : cont_{cont} {
-    constructTree();
-  }
+    void divide() {
+      node_stack_.push(pNode(this));
 
-  // move-constructs the underlying container
-  explicit Octree(Container&& cont) noexcept : cont_{cont} { constructTree(); }
+      while (!node_stack_.empty()) {
+        auto current_node = node_stack_.top();
+        node_stack_.pop();
 
-  std::set<std::size_t> getIntersectingFigures() const {
-    std::set<std::size_t> res;
-    root_->getIntersectingFigures(res);
-    return res;
-  }
+        if (current_node->triangles_.empty()) {
+          continue;
+        }
 
-  ~Octree() { delete root_; }
+        Range3D<T> new_coords = coords_;
+        for (auto i = 0; i < 8; ++i) {
+          if (i & 0x1) {
+            new_coords.min_x_ += coords_.dimX() / 2;
+          } else {
+            new_coords.max_x_ -= coords_.dimX() / 2;
+          }
 
- private:
-  struct Parallelepiped {
-    NumType x_min_, x_max_;
-    NumType y_min_, y_max_;
-    NumType z_min_, z_max_;
-  };
+          if (i & 0x3) {
+            new_coords.min_y_ += coords_.dimY() / 2;
+          } else {
+            new_coords.max_y_ -= coords_.dimY() / 2;
+          }
 
-  struct Node {
-    Parallelepiped coords_;
+          if (i & 0x7) {
+            new_coords.min_z_ += coords_.dimZ() / 2;
+          } else {
+            new_coords.max_z_ -= coords_.dimZ() / 2;
+          }
 
-    Node* parent_;
-    std::array<Node*, 8> children_{};
+          children_[i] =
+              std::make_shared<Node>(
+                  new_coords, InternalContainer(), current_node);
+        }
 
-    void getIntersectingFigures(std::set<std::size_t>& res) {
-      for (int i = 0; i < 8; ++i) {
-        children_[i]->getIntersectingFigures(res);
+        for (auto it = triangles_.begin(); it != triangles_.end(); ++it) {
+          std::find_if(children_.begin(), children_.end(),
+                       [it, current_node, this](auto& ch) {
+            auto tr = it->first;
+
+            if (ch->coords_.contains(tr.getRange())) {
+              ch->triangles_.push_back(tr);
+              ch->valid = true;
+              node_stack_.push(ch);
+              it = current_node->triangles_.erase(it);
+              return true;
+            }
+            return false;
+          });
+        }
       }
     }
 
-    ~Node() {
-      for (int i = 0; i < 8; ++i) {
-        delete children_[i];
+    void getIntersectionsAmongChildren(
+        std::set<std::size_t>& res,
+        const std::pair<Triangle3D<T>, std::size_t>& triangle) const {
+      if (!valid_) {
+        return;
+      }
+
+      node_stack_.push(pNode(this));
+
+      while (!node_stack_.empty()) {
+        auto current_node = node_stack_.top();
+        node_stack_.pop();
+
+        std::for_each(children_.begin(), children_.end(),
+                     [this, triangle, res](const auto& ch) {
+          if (ch->valid_) {
+            std::for_each(triangles_.begin(), triangles_.end(),
+                          [triangle, res](const auto& other) {
+              if (other.first.intersects(triangle.first)) {
+                res.insert(other.second);
+                res.insert(triangle.second);
+              }
+            });
+
+            node_stack_.push(ch);
+          }
+        });
+      }
+    }
+
+    std::set<std::size_t> getIntersections() const {
+      auto res = std::set<std::size_t>();
+
+      while (!node_stack_.empty()) {
+        auto current_node = node_stack_.top();
+        node_stack_.pop();
+
+        for (auto it = triangles_.begin(); it != triangles_.end(); ++it) {
+          auto tr1 = *it;
+          for (auto jt = it + 1; jt != triangles_.end(); ++jt) {
+            auto tr2 = *jt;
+            if (tr1.first.intersects(tr2.first)) {
+              res.insert(tr1.second);
+              res.insert(tr2.second);
+            }
+          }
+
+          getIntersectionsAmongChildren(res, tr1.fisrt);
+        }
+
+        std::for_each(children_.cbegin(), children_.cend(),
+                      [this](const auto& ch) {
+          if (ch->valid_) {
+            node_stack_.push(ch);
+          }
+        });
       }
     }
   };
 
-  Node* root_ = nullptr;
+ public:
+  template <
+      typename It,
+      typename
+          = std::enable_if<std::is_base_of_v<std::input_iterator_tag, It>>>
+  Octree(It begin, It end) {
+    auto range = begin->getRange();
+    InternalContainer triangles;
 
-  Parallelepiped getEdges() const {
-    NumType min_init = std::numeric_limits<NumType>::max();
-    NumType max_init = std::numeric_limits<NumType>::min();
+    std::size_t count = 0;
+    for (auto it = begin; it != end; ++it) {
+      auto cur = it->getRange();
 
-    Parallelepiped res{min_init, max_init, min_init,
-                       max_init, min_init, max_init};
+      if (cur.min_x_ < range.min_x_) {
+        range.min_x_ = cur.min_x_;
+      }
+      if (range.max_x_ < cur.max_x_) {
+        range.max_x_ = cur.max_x_;
+      }
 
-    for (auto& f : cont_) {
-      NumType x_min = f.minX();
-      NumType x_max = f.maxX();
-      NumType y_min = f.minY();
-      NumType y_max = f.maxY();
-      NumType z_min = f.minZ();
-      NumType z_max = f.maxZ();
+      if (cur.min_y_ < range.min_y_) {
+        range.min_y_ = cur.min_y_;
+      }
+      if (range.max_y_ < cur.max_y_) {
+        range.max_y_ = cur.max_y_;
+      }
 
-      res.x_min_ = (x_min < res.x_min_ ? x_min : res.x_min_);
-      res.x_max_ = (x_max > res.x_max_ ? x_max : res.x_max_);
-      res.y_min_ = (y_min < res.y_min_ ? y_min : res.y_min_);
-      res.y_max_ = (y_max > res.y_max_ ? y_max : res.y_max_);
-      res.z_min_ = (z_min < res.z_min_ ? z_min : res.z_min_);
-      res.z_max_ = (z_max > res.z_max_ ? x_min : res.z_max_);
+      if (cur.min_z_ < range.min_z_) {
+        range.min_z_ = cur.min_z_;
+      }
+      if (range.max_x_ < cur.max_x_) {
+        range.max_z_ = cur.max_z_;
+      }
+      triangles.push_back(std::make_pair(*it, count++));
     }
 
-    return res;
+    root_ = {.coords_ = range, .triangles_ = triangles, .valid_ = true};
+    root_.divide();
   }
 
-  void constructTree() {
-    Parallelepiped edges = getEdges();
-    root_ = new Node{edges};
+  std::set<std::size_t> getIntersections() const {
+    return root_.getIntersections();
   }
+
+ private:
+  Node root_;
 };
 
 }  // namespace geometry

@@ -22,8 +22,8 @@ struct Vector3D {
   T norm() const noexcept { return std::sqrt(norm2()); }
 
   bool isClose(const Vector3D<T>& other,
-               T abs_tol = comparator::absTolerance<T>(),
-               T rel_tol = comparator::relTolerance<T>()) const noexcept {
+               T abs_tol = comparator::absoluteTolerance<T>(),
+               T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     return comparator::isClose(x_, other.x_, abs_tol, rel_tol) &&
            comparator::isClose(y_, other.y_, abs_tol, rel_tol) &&
            comparator::isClose(z_, other.z_, abs_tol, rel_tol);
@@ -118,8 +118,8 @@ T tripleProduct(const Vector3D<T>& a, const Vector3D<T>& b,
 
 template <typename T>
 bool collinear(const Vector3D<T>& a, const Vector3D<T>& b,
-               T abs_tol = comparator::absTolerance<T>(),
-               T rel_tol = comparator::relTolerance<T>()) noexcept {
+               T abs_tol = comparator::absoluteTolerance<T>(),
+               T rel_tol = comparator::relativeTolerance<T>()) noexcept {
   return crossProduct(a, b).isClose(Vector3D<T>::zeroVector());
 }
 

@@ -13,8 +13,8 @@ struct Segment3D {
   Line3D<T> line() const noexcept { return Line3D<T>(end_ - begin_, begin_); }
   Vector3D<T> getIntersectionPoint(
       const Line3D<T>& l,
-      T abs_tol = comparator::absTolerance<T>(),
-      T rel_tol = comparator::relTolerance<T>()) const noexcept {
+      T abs_tol = comparator::absoluteTolerance<T>(),
+      T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     auto this_line = line();
     if (!this_line.valid()) {
       if (l.contains(begin_)) {
@@ -32,16 +32,16 @@ struct Segment3D {
 
   bool intersectsOnLine(
       const Segment3D<T>& other,
-      T abs_tol = comparator::absTolerance<T>(),
-      T rel_tol = comparator::relTolerance<T>()) const noexcept {
+      T abs_tol = comparator::absoluteTolerance<T>(),
+      T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     auto range = getRange();
     return range.contains(other.begin_, abs_tol, rel_tol) ||
            range.contains(other.end_, abs_tol, rel_tol);
   }
 
   bool intersects(const Segment3D<T>& other,
-                  T abs_tol = comparator::absTolerance<T>(),
-                  T rel_tol = comparator::relTolerance<T>()) const noexcept {
+                  T abs_tol = comparator::absoluteTolerance<T>(),
+                  T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     auto copy(*this);
     auto other_copy(other);
     auto this_line = copy.line();

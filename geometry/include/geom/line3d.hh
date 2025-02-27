@@ -25,8 +25,8 @@ class Line3D {
  public:
   bool valid() const noexcept { return direction_.valid() && origin_.valid(); }
   bool contains(const Vector3D<T>& p,
-                T abs_tol = comparator::absTolerance<T>(),
-                T rel_tol = comparator::relTolerance<T>()) const noexcept {
+                T abs_tol = comparator::absoluteTolerance<T>(),
+                T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     return collinear(p - origin_, direction_, abs_tol, rel_tol);
   }
 
@@ -41,8 +41,8 @@ class Line3D {
   }
 
   bool isClose(const Line3D<T>& other,
-               T abs_tol = comparator::absTolerance<T>(),
-               T rel_tol = comparator::relTolerance<T>()) const noexcept {
+               T abs_tol = comparator::absoluteTolerance<T>(),
+               T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
     return collinear(direction_, other.direction_, abs_tol, rel_tol) &&
            collinear(origin_ - other.origin_, direction_, abs_tol, rel_tol);
   }
