@@ -13,7 +13,8 @@ class Triangles3DRecipe(ConanFile):
   def requirements(self):
     if self.options.testing:
       self.test_requires("gtest/1.15.0")
-      pip.main(['install', 'trimesh==4.6.3', 'numpy==2.2.0'])
+      self.test_requires("cgal/6.0.1")
+      pip.main(['install', 'numpy==2.2.0'])
 
   def generate(self):
     # Customize CMakeToolchain in the generate() method

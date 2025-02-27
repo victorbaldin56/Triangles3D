@@ -62,17 +62,17 @@ class Octree final {
 
           children_[i] =
               std::make_shared<Node>(
-                  new_coords, InternalContainer(), current_node);
+                  {new_coords, InternalContainer(), current_node});
         }
 
         for (auto it = triangles_.begin(); it != triangles_.end(); ++it) {
-          std::find_if(children_.begin(), children_.end(),
-                       [it, current_node, this](auto& ch) {
+          (void)std::find_if(children_.begin(), children_.end(),
+                             [&it, current_node, this](auto& ch) {
             auto tr = it->first;
 
             if (ch->coords_.contains(tr.getRange())) {
               ch->triangles_.push_back(tr);
-              ch->valid = true;
+              ch->valid_ = true;
               node_stack_.push(ch);
               it = current_node->triangles_.erase(it);
               return true;
@@ -120,10 +120,13 @@ class Octree final {
         auto current_node = node_stack_.top();
         node_stack_.pop();
 
-        for (auto it = triangles_.begin(); it != triangles_.end(); ++it) {
+        for (auto it = triangles_.cbegin(); it != triangles_.cend(); ++it) {
           auto tr1 = *it;
-          for (auto jt = it + 1; jt != triangles_.end(); ++jt) {
+          for (auto jt = it; jt != triangles_.cend(); ++jt) {
             auto tr2 = *jt;
+            if (tr1.second == tr2.second) {
+              continue;
+            }
             if (tr1.first.intersects(tr2.first)) {
               res.insert(tr1.second);
               res.insert(tr2.second);
