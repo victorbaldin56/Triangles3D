@@ -18,11 +18,8 @@ class Line3D {
   // getters
  public:
   const Vector3D<T>& direction() const& { return direction_; }
-
   Vector3D<T>&& direction() && { return direction_; }
-
   const Vector3D<T>& origin() const& { return origin_; }
-
   Vector3D<T>&& origin() && { return origin_; }
 
  public:
