@@ -1,5 +1,4 @@
-#ifndef TRIANGLES_3D_GEOMETRY_TRIANGLE_3D_HH_
-#define TRIANGLES_3D_GEOMETRY_TRIANGLE_3D_HH_
+#pragma once
 
 #include <algorithm>
 
@@ -107,4 +106,3 @@ std::ostream& operator<<(std::ostream& os, const Triangle3D<T>& t) {
 
 }
 
-#endif // TRIANGLES_3D_GEOMETRY_TRIANGLE_3D_HH_

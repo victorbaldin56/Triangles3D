@@ -1,5 +1,4 @@
-#ifndef TRIANGLES_3D_GEOMETRY_PLANE_HH_
-#define TRIANGLES_3D_GEOMETRY_PLANE_HH_
+#pragma once
 
 #include "vector3d.hh"
 #include "line3d.hh"
@@ -71,4 +70,3 @@ class Plane {
 
 }
 
-#endif // TRIANGLES_3D_GEOMETRY_PLANE_HH_

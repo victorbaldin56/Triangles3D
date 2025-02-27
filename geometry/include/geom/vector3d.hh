@@ -1,5 +1,4 @@
-#ifndef TRIANGLES_3D_GEOMETRY_VECTOR_3D_HH_
-#define TRIANGLES_3D_GEOMETRY_VECTOR_3D_HH_
+#pragma once
 
 #include <cmath>
 #include <type_traits>
@@ -146,4 +145,3 @@ std::ostream& operator<<(std::ostream& os, const Vector3D<T>& v) {
 
 }
 
-#endif // TRIANGLES_3D_GEOMETRY_VECTOR_3D_HH_

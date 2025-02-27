@@ -1,5 +1,4 @@
-#ifndef TRIANGLES_3D_GEOMETRY_OCTREE_HH_
-#define TRIANGLES_3D_GEOMETRY_OCTREE_HH_
+#pragma once
 
 #include <array>
 #include <numeric>
@@ -107,4 +106,3 @@ class Octree {
 
 }
 
-#endif // TRIANGLES_3D_GEOMETRY_OCTREE_HH_

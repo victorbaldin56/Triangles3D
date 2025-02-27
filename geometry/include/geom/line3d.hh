@@ -1,5 +1,4 @@
-#ifndef TRIANGLES_3D_GEOMETRY_LINE_3D_HH_
-#define TRIANGLES_3D_GEOMETRY_LINE_3D_HH_
+#pragma once
 
 #include "vector3d.hh"
 
@@ -61,4 +60,3 @@ class Line3D {
 
 }
 
-#endif // TRIANGLES_3D_GEOMETRY_LINE_3D_HH_

@@ -1,5 +1,4 @@
-#ifndef TRIANGLES_3D_GEOMETRY_SEGMENT_3D_HH_
-#define TRIANGLES_3D_GEOMETRY_SEGMENT_3D_HH_
+#pragma once
 
 #include "line3d.hh"
 #include "range3d.hh"
@@ -20,16 +19,6 @@ struct Segment3D {
     if (!intersection_point.valid()) {
       return false;
     }
-
-    T x_min = std::min(begin_.x_, end_.x_),
-      x_max = std::max(begin_.x_, end_.x_);
-
-    T y_min = std::min(begin_.y_, end_.y_),
-      y_max = std::max(begin_.y_, end_.y_);
-
-    T z_min = std::min(begin_.z_, end_.z_),
-      z_max = std::max(begin_.z_, end_.z_);
-
     return getRange().contains(intersection_point);
   }
 
@@ -37,6 +26,9 @@ struct Segment3D {
     return intersectsLine(other.line()) && other.intersectsLine(line());
   }
 
+  /**
+   * Returns Range3D built on current segment as on main diagonal.
+   */
   Range3D<T> getRange() const {
     return {std::min(begin_.x_, end_.x_), std::max(begin_.x_, end_.x_),
             std::min(begin_.y_, end_.y_), std::max(begin_.y_, end_.y_),
@@ -46,4 +38,3 @@ struct Segment3D {
 
 }
 
-#endif // TRIANGLES_3D_GEOMETRY_SEGMENT_3D_HH_
