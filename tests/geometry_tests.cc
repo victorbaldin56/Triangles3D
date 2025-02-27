@@ -145,7 +145,7 @@ TEST(Triangle3D, Intersects_NonCoplanarNoIntersection) {
       t1.intersects(t2));  // Non-coplanar triangles with no intersection
 }
 
-#if 0
+#if 1
 TEST(Triangle3D, Intersects_DegenerateTriangle) {
   Triangle3D<double> t1{{0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}};  // Degenerate triangle (a point)
   Triangle3D<double> t2{{0.1, 0.2, 0.3}, {1.1, 0.2, 0.3}, {0.1, 1.2, 0.3}};

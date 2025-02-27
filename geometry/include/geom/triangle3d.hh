@@ -11,20 +11,24 @@ template <typename T>
 struct Triangle3D {
   Vector3D<T> a_, b_, c_;
 
+  /**
+   * Decays degenerate triangle to segment.
+   */
   Segment3D<T> toSegment() const {
-    auto max_x = std::max({a_.x_, b_.x_, c_.x_});
-    auto min_x = std::min({a_.x_, b_.x_, c_.x_});
+    auto ab = Segment3D<T>{a_, b_};
+    auto bc = Segment3D<T>{b_, c_};
+    auto ac = Segment3D<T>{a_, c_};
 
-    if (a_.x_ != max_x && a_.x_ != min_x) {
-      return {b_, c_};
+    if (ab.getRange().contains(c_)) {
+      return ab;
     }
-    if (b_.x_ != max_x && b_.x_ != min_x) {
-      return {a_, c_};
+    if (bc.getRange().contains(a_)) {
+      return bc;
     }
-    if (c_.x_ != max_x && c_.x_ != min_x) {
-      return {a_, b_};
-    }
+    return ac;
   }
+
+  bool isDegenerate() const { return Plane<T>(a_, b_, c_).valid(); }
 
   bool intersectsLine(const Line3D<T>& line) const {
     Segment3D<T> ab = {a_, b_};
@@ -36,12 +40,17 @@ struct Triangle3D {
 
   T area() const { return crossProduct(a_ - b_, a_ - c_).norm() / 2; }
 
-  T minX() const { return std::min({a_.x_, b_.x_, c_.x_}); }
-  T maxX() const { return std::max({a_.x_, b_.x_, c_.x_}); }
-  T minY() const { return std::min({a_.y_, b_.y_, c_.y_}); }
-  T maxY() const { return std::max({a_.y_, b_.y_, c_.y_}); }
-  T minZ() const { return std::min({a_.z_, b_.z_, c_.z_}); }
-  T maxZ() const { return std::max({a_.z_, b_.z_, c_.z_}); }
+  /**
+   * Returns a minimal range containing the whole triangle.
+   */
+  Range3D<T> getRange() const {
+    auto xs = {a_.x_, b_.x_, c_.x_};
+    auto ys = {a_.y_, b_.y_, c_.y_};
+    auto zs = {a_.z_, b_.z_, c_.z_};
+    return {std::min(xs), std::max(xs),
+            std::min(ys), std::max(ys),
+            std::min(zs), std::max(zs)};
+  }
 
   bool contains(const Vector3D<T>& point) const {
     Triangle3D<T> t1 = {a_, b_, point};
