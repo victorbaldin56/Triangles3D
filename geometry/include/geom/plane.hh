@@ -13,8 +13,10 @@ class Plane {
 
   // constructors
  public:
-  Plane() {}
-  Plane(const Vector3D<T>& a, const Vector3D<T>& b, const Vector3D<T>& c)
+  Plane() noexcept {}
+  Plane(const Vector3D<T>& a,
+        const Vector3D<T>& b,
+        const Vector3D<T>& c) noexcept
       : n_{crossProduct(a - b, a - c).normalize()},
         // normalization applied here to make easier comparison between planes
         // and make plane with zero normal vector invalid in place
@@ -22,14 +24,14 @@ class Plane {
 
   // getters
  public:
-  const Vector3D<T>& normal() const& { return n_; }
-  Vector3D<T>&& normal() && { return n_; }
-  T distance() const { return d_; }
+  const Vector3D<T>& normal() const & noexcept { return n_; }
+  Vector3D<T>&& normal() && noexcept { return n_; }
+  T distance() const noexcept { return d_; }
 
  public:
-  bool valid() const { return n_.valid() && std::isfinite(d_); }
+  bool valid() const noexcept { return n_.valid() && std::isfinite(d_); }
 
-  Line3D<T> getIntersectionLine(const Plane<T>& other) const {
+  Line3D<T> getIntersectionLine(const Plane<T>& other) const noexcept {
     T normal_dot = dot(n_, other.n_);
     T denom = 1 - normal_dot * normal_dot;
     T c1 = (d_ - other.d_ * normal_dot) / denom;
@@ -38,13 +40,13 @@ class Plane {
     return Line3D<T>{crossProduct(n_, other.n_), c1 * n_ + c2 * other.n_};
   }
 
-  Vector3D<T> getIntersectionPoint(const Line3D<T>& line) const {
+  Vector3D<T> getIntersectionPoint(const Line3D<T>& line) const noexcept {
     return line.origin() +
            (d_ - dot(line.origin(), n_) / dot(line.direction(), n_)) *
                line.direction();
   }
 
-  Vector3D<T> getIntersectionPoint(const Segment3D<T>& seg) const {
+  Vector3D<T> getIntersectionPoint(const Segment3D<T>& seg) const noexcept {
     Line3D<T> l = seg.line();
     auto p = getIntersectionPoint(l);
     auto range = seg.getRange();
@@ -54,7 +56,7 @@ class Plane {
     return Vector3D<T>();
   }
 
-  bool equal(const Plane<T>& other) const {
+  bool equal(const Plane<T>& other) const noexcept {
     return (n_.equal(other.n_) && comparator::isClose(d_, other.d_)) ||
            (n_.equal(-other.n_) && comparator::isClose(d_, -other.d_));
   }

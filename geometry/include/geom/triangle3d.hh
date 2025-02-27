@@ -28,9 +28,9 @@ struct Triangle3D {
     return ac;
   }
 
-  bool isDegenerate() const { return Plane<T>(a_, b_, c_).valid(); }
+  bool isDegenerate() const noexcept { return Plane<T>(a_, b_, c_).valid(); }
 
-  bool intersectsLine(const Line3D<T>& line) const {
+  bool intersectsLine(const Line3D<T>& line) const noexcept {
     Segment3D<T> ab = {a_, b_};
     Segment3D<T> bc = {b_, c_};
     Segment3D<T> ac = {a_, c_};
@@ -43,7 +43,7 @@ struct Triangle3D {
   /**
    * Returns a minimal range containing the whole triangle.
    */
-  Range3D<T> getRange() const {
+  Range3D<T> getRange() const noexcept {
     auto xs = {a_.x_, b_.x_, c_.x_};
     auto ys = {a_.y_, b_.y_, c_.y_};
     auto zs = {a_.z_, b_.z_, c_.z_};
@@ -52,18 +52,18 @@ struct Triangle3D {
             std::min(zs), std::max(zs)};
   }
 
-  bool contains(const Vector3D<T>& point) const {
+  bool contains(const Vector3D<T>& point) const noexcept {
     Triangle3D<T> t1 = {a_, b_, point};
     Triangle3D<T> t2 = {b_, c_, point};
     Triangle3D<T> t3 = {a_, c_, point};
     return comparator::isClose(area(), t1.area() + t2.area() + t3.area());
   }
 
-  bool intersectsInPlane(const Triangle3D<T>& other) const {
+  bool intersectsInPlane(const Triangle3D<T>& other) const noexcept {
     return contains(other.a_) || contains(other.b_) || contains(other.c_);
   }
 
-  bool intersects(const Triangle3D<T>& other) const {
+  bool intersects(const Triangle3D<T>& other) const noexcept {
     auto copy(*this);
     auto other_copy(other);
     Plane<T> this_p{copy.a_, copy.b_, copy.c_};

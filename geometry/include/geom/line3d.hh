@@ -10,22 +10,22 @@ class Line3D {
 
  public:
   Line3D() {}
-  Line3D(const Vector3D<T>& direction, const Vector3D<T>& origin)
+  Line3D(const Vector3D<T>& direction, const Vector3D<T>& origin) noexcept
       : direction_{direction}, origin_{origin} {
     direction_.normalize();  // same reason as for Plane3D
   }
 
   // getters
  public:
-  const Vector3D<T>& direction() const& { return direction_; }
-  Vector3D<T>&& direction() && { return direction_; }
-  const Vector3D<T>& origin() const& { return origin_; }
-  Vector3D<T>&& origin() && { return origin_; }
+  const Vector3D<T>& direction() const & noexcept { return direction_; }
+  Vector3D<T>&& direction() && noexcept { return direction_; }
+  const Vector3D<T>& origin() const & noexcept { return origin_; }
+  Vector3D<T>&& origin() && noexcept { return origin_; }
 
  public:
-  bool valid() const { return direction_.valid() && origin_.valid(); }
+  bool valid() const noexcept { return direction_.valid() && origin_.valid(); }
 
-  Vector3D<T> getIntersectionPoint(const Line3D<T>& other) const {
+  Vector3D<T> getIntersectionPoint(const Line3D<T>& other) const noexcept {
     T triple_product =
         tripleProduct(origin_ - other.origin_, direction_, other.direction_);
 
@@ -40,7 +40,7 @@ class Line3D {
            direction_ * dot(dir_cross, origin_cross) / dir_cross.norm2();
   }
 
-  bool equal(const Line3D<T>& other) {
+  bool equal(const Line3D<T>& other) noexcept {
     return collinear(direction_, other.direction_) &&
            collinear(origin_ - other.origin_, direction_);
   }

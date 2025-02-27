@@ -10,7 +10,7 @@ struct Range3D {
   T min_y, max_y;  // min_y >= max_y means empty range
   T min_z, max_z;  // min_z >= max_z means empty range
 
-  bool contains(const Vector3D<T>& p) {
+  bool contains(const Vector3D<T>& p) noexcept {
     return comparator::isLessClose(min_x, p.x_) &&
            comparator::isLessClose(p.x_, max_x) &&
            comparator::isLessClose(min_y, p.y_) &&
