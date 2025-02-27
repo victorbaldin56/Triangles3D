@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cmath>
-#include <type_traits>
 #include <iostream>
+#include <type_traits>
 
 #include "comparator.hh"
 
@@ -19,13 +19,9 @@ struct Vector3D {
     return std::isfinite(x_) && std::isfinite(y_) && std::isfinite(z_);
   }
 
-  T norm2() const {
-    return x_*x_ + y_*y_ + z_*z_;
-  }
+  T norm2() const { return x_ * x_ + y_ * y_ + z_ * z_; }
 
-  T norm() const {
-    return std::sqrt(norm2());
-  }
+  T norm() const { return std::sqrt(norm2()); }
 
   bool equal(const Vector3D<T>& other) const {
     return comparator::isClose(x_, other.x_) &&
@@ -48,38 +44,34 @@ struct Vector3D {
   }
 
   Vector3D<T>& operator*=(T scalar) {
-    x_*=scalar;
-    y_*=scalar;
-    z_*=scalar;
+    x_ *= scalar;
+    y_ *= scalar;
+    z_ *= scalar;
     return *this;
   }
 
   Vector3D<T>& operator/=(T scalar) {
-    x_/=scalar;
-    y_/=scalar;
-    z_/=scalar;
+    x_ /= scalar;
+    y_ /= scalar;
+    z_ /= scalar;
     return *this;
   }
 
-  Vector3D<T> operator+() const {
-    return *this;
-  }
+  Vector3D<T> operator+() const { return *this; }
 
   Vector3D<T> operator-() const {
-    return Vector3D<T>{*this}*=static_cast<T>(-1);
+    return Vector3D<T>{*this} *= static_cast<T>(-1);
   }
 
   Vector3D<T>& normalize() {
     T n = norm();
-    x_/=n;
-    y_/=n;
-    z_/=n;
+    x_ /= n;
+    y_ /= n;
+    z_ /= n;
     return *this;
   }
 
-  static Vector3D<T> zeroVector() {
-    return {0, 0, 0};
-  }
+  static Vector3D<T> zeroVector() { return {0, 0, 0}; }
 };
 
 template <typename T>
@@ -94,34 +86,32 @@ Vector3D<T> operator-(Vector3D<T> a, const Vector3D<T>& b) {
 
 template <typename T>
 Vector3D<T> operator*(T scalar, Vector3D<T> v) {
-  return v*=scalar;
+  return v *= scalar;
 }
 
 template <typename T>
 Vector3D<T> operator*(const Vector3D<T>& v, T scalar) {
-  return scalar*v;
+  return scalar * v;
 }
 
 template <typename T>
 Vector3D<T> operator/(Vector3D<T> v, T scalar) {
-  return v/=scalar;
+  return v /= scalar;
 }
 
 template <typename T>
 T dot(const Vector3D<T>& a, const Vector3D<T>& b) {
-  return a.x_*b.x_ + a.y_*b.y_ + a.z_*b.z_;
+  return a.x_ * b.x_ + a.y_ * b.y_ + a.z_ * b.z_;
 }
 
 template <typename T>
 Vector3D<T> crossProduct(const Vector3D<T>& a, const Vector3D<T>& b) {
-  return {a.y_*b.z_ - a.z_*b.y_,
-          a.z_*b.x_ - a.x_*b.z_,
-          a.x_*b.y_ - a.y_*b.x_};
+  return {a.y_ * b.z_ - a.z_ * b.y_, a.z_ * b.x_ - a.x_ * b.z_,
+          a.x_ * b.y_ - a.y_ * b.x_};
 }
 
 template <typename T>
-T tripleProduct(const Vector3D<T>& a,
-                const Vector3D<T>& b,
+T tripleProduct(const Vector3D<T>& a, const Vector3D<T>& b,
                 const Vector3D<T>& c) {
   return dot(a, crossProduct(b, c));
 }
@@ -143,5 +133,4 @@ std::ostream& operator<<(std::ostream& os, const Vector3D<T>& v) {
   return os;
 }
 
-}
-
+}  // namespace geometry

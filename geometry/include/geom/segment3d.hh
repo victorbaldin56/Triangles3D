@@ -36,5 +36,4 @@ struct Segment3D {
   }
 };
 
-}
-
+}  // namespace geometry

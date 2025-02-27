@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "geom/vector3d.hh"
 #include "geom/plane.hh"
 #include "geom/triangle3d.hh"
+#include "geom/vector3d.hh"
 
 using namespace geometry;
 
@@ -28,7 +28,7 @@ TEST(Vector3D, crossProduct) {
 TEST(Vector3D, normalize) {
   Vector3D<double> v{1000, 99, 9.7};
   auto n = v.normalize();
-  ASSERT_TRUE(n.equal(1/std::sqrt(dot(v, v))*v));
+  ASSERT_TRUE(n.equal(1 / std::sqrt(dot(v, v)) * v));
   ASSERT_TRUE(comparator::isClose(n.norm(), 1.0));
 }
 
@@ -141,7 +141,8 @@ TEST(Triangle3D, Intersects_NonCoplanarNoIntersection) {
   Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};
   Triangle3D<double> t2{{3.3, 3.4, 1.5}, {4.4, 3.4, 1.5}, {3.3, 4.4, 1.5}};
 
-  ASSERT_FALSE(t1.intersects(t2));  // Non-coplanar triangles with no intersection
+  ASSERT_FALSE(
+      t1.intersects(t2));  // Non-coplanar triangles with no intersection
 }
 
 #if 0
@@ -154,7 +155,9 @@ TEST(Triangle3D, Intersects_DegenerateTriangle) {
 #endif
 
 TEST(Triangle3D, Intersects_DegenerateTriangleNoIntersection) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}};  // Degenerate triangle (a point)
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {0.1, 0.2, 0.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate triangle (a point)
   Triangle3D<double> t2{{1.1, 1.2, 1.3}, {2.2, 2.2, 2.3}, {3.3, 3.3, 3.3}};
 
   ASSERT_FALSE(t1.intersects(t2));  // Degenerate triangle does not intersect

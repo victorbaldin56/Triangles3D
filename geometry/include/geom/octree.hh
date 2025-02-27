@@ -3,8 +3,8 @@
 #include <array>
 #include <numeric>
 #include <set>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "vector3d.hh"
 
@@ -15,12 +15,11 @@ namespace geometry {
 template <typename FigureT, typename Container = std::vector<FigureT>>
 class Octree {
  public:
-  using Iterator  = typename Container::iterator;
+  using Iterator = typename Container::iterator;
   using CIterator = typename Container::const_iterator;
 
  private:
   const Container cont_;
-
 
  public:
   // copy-constructs the underlying container
@@ -29,9 +28,7 @@ class Octree {
   }
 
   // move-constructs the underlying container
-  explicit Octree(Container&& cont) noexcept : cont_{cont} {
-    constructTree();
-  }
+  explicit Octree(Container&& cont) noexcept : cont_{cont} { constructTree(); }
 
   std::set<std::size_t> getIntersectingFigures() const {
     std::set<std::size_t> res;
@@ -39,9 +36,7 @@ class Octree {
     return res;
   }
 
-  ~Octree() {
-    delete root_;
-  }
+  ~Octree() { delete root_; }
 
  private:
   struct Parallelepiped {
@@ -75,9 +70,8 @@ class Octree {
     NumType min_init = std::numeric_limits<NumType>::max();
     NumType max_init = std::numeric_limits<NumType>::min();
 
-    Parallelepiped res{min_init, max_init,
-                       min_init, max_init,
-                       min_init, max_init};
+    Parallelepiped res{min_init, max_init, min_init,
+                       max_init, min_init, max_init};
 
     for (auto& f : cont_) {
       NumType x_min = f.minX();
@@ -104,5 +98,4 @@ class Octree {
   }
 };
 
-}
-
+}  // namespace geometry

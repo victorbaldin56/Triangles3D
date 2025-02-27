@@ -30,14 +30,11 @@ struct Triangle3D {
     Segment3D<T> ab = {a_, b_};
     Segment3D<T> bc = {b_, c_};
     Segment3D<T> ac = {a_, c_};
-    return ab.intersectsLine(line) ||
-           bc.intersectsLine(line) ||
+    return ab.intersectsLine(line) || bc.intersectsLine(line) ||
            ac.intersectsLine(line);
   }
 
-  T area() const {
-    return crossProduct(a_ - b_, a_ - c_).norm()/2;
-  }
+  T area() const { return crossProduct(a_ - b_, a_ - c_).norm() / 2; }
 
   T minX() const { return std::min({a_.x_, b_.x_, c_.x_}); }
   T maxX() const { return std::max({a_.x_, b_.x_, c_.x_}); }
@@ -86,9 +83,8 @@ struct Triangle3D {
     Vector3D<T> bci = other_p.getIntersectionPoint(bc);
     Vector3D<T> aci = other_p.getIntersectionPoint(ac);
 
-    return other_copy.contains(abi)
-           || other_copy.contains(bci)
-           || other_copy.contains(aci);
+    return other_copy.contains(abi) || other_copy.contains(bci) ||
+           other_copy.contains(aci);
   }
 };
 
@@ -104,5 +100,4 @@ std::ostream& operator<<(std::ostream& os, const Triangle3D<T>& t) {
   return os;
 }
 
-}
-
+}  // namespace geometry
