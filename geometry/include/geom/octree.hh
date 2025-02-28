@@ -21,16 +21,21 @@ class Octree final {
   using InternalContainer = std::list<std::pair<Triangle3D<T>, std::size_t>>;
 
  private:
-  struct Node final {
+  struct Node final : public std::enable_shared_from_this<Node> {
     Range3D<T> coords_;
     InternalContainer triangles_;
     pNode parent_;
     std::array<pNode, 8> children_;
-    mutable std::stack<pNode> node_stack_;
+    std::stack<pNode> node_stack_;
     bool valid_;
 
+    Node(const Range3D<T>& coords,
+         const InternalContainer& cont,
+         const pNode& parent)
+        : coords_(coords), triangles_(cont), parent_(parent) {}
+
     void divide() {
-      node_stack_.push(pNode(this));
+      node_stack_.push(this->shared_from_this());
 
       while (!node_stack_.empty()) {
         auto current_node = node_stack_.top();
@@ -62,15 +67,15 @@ class Octree final {
 
           children_[i] =
               std::make_shared<Node>(
-                  {new_coords, InternalContainer(), current_node});
+                  new_coords, InternalContainer(), current_node);
         }
 
         for (auto it = triangles_.begin(); it != triangles_.end(); ++it) {
           (void)std::find_if(children_.begin(), children_.end(),
                              [&it, current_node, this](auto& ch) {
-            auto tr = it->first;
+            auto tr = *it;
 
-            if (ch->coords_.contains(tr.getRange())) {
+            if (ch->coords_.contains(tr.first.getRange())) {
               ch->triangles_.push_back(tr);
               ch->valid_ = true;
               node_stack_.push(ch);
@@ -83,37 +88,7 @@ class Octree final {
       }
     }
 
-    void getIntersectionsAmongChildren(
-        std::set<std::size_t>& res,
-        const std::pair<Triangle3D<T>, std::size_t>& triangle) const {
-      if (!valid_) {
-        return;
-      }
-
-      node_stack_.push(pNode(this));
-
-      while (!node_stack_.empty()) {
-        auto current_node = node_stack_.top();
-        node_stack_.pop();
-
-        std::for_each(children_.begin(), children_.end(),
-                     [this, triangle, res](const auto& ch) {
-          if (ch->valid_) {
-            std::for_each(triangles_.begin(), triangles_.end(),
-                          [triangle, res](const auto& other) {
-              if (other.first.intersects(triangle.first)) {
-                res.insert(other.second);
-                res.insert(triangle.second);
-              }
-            });
-
-            node_stack_.push(ch);
-          }
-        });
-      }
-    }
-
-    std::set<std::size_t> getIntersections() const {
+    std::set<std::size_t> getIntersections() {
       auto res = std::set<std::size_t>();
 
       while (!node_stack_.empty()) {
@@ -133,12 +108,43 @@ class Octree final {
             }
           }
 
-          getIntersectionsAmongChildren(res, tr1.fisrt);
+          getIntersectionsAmongChildren(res, tr1);
         }
 
         std::for_each(children_.cbegin(), children_.cend(),
                       [this](const auto& ch) {
           if (ch->valid_) {
+            node_stack_.push(ch);
+          }
+        });
+      }
+      return res;
+    }
+
+    void getIntersectionsAmongChildren(
+        std::set<std::size_t>& res,
+        const std::pair<Triangle3D<T>, std::size_t>& triangle) {
+      if (!valid_) {
+        return;
+      }
+
+      node_stack_.push(this->shared_from_this());
+
+      while (!node_stack_.empty()) {
+        auto current_node = node_stack_.top();
+        node_stack_.pop();
+
+        std::for_each(children_.begin(), children_.end(),
+                     [this, triangle, &res](const auto& ch) {
+          if (ch->valid_) {
+            std::for_each(triangles_.begin(), triangles_.end(),
+                          [triangle, &res](const auto& other) {
+              if (other.first.intersects(triangle.first)) {
+                res.insert(other.second);
+                res.insert(triangle.second);
+              }
+            });
+
             node_stack_.push(ch);
           }
         });
@@ -182,16 +188,16 @@ class Octree final {
       triangles.push_back(std::make_pair(*it, count++));
     }
 
-    root_ = {.coords_ = range, .triangles_ = triangles, .valid_ = true};
-    root_.divide();
+    root_ = std::make_shared<Node>(range, triangles, nullptr);
+    root_->divide();
   }
 
-  std::set<std::size_t> getIntersections() const {
-    return root_.getIntersections();
+  std::set<std::size_t> getIntersections() {
+    return root_->getIntersections();
   }
 
  private:
-  Node root_;
+  pNode root_;
 };
 
 }  // namespace geometry
