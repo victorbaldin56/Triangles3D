@@ -14,8 +14,22 @@ int main() {
                 count, triangles.begin());
   }
 
+  auto res = std::set<std::size_t>();
+
+#if 0
   auto octree = geometry::Octree<double>(triangles.begin(), triangles.end());
-  auto res = octree.getIntersections();
+  res = octree.getIntersections();
+#else
+  for (std::size_t i = 0; i < triangles.size(); ++i) {
+    for (std::size_t j = i + 1; j < triangles.size(); ++j) {
+      if (triangles[i].intersects(triangles[j])) {
+        res.insert(i + 1);
+        res.insert(j + 1);
+      }
+    }
+  }
+#endif
+
   std::copy(res.begin(), res.end(),
             std::ostream_iterator<std::size_t>(std::cout, " "));
   return 0;

@@ -14,9 +14,11 @@ def ansFilePath(test_num):
 
 def getAns(ans_file):
   with open(ans_file, 'r') as af:
-    return map(int, af.readline().split())
+    return list(map(int, af.readline().split()))
 
 def test(test_num):
+  fail = False
+
   for test_num in range(10):
     input_path = inputFilePath(test_num)
     ans_path = ansFilePath(test_num)
@@ -27,12 +29,18 @@ def test(test_num):
       )
       if process.returncode != 0:
         raise RuntimeError(f'Driver failed: {process.stderr}')
-      output = map(int, process.stdout.strip().split())
+      output = list(map(int, process.stdout.strip().split()))
       ref_output = getAns(ans_path)
-      return output == ref_output
+      if (output != ref_output):
+        print(f"Test {test_num} failed\n"
+              f"Expected: {ref_output}\n"
+              f"Actual: {output}\n")
+        fail = True
+      else:
+        print(f"Test {test_num} passed")
+
+  if fail:
+    raise RuntimeError("End-to-end test failed\n")
 
 for i in range(10):
-  if test(i):
-    print(f'Test {i} passed')
-  else:
-    raise RuntimeError(f'Test {i} failed')
+  test(i)

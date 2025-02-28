@@ -140,12 +140,33 @@ TEST(Triangle3D, Intersects_NonCoplanarIntersection) {
   ASSERT_TRUE(t1.intersects(t2));  // Non-coplanar triangles intersecting
 }
 
+TEST(Triangle3D, Intersects_NonCoplanar_ParallelTriangles) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};  // Triangle in XY plane
+  Triangle3D<double> t2{{0.1, 0.2, 1.3}, {2.1, 0.2, 1.3}, {0.1, 2.2, 1.3}};  // Parallel triangle above XY plane
+
+  ASSERT_FALSE(t1.intersects(t2));  // Parallel non-coplanar triangles with no intersection
+}
+
 TEST(Triangle3D, Intersects_NonCoplanarNoIntersection) {
   Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};
   Triangle3D<double> t2{{3.3, 3.4, 1.5}, {4.4, 3.4, 1.5}, {3.3, 4.4, 1.5}};
 
   ASSERT_FALSE(
       t1.intersects(t2));  // Non-coplanar triangles with no intersection
+}
+
+TEST(Triangle3D, Intersects_NonCoplanar_IntersectingAlongLine) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};  // Triangle in XY plane
+  Triangle3D<double> t2{{1.1, 1.2, -1.3}, {1.1, 1.2, 1.3}, {1.1, 1.2, 0.3}};  // Vertical line intersecting t1
+
+  ASSERT_TRUE(t1.intersects(t2));  // Triangles intersect along a line
+}
+
+TEST(Triangle3D, Intersects_NonCoplanar_OneTrianglePiercesTheOther) {
+  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};  // Triangle in XY plane
+  Triangle3D<double> t2{{1.1, 1.2, -1.3}, {1.1, 1.2, 1.3}, {2.2, 2.2, 0.3}};  // Triangle piercing t1
+
+  ASSERT_TRUE(t1.intersects(t2));  // One triangle pierces the other
 }
 
 #if 1

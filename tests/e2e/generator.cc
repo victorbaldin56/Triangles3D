@@ -97,8 +97,8 @@ class TestGenerator {
     for (auto i = 0u; i < size; ++i) {
       for (auto j = i + 1; j < size; ++j) {
         if (CGAL::do_intersect(triangles[i], triangles[j])) {
-          res.insert(i);
-          res.insert(j);
+          res.insert(i + 1);
+          res.insert(j + 1);
         }
       }
     }

@@ -161,7 +161,7 @@ class Octree final {
     auto range = begin->getRange();
     InternalContainer triangles;
 
-    std::size_t count = 0;
+    std::size_t count = 1;
     for (auto it = begin; it != end; ++it) {
       auto cur = it->getRange();
 
