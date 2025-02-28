@@ -7,8 +7,7 @@ class Triangles3DRecipe(ConanFile):
   version = "1.0"
   settings = "os", "compiler", "build_type", "arch"
   generators = "CMakeDeps"
-  options = {"testing": [True, False]}
-  options = {"build_test_generator": [True, False]}
+  options = {"testing": [True, False], "build_test_generator": [True, False]}
   default_options = {"testing": False, "build_test_generator": False}
 
   def requirements(self):
