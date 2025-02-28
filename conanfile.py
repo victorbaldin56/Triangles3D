@@ -8,18 +8,20 @@ class Triangles3DRecipe(ConanFile):
   settings = "os", "compiler", "build_type", "arch"
   generators = "CMakeDeps"
   options = {"testing": [True, False]}
-  default_options = {"testing": False}
+  options = {"build_test_generator": [True, False]}
+  default_options = {"testing": False, "build_test_generator": False}
 
   def requirements(self):
     if self.options.testing:
       self.test_requires("gtest/1.15.0")
-      self.test_requires("cgal/6.0.1")
-      pip.main(['install', 'numpy==2.2.0'])
+      if self.options.build_test_generator:
+        self.test_requires("cgal/6.0.1")
 
   def generate(self):
     # Customize CMakeToolchain in the generate() method
     tc = CMakeToolchain(self)
     tc.variables["BUILD_TESTING"] = self.options.testing
+    tc.variables['BUILD_TEST_GENERATOR'] = self.options.build_test_generator
     tc.generate()
 
   def build(self):
