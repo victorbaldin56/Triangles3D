@@ -6,7 +6,6 @@ add_subdirectory(src)
 
 if (${BUILD_TESTING})
   find_package(GTest REQUIRED)
-  find_package(CGAL REQUIRED) # for end-to-end test generator
   include(GoogleTest)
   enable_testing()
   add_subdirectory(tests)
