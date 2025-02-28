@@ -1,3 +1,4 @@
+#include <cmath>
 #include <filesystem>
 #include <iostream>
 #include <random>
@@ -54,21 +55,39 @@ class TestGenerator {
 
   std::vector<Triangle_3> generateRandomTriangles(unsigned count) {
     auto res = std::vector<Triangle_3>(count);
-    std::transform(res.begin(), res.end(), res.begin(), [this](const auto& e) {
-      return generateRandomTriangle();
+    std::transform(res.begin(), res.end(), res.begin(),
+                   [this, count](const auto& e) {
+      return generateRandomTriangle(count);
     });
 
     return res;
   }
 
-  Triangle_3 generateRandomTriangle() {
+  Triangle_3 generateRandomTriangle(unsigned triangles_count) {
+    auto triangles_per_edge = triangles_count;
+    auto transfer_width =
+        (kMaxCoord - kMinCoord) / ((triangles_per_edge + 1) * 2);
+    auto trans_dist =
+        std::uniform_int_distribution<int>(
+            -triangles_per_edge, triangles_per_edge);
+
+    auto tr_x = transfer_width * trans_dist(rng_);
+    auto tr_y = transfer_width * trans_dist(rng_);
+    auto tr_z = transfer_width * trans_dist(rng_);
     return Triangle_3(
-        generateRandomPoint(), generateRandomPoint(), generateRandomPoint());
+        generateRandomPoint(tr_x, tr_y, tr_z),
+        generateRandomPoint(tr_x, tr_y, tr_z),
+        generateRandomPoint(tr_x, tr_y, tr_z));
   }
 
-  Point_3 generateRandomPoint() {
-    auto dist = std::uniform_real_distribution<double>(kMinCoord, kMaxCoord);
-    return Point_3(dist(rng_), dist(rng_), dist(rng_));
+  Point_3 generateRandomPoint(double tr_x, double tr_y, double tr_z) {
+    auto x_dst = std::uniform_real_distribution<double>(-tr_x, tr_x);
+    auto y_dst = std::uniform_real_distribution<double>(-tr_y, tr_y);
+    auto z_dst = std::uniform_real_distribution<double>(-tr_z, tr_z);
+    auto x = x_dst(rng_) + tr_x + kCenterCoord;
+    auto y = y_dst(rng_) + tr_y + kCenterCoord;
+    auto z = z_dst(rng_) + tr_z + kCenterCoord;
+    return Point_3(x, y, z);
   }
 
   std::set<unsigned> getReferenceAnswer(
@@ -93,6 +112,8 @@ class TestGenerator {
     auto os = std::fstream();
     os.exceptions(std::ios::failbit);
     os.open(filepath, std::ios::trunc | std::ios::out);
+
+    os << triangles.size() << '\n';
     std::copy(triangles.begin(), triangles.end(),
               std::ostream_iterator<Triangle_3>(os, "\n"));
   }
@@ -122,9 +143,10 @@ class TestGenerator {
   static constexpr auto kInputDir = "input";
   static constexpr auto kAnsDir = "ans";
   static constexpr auto kMinTriangles = 1u;
-  static constexpr auto kMaxTriangles = 1000u;
+  static constexpr auto kMaxTriangles = 300u;
   static constexpr auto kMinCoord = 0.0;
   static constexpr auto kMaxCoord = 1.0;
+  static constexpr auto kCenterCoord = (kMinCoord + kMaxCoord) / 2;
 
   fs::path current_directory_;
   fs::path input_directory_;
