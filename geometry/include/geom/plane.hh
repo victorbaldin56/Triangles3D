@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include "line3d.hh"
 #include "segment3d.hh"
 #include "vector3d.hh"
@@ -41,9 +43,9 @@ class Plane {
   }
 
   Vector3D<T> getIntersectionPoint(const Line3D<T>& line) const noexcept {
-    return line.origin() +
-           (d_ - dot(line.origin(), n_) / dot(line.direction(), n_)) *
-               line.direction();
+    auto&& origin = line.origin();
+    auto&& dir = line.direction();
+    return origin + (d_ - dot(origin, n_) / dot(dir, n_)) * dir;
   }
 
   Vector3D<T> getIntersectionPoint(const Segment3D<T>& seg) const noexcept {
@@ -55,6 +57,9 @@ class Plane {
       return Vector3D<T>{};
     }
     auto p = getIntersectionPoint(l);
+    assert(!p.valid() || contains(p));
+    assert(!p.valid() || l.contains(p));
+
     auto range = seg.getRange();
     if (range.contains(p)) {
       return p;
