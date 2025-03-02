@@ -175,15 +175,23 @@ TEST(Triangle3D, Intersects_NonCoplanar_IntersectingAlongLine) {
 }
 
 TEST(Triangle3D, Intersects_NonCoplanar_OneTrianglePiercesTheOther) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};  // Triangle in XY plane
-  Triangle3D<double> t2{{1.1, 1.2, -1.3}, {1.1, 1.2, 1.3}, {2.2, 2.2, 0.3}};  // Triangle piercing t1
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {2.1, 0.2, 0.3},
+                        {0.1, 2.2, 0.3}};  // Triangle in XY plane
+  Triangle3D<double> t2{{1.1, 1.2, -1.3},
+                        {1.1, 1.2, 1.3},
+                        {2.2, 2.2, 0.3}};  // Triangle piercing t1
 
   ASSERT_TRUE(t1.intersects(t2));  // One triangle pierces the other
 }
 
 TEST(Triangle3D, Intersects_NonCoplanar_IntersectingAtEdge) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};  // Triangle in XY plane
-  Triangle3D<double> t2{{2.1, 0.2, 0.3}, {2.1, 0.2, 1.3}, {0.1, 2.2, 0.3}};  // Triangle sharing an edge with t1
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {2.1, 0.2, 0.3},
+                        {0.1, 2.2, 0.3}};  // Triangle in XY plane
+  Triangle3D<double> t2{{2.1, 0.2, 0.3},
+                        {2.1, 0.2, 1.3},
+                        {0.1, 2.2, 0.3}};  // Triangle sharing an edge with t1
 
   ASSERT_TRUE(t1.intersects(t2));  // Triangles intersect at an edge
 }
