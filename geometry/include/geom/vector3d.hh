@@ -101,12 +101,14 @@ T dot(const Vector3D<T>& a, const Vector3D<T>& b) noexcept {
 
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 Vector3D<T> crossProduct(const Vector3D<T>& a, const Vector3D<T>& b) noexcept {
-  return {a.y_ * b.z_ - a.z_ * b.y_, a.z_ * b.x_ - a.x_ * b.z_,
+  return {a.y_ * b.z_ - a.z_ * b.y_,
+          a.z_ * b.x_ - a.x_ * b.z_,
           a.x_ * b.y_ - a.y_ * b.x_};
 }
 
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
-T tripleProduct(const Vector3D<T>& a, const Vector3D<T>& b,
+T tripleProduct(const Vector3D<T>& a,
+                const Vector3D<T>& b,
                 const Vector3D<T>& c) noexcept {
   return dot(a, crossProduct(b, c));
 }

@@ -64,7 +64,7 @@ class TestGenerator {
   }
 
   Triangle_3 generateRandomTriangle(unsigned triangles_count) {
-    auto triangles_per_edge = triangles_count;
+    auto triangles_per_edge = static_cast<int>(std::cbrt(triangles_count));
     auto transfer_width =
         (kMaxCoord - kMinCoord) / ((triangles_per_edge + 1) * 2);
     auto trans_dist =

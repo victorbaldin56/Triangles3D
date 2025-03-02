@@ -186,6 +186,21 @@ TEST(Triangle3D, Intersects_NonCoplanar_IntersectingAtVertex) {
 TEST(Triangle3D, Intersects_NonCoplanar_WideIntersection) {
   Triangle3D<double> t1{{0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}};
   Triangle3D<double> t2{{0.25, 0.25, 1.0}, {0.25, 0.25, -1.0}, {0.25, 0.25, 0.0}};
+
+  ASSERT_TRUE(t1.intersects(t2));
+}
+
+TEST(Triangle3D, Intersects_NonCoplanar_GeoGebra_NoIntersection1) {
+  Triangle3D<double> t1{{-11.24638, 8.98911, 2}, {0, 0, -5}, {0, 100, 0}};
+  Triangle3D<double> t2{{-1.934114, -2.56997, -1}, {-5.02241, 1.85908, 0}, {0, 0, 5}};
+
+  ASSERT_FALSE(t1.intersects(t2));
+}
+
+TEST(Triangle3D, Intersects_NonCoplanar_GeoGebra_Intersection1) {
+  Triangle3D<double> t1{{-14.23772, -2.9921, 0}, {-15, -15, -5}, {-11.20053, 23.11501, 0}};
+  Triangle3D<double> t2{{-28.99101, 14.7833, 0}, {-10.71675, -2.03107, -1}, {-15, -20, 2.1}};
+
   ASSERT_TRUE(t1.intersects(t2));
 }
 
