@@ -141,23 +141,35 @@ TEST(Triangle3D, Intersects_NonCoplanarIntersection) {
 }
 
 TEST(Triangle3D, Intersects_NonCoplanar_ParallelTriangles) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};  // Triangle in XY plane
-  Triangle3D<double> t2{{0.1, 0.2, 1.3}, {2.1, 0.2, 1.3}, {0.1, 2.2, 1.3}};  // Parallel triangle above XY plane
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {2.1, 0.2, 0.3},
+                        {0.1, 2.2, 0.3}};  // Triangle in XY plane
+  Triangle3D<double> t2{{0.1, 0.2, 1.3},
+                        {2.1, 0.2, 1.3},
+                        {0.1, 2.2, 1.3}};  // Parallel triangle above XY plane
 
-  ASSERT_FALSE(t1.intersects(t2));  // Parallel non-coplanar triangles with no intersection
+  ASSERT_FALSE(t1.intersects(t2));
 }
 
 TEST(Triangle3D, Intersects_NonCoplanarNoIntersection) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};
-  Triangle3D<double> t2{{3.3, 3.4, 1.5}, {4.4, 3.4, 1.5}, {3.3, 4.4, 1.5}};
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {2.1, 0.2, 0.3},
+                        {0.1, 2.2, 0.3}};
+  Triangle3D<double> t2{{3.3, 3.4, 1.5},
+                        {4.4, 3.4, 1.5},
+                        {3.3, 4.4, 1.5}};
 
   ASSERT_FALSE(
       t1.intersects(t2));  // Non-coplanar triangles with no intersection
 }
 
 TEST(Triangle3D, Intersects_NonCoplanar_IntersectingAlongLine) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};  // Triangle in XY plane
-  Triangle3D<double> t2{{1.1, 1.2, -1.3}, {1.1, 1.2, 1.3}, {1.1, 1.2, 0.3}};  // Vertical line intersecting t1
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {2.1, 0.2, 0.3},
+                        {0.1, 2.2, 0.3}};  // Triangle in XY plane
+  Triangle3D<double> t2{{1.1, 1.2, -1.3},
+                        {1.1, 1.2, 1.3},
+                        {1.1, 1.2, 0.3}};  // Vertical line intersecting t1
 
   ASSERT_TRUE(t1.intersects(t2));  // Triangles intersect along a line
 }
@@ -177,37 +189,57 @@ TEST(Triangle3D, Intersects_NonCoplanar_IntersectingAtEdge) {
 }
 
 TEST(Triangle3D, Intersects_NonCoplanar_IntersectingAtVertex) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};  // Triangle in XY plane
-  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {0.1, 0.2, 1.3}, {1.1, 1.2, 0.3}};  // Triangle sharing a vertex with t1
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {2.1, 0.2, 0.3},
+                        {0.1, 2.2, 0.3}};  // Triangle in XY plane
+  Triangle3D<double> t2{{0.1, 0.2, 0.3},
+                        {0.1, 0.2, 1.3},
+                        {1.1, 1.2, 0.3}};  // Triangle sharing a vertex with t1
 
   ASSERT_TRUE(t1.intersects(t2));  // Triangles intersect at a vertex
 }
 
 TEST(Triangle3D, Intersects_NonCoplanar_WideIntersection) {
-  Triangle3D<double> t1{{0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}};
-  Triangle3D<double> t2{{0.25, 0.25, 1.0}, {0.25, 0.25, -1.0}, {0.25, 0.25, 0.0}};
+  Triangle3D<double> t1{{0.0, 0.0, 0.0},
+                        {1.0, 0.0, 0.0},
+                        {0.0, 1.0, 0.0}};
+  Triangle3D<double> t2{{0.25, 0.25, 1.0},
+                        {0.25, 0.25, -1.0},
+                        {0.25, 0.25, 0.0}};
 
   ASSERT_TRUE(t1.intersects(t2));
 }
 
 TEST(Triangle3D, Intersects_NonCoplanar_GeoGebra_NoIntersection1) {
-  Triangle3D<double> t1{{-11.24638, 8.98911, 2}, {0, 0, -5}, {0, 100, 0}};
-  Triangle3D<double> t2{{-1.934114, -2.56997, -1}, {-5.02241, 1.85908, 0}, {0, 0, 5}};
+  Triangle3D<double> t1{{-11.24638, 8.98911, 2},
+                        {0, 0, -5},
+                        {0, 100, 0}};
+  Triangle3D<double> t2{{-1.934114, -2.56997, -1},
+                        {-5.02241, 1.85908, 0},
+                        {0, 0, 5}};
 
   ASSERT_FALSE(t1.intersects(t2));
 }
 
 TEST(Triangle3D, Intersects_NonCoplanar_GeoGebra_Intersection1) {
-  Triangle3D<double> t1{{-14.23772, -2.9921, 0}, {-15, -15, -5}, {-11.20053, 23.11501, 0}};
-  Triangle3D<double> t2{{-28.99101, 14.7833, 0}, {-10.71675, -2.03107, -1}, {-15, -20, 2.1}};
+  Triangle3D<double> t1{{-14.23772, -2.9921, 0},
+                        {-15, -15, -5},
+                        {-11.20053, 23.11501, 0}};
+  Triangle3D<double> t2{{-28.99101, 14.7833, 0},
+                        {-10.71675, -2.03107, -1},
+                        {-15, -20, 2.1}};
 
   ASSERT_TRUE(t1.intersects(t2));
 }
 
 #if 1
 TEST(Triangle3D, Intersects_DegenerateTriangle) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}};  // Degenerate triangle (a point)
-  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {1.1, 0.2, 0.3}, {0.1, 1.2, 0.3}};
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {0.1, 0.2, 0.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate triangle (a point)
+  Triangle3D<double> t2{{0.1, 0.2, 0.3},
+                        {1.1, 0.2, 0.3},
+                        {0.1, 1.2, 0.3}};
 
   ASSERT_TRUE(t1.intersects(t2));  // Degenerate triangle intersects at a point
 }
@@ -217,63 +249,100 @@ TEST(Triangle3D, Intersects_DegenerateTriangleNoIntersection) {
   Triangle3D<double> t1{{0.1, 0.2, 0.3},
                         {0.1, 0.2, 0.3},
                         {0.1, 0.2, 0.3}};  // Degenerate triangle (a point)
-  Triangle3D<double> t2{{1.1, 1.2, 1.3}, {2.2, 2.2, 2.3}, {3.3, 3.3, 3.3}};
+  Triangle3D<double> t2{{1.1, 1.2, 1.3},
+                        {2.2, 2.2, 2.3},
+                        {3.3, 3.3, 3.3}};
 
   ASSERT_FALSE(t1.intersects(t2));  // Degenerate triangle does not intersect
 }
 
 TEST(Triangle3D, Intersects_BothDegenerateToPoint_SamePoint) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}};  // Degenerate to a point
-  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}};  // Degenerate to the same point
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {0.1, 0.2, 0.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate to a point
+  Triangle3D<double> t2{{0.1, 0.2, 0.3},
+                        {0.1, 0.2, 0.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate to the same point
 
   ASSERT_TRUE(t1.intersects(t2));  // Both triangles are the same point
 }
 
 TEST(Triangle3D, Intersects_BothDegenerateToPoint_DifferentPoints) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}, {0.1, 0.2, 0.3}};  // Degenerate to a point
-  Triangle3D<double> t2{{1.1, 1.2, 1.3}, {1.1, 1.2, 1.3}, {1.1, 1.2, 1.3}};  // Degenerate to a different point
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {0.1, 0.2, 0.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate to a point
+  Triangle3D<double> t2{{1.1, 1.2, 1.3},
+                        {1.1, 1.2, 1.3},
+                        {1.1, 1.2, 1.3}};  // Degenerate to a different point
 
   ASSERT_FALSE(t1.intersects(t2));  // Different points, no intersection
 }
 
 TEST(Triangle3D, Intersects_BothDegenerateToSegment_SameSegment) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
-  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to the same segment
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {1.1, 1.2, 1.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate to a segment
+  Triangle3D<double> t2{{0.1, 0.2, 0.3},
+                        {1.1, 1.2, 1.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate to the same segment
 
   ASSERT_TRUE(t1.intersects(t2));  // Both triangles are the same segment
 }
 
 TEST(Triangle3D, Intersects_BothDegenerateToSegment_OverlappingSegments) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
-  Triangle3D<double> t2{{0.5, 0.6, 0.7}, {1.1, 1.2, 1.3}, {0.5, 0.6, 0.7}};  // Degenerate to an overlapping segment
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {1.1, 1.2, 1.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate to a segment
+  Triangle3D<double> t2{{0.5, 0.6, 0.7},
+                        {1.1, 1.2, 1.3},
+                        {0.5, 0.6, 0.7}};
 
   ASSERT_TRUE(t1.intersects(t2));  // Segments overlap
 }
 
 TEST(Triangle3D, Intersects_BothDegenerateToSegment_NonOverlappingSegments) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
-  Triangle3D<double> t2{{2.2, 2.3, 2.4}, {3.3, 3.4, 3.5}, {2.2, 2.3, 2.4}};  // Degenerate to a non-overlapping segment
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {1.1, 1.2, 1.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate to a segment
+  Triangle3D<double> t2{{2.2, 2.3, 2.4},
+                        {3.3, 3.4, 3.5},
+                        {2.2, 2.3, 2.4}};
 
   ASSERT_FALSE(t1.intersects(t2));  // Segments do not overlap
 }
 
 TEST(Triangle3D, Intersects_BothDegenerateToSegment_SharedEndpoint) {
-  Triangle3D<double> t1{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
-  Triangle3D<double> t2{{1.1, 1.2, 1.3}, {2.2, 2.3, 2.4}, {1.1, 1.2, 1.3}};  // Degenerate to a segment sharing an endpoint
+  Triangle3D<double> t1{{0.1, 0.2, 0.3},
+                        {1.1, 1.2, 1.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate to a segment
+  Triangle3D<double> t2{{1.1, 1.2, 1.3},
+                        {2.2, 2.3, 2.4},
+                        {1.1, 1.2, 1.3}};
 
   ASSERT_TRUE(t1.intersects(t2));  // Segments share an endpoint
 }
 
-TEST(Triangle3D, Intersects_OneDegenerateToPoint_OneDegenerateToSegment_PointOnSegment) {
-  Triangle3D<double> t1{{0.5, 0.6, 0.7}, {0.5, 0.6, 0.7}, {0.5, 0.6, 0.7}};  // Degenerate to a point
-  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
+TEST(Triangle3D,
+     Intersects_OneDegenerateToPoint_OneDegenerateToSegment_PointOnSegment) {
+  Triangle3D<double> t1{{0.5, 0.6, 0.7},
+                        {0.5, 0.6, 0.7},
+                        {0.5, 0.6, 0.7}};  // Degenerate to a point
+  Triangle3D<double> t2{{0.1, 0.2, 0.3},
+                        {1.1, 1.2, 1.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate to a segment
 
   ASSERT_TRUE(t1.intersects(t2));  // Point lies on the segment
 }
 
-TEST(Triangle3D, Intersects_OneDegenerateToPoint_OneDegenerateToSegment_PointNotOnSegment) {
-  Triangle3D<double> t1{{2.2, 2.3, 2.4}, {2.2, 2.3, 2.4}, {2.2, 2.3, 2.4}};  // Degenerate to a point
-  Triangle3D<double> t2{{0.1, 0.2, 0.3}, {1.1, 1.2, 1.3}, {0.1, 0.2, 0.3}};  // Degenerate to a segment
+TEST(
+    Triangle3D,
+    Intersects_OneDegenerateToPoint_OneDegenerateToSegment_PointNotOnSegment) {
+  Triangle3D<double> t1{{2.2, 2.3, 2.4},
+                        {2.2, 2.3, 2.4},
+                        {2.2, 2.3, 2.4}};  // Degenerate to a point
+  Triangle3D<double> t2{{0.1, 0.2, 0.3},
+                        {1.1, 1.2, 1.3},
+                        {0.1, 0.2, 0.3}};  // Degenerate to a segment
 
   ASSERT_FALSE(t1.intersects(t2));  // Point does not lie on the segment
 }
