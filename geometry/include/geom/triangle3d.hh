@@ -7,7 +7,7 @@
 
 namespace geometry {
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 struct Triangle3D {
   Vector3D<T> a_, b_, c_;
 
@@ -51,7 +51,8 @@ struct Triangle3D {
   }
 
   bool intersectsInPlane(const Triangle3D<T>& other) const noexcept {
-    return contains(other.a_) || contains(other.b_) || contains(other.c_);
+    return contains(other.a_) || contains(other.b_) || contains(other.c_) ||
+           other.contains(a_) || other.contains(b_) || other.contains(c_);
   }
 
   bool intersects(const Triangle3D<T>& other) const noexcept {
@@ -103,13 +104,13 @@ struct Triangle3D {
   }
 };
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 std::istream& operator>>(std::istream& is, Triangle3D<T>& t) {
   is >> t.a_ >> t.b_ >> t.c_;
   return is;
 }
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 std::ostream& operator<<(std::ostream& os, const Triangle3D<T>& t) {
   os << t.a_ << t.b_ << t.c_;
   return os;

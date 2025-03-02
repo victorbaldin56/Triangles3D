@@ -4,7 +4,7 @@
 
 namespace geometry {
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 class Line3D {
   Vector3D<T> direction_, origin_;
 

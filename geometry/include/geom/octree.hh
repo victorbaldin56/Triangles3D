@@ -13,7 +13,7 @@
 
 namespace geometry {
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 class Octree final {
   struct Node;
 

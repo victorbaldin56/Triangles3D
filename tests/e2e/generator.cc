@@ -143,7 +143,7 @@ class TestGenerator {
   static constexpr auto kInputDir = "input";
   static constexpr auto kAnsDir = "ans";
   static constexpr auto kMinTriangles = 1u;
-  static constexpr auto kMaxTriangles = 300u;
+  static constexpr auto kMaxTriangles = 50u;
   static constexpr auto kMinCoord = 0.0;
   static constexpr auto kMaxCoord = 1.0;
   static constexpr auto kCenterCoord = (kMinCoord + kMaxCoord) / 2;

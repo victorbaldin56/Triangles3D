@@ -8,11 +8,8 @@
 
 namespace geometry {
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 struct Vector3D {
-  static_assert(std::is_floating_point<T>(),
-                "Only floating-point type can be used.");
-
   T x_ = NAN, y_ = NAN, z_ = NAN;
 
   bool valid() const noexcept {
@@ -72,60 +69,60 @@ struct Vector3D {
   static Vector3D<T> zeroVector() noexcept { return {0, 0, 0}; }
 };
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 Vector3D<T> operator+(Vector3D<T> a, const Vector3D<T>& b) noexcept {
   return a += b;
 }
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 Vector3D<T> operator-(Vector3D<T> a, const Vector3D<T>& b) noexcept {
   return a -= b;
 }
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 Vector3D<T> operator*(T scalar, Vector3D<T> v) noexcept {
   return v *= scalar;
 }
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 Vector3D<T> operator*(const Vector3D<T>& v, T scalar) noexcept {
   return scalar * v;
 }
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 Vector3D<T> operator/(Vector3D<T> v, T scalar) noexcept {
   return v /= scalar;
 }
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 T dot(const Vector3D<T>& a, const Vector3D<T>& b) noexcept {
   return a.x_ * b.x_ + a.y_ * b.y_ + a.z_ * b.z_;
 }
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 Vector3D<T> crossProduct(const Vector3D<T>& a, const Vector3D<T>& b) noexcept {
   return {a.y_ * b.z_ - a.z_ * b.y_, a.z_ * b.x_ - a.x_ * b.z_,
           a.x_ * b.y_ - a.y_ * b.x_};
 }
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 T tripleProduct(const Vector3D<T>& a, const Vector3D<T>& b,
                 const Vector3D<T>& c) noexcept {
   return dot(a, crossProduct(b, c));
 }
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 bool collinear(const Vector3D<T>& a, const Vector3D<T>& b) noexcept {
   return crossProduct(a, b).isClose(Vector3D<T>::zeroVector());
 }
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 std::istream& operator>>(std::istream& is, Vector3D<T>& v) {
   is >> v.x_ >> v.y_ >> v.z_;
   return is;
 }
 
-template <typename T>
+template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 std::ostream& operator<<(std::ostream& os, const Vector3D<T>& v) {
   os << v.x_ << v.y_ << v.z_;
   return os;

@@ -5,7 +5,7 @@
 
 int main() {
   std::cin.exceptions(std::ios::failbit | std::ios::eofbit);
-  auto count = std::size_t{0};
+  auto count = std::size_t(0);
   std::cin >> count;
 
   auto triangles = std::vector<geometry::Triangle3D<double>>(count);
@@ -20,8 +20,8 @@ int main() {
   auto octree = geometry::Octree<double>(triangles.begin(), triangles.end());
   res = octree.getIntersections();
 #else
-  for (std::size_t i = 0; i < triangles.size(); ++i) {
-    for (std::size_t j = i + 1; j < triangles.size(); ++j) {
+  for (auto i = std::size_t(0); i < count; ++i) {
+    for (auto j = i + 1; j < count; ++j) {
       if (triangles[i].intersects(triangles[j])) {
         res.insert(i + 1);
         res.insert(j + 1);
