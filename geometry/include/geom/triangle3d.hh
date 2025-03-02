@@ -43,54 +43,63 @@ struct Triangle3D {
             std::min(zs), std::max(zs)};
   }
 
-  bool contains(const Vector3D<T>& point,
-                T abs_tol = comparator::absoluteTolerance<T>(),
-                T rel_tol = comparator::relativeTolerance<T>()) const noexcept {
+  bool contains(const Vector3D<T>& point) const noexcept {
     Triangle3D<T> t1 = {a_, b_, point};
     Triangle3D<T> t2 = {b_, c_, point};
     Triangle3D<T> t3 = {a_, c_, point};
-    return comparator::isClose(
-        area(), t1.area() + t2.area() + t3.area(), abs_tol, rel_tol);
+    return comparator::isClose(area(), t1.area() + t2.area() + t3.area());
   }
 
   bool intersectsInPlane(const Triangle3D<T>& other) const noexcept {
-    return contains(other.a_) ||
-           contains(other.b_) ||
-           contains(other.c_);
+    return contains(other.a_) || contains(other.b_) || contains(other.c_);
   }
 
   bool intersects(const Triangle3D<T>& other) const noexcept {
-    auto copy(*this);
-    auto other_copy(other);
-    auto this_p = Plane<T>(copy.a_, copy.b_, copy.c_);
-    auto other_p = Plane<T>(other_copy.a_, other_copy.b_, other_copy.c_);
+    auto this_p = Plane<T>(a_, b_, c_);
+    auto other_p = Plane<T>(other.a_, other.b_, other.c_);
 
-    if (!other_p.valid()) {
-      if (!this_p.valid()) {
-        auto this_seg = copy.toSegment();
-        auto other_seg = other_copy.toSegment();
-        return this_seg.intersects(other_seg);
-      }
-      std::swap(other_copy, copy);
-      std::swap(other_p, this_p);
+    auto this_valid = this_p.valid();
+    auto other_valid = other_p.valid();
+
+    if (!this_valid && !other_valid) {
+      auto this_seg = toSegment();
+      auto other_seg = other.toSegment();
+      return this_seg.intersects(other_seg);
+    }
+
+    if (this_valid && !other_valid) {
+      auto intersection = this_p.getIntersectionPoint(other.toSegment());
+      return contains(intersection);
+    }
+
+    if (!this_valid && other_valid) {
+      auto intersection = other_p.getIntersectionPoint(toSegment());
+      return other.contains(intersection);
     }
 
     // planes are coincident with floating point tolerance
     if (this_p.isClose(other_p)) {
-      return copy.intersectsInPlane(other);
+      return intersectsInPlane(other);
     }
 
-    auto ab = Segment3D<T>{copy.a_, copy.b_};
-    auto bc = Segment3D<T>{copy.b_, copy.c_};
-    auto ac = Segment3D<T>{copy.a_, copy.c_};
+    auto ab = Segment3D<T>{a_, b_};
+    auto bc = Segment3D<T>{b_, c_};
+    auto ac = Segment3D<T>{a_, c_};
+
+    auto oab = Segment3D<T>{other.a_, other.b_};
+    auto obc = Segment3D<T>{other.b_, other.c_};
+    auto oac = Segment3D<T>{other.a_, other.c_};
 
     auto abi = other_p.getIntersectionPoint(ab);
     auto bci = other_p.getIntersectionPoint(bc);
     auto aci = other_p.getIntersectionPoint(ac);
 
-    return other_copy.contains(abi) ||
-           other_copy.contains(bci) ||
-           other_copy.contains(aci);
+    auto oabi = this_p.getIntersectionPoint(oab);
+    auto obci = this_p.getIntersectionPoint(obc);
+    auto oaci = this_p.getIntersectionPoint(oac);
+
+    return other.contains(abi) || other.contains(bci) || other.contains(aci) ||
+           contains(oabi) || contains(obci) || contains(oaci);
   }
 };
 
