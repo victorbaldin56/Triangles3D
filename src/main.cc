@@ -4,15 +4,33 @@
 #include "geom/octree.hh"
 
 int main() {
-  std::size_t count = 0;
+  std::cin.exceptions(std::ios::failbit | std::ios::eofbit);
+  auto count = std::size_t(0);
   std::cin >> count;
 
-  std::vector<geometry::Triangle3D<double>> triangles(count);
-  for (auto& t : triangles) {
-    std::cin >> t;
+  auto triangles = std::vector<geometry::Triangle3D<double>>(count);
+  if (count) {
+    std::copy_n(std::istream_iterator<geometry::Triangle3D<double>>(std::cin),
+                count, triangles.begin());
   }
 
-  // we dont need to copy triangles vector
-  geometry::Octree<geometry::Triangle3D<double>> octree{std::move(triangles)};
+  auto res = std::set<std::size_t>();
+
+#if 0
+  auto octree = geometry::Octree<double>(triangles.begin(), triangles.end());
+  res = octree.getIntersections();
+#else
+  for (auto i = std::size_t(0); i < count; ++i) {
+    for (auto j = i + 1; j < count; ++j) {
+      if (triangles[i].intersects(triangles[j])) {
+        res.insert(i + 1);
+        res.insert(j + 1);
+      }
+    }
+  }
+#endif
+
+  std::copy(res.begin(), res.end(),
+            std::ostream_iterator<std::size_t>(std::cout, " "));
   return 0;
 }
