@@ -66,7 +66,8 @@ class Plane {
       return Vector3D<T>{};  // no intersection
     }
 
-    auto&& res = origin + dir * (d_ - dot(origin, n_) / denominator);
+    auto&& t = (d_ - dot(origin, n_)) / denominator;
+    auto&& res = origin + dir * t;
     assert(line.contains(res));
     assert(contains(res));
     return res;
