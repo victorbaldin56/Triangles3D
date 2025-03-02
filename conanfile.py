@@ -11,6 +11,7 @@ class Triangles3DRecipe(ConanFile):
   default_options = {"testing": False, "build_test_generator": False}
 
   def requirements(self):
+    self.requires("spdlog/1.15.1")
     if self.options.testing:
       self.test_requires("gtest/1.15.0")
       self.test_requires("cgal/6.0.1")

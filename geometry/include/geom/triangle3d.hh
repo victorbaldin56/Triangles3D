@@ -50,6 +50,7 @@ struct Triangle3D {
     return comparator::isClose(area(), t1.area() + t2.area() + t3.area());
   }
 
+  // FIXME: шестиконечная звезда
   bool intersectsInPlane(const Triangle3D<T>& other) const noexcept {
     return contains(other.a_) || contains(other.b_) || contains(other.c_) ||
            other.contains(a_) || other.contains(b_) || other.contains(c_);
@@ -69,6 +70,7 @@ struct Triangle3D {
     }
 
     if (this_valid && !other_valid) {
+      // FIXME: line can lie on plane!!
       auto intersection = this_p.getIntersectionPoint(other.toSegment());
       return contains(intersection);
     }

@@ -11,7 +11,7 @@ class Line3D {
  public:
   Line3D() {}
   Line3D(const Vector3D<T>& direction, const Vector3D<T>& origin) noexcept
-      : direction_{direction}, origin_{origin} {
+      : direction_(direction), origin_(origin) {
     direction_.normalize();  // same reason as for Plane3D
   }
 
