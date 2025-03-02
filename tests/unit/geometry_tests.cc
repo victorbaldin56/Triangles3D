@@ -1,10 +1,17 @@
-#include <gtest/gtest.h>
+#include "CGAL/Exact_predicates_exact_constructions_kernel.h"
+#include "CGAL/intersections.h"
+
+#include "gtest/gtest.h"
 
 #include "geom/plane.hh"
 #include "geom/triangle3d.hh"
 #include "geom/vector3d.hh"
 
 using namespace geometry;
+
+using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
+using Triangle_3 = Kernel::Triangle_3;
+using Point_3 = Kernel::Point_3;
 
 constexpr double kAbsTol = 0;
 constexpr double kRelTol = 1e-3;
@@ -225,7 +232,14 @@ TEST(Triangle3D, Intersects_NonCoplanar_GeoGebra_NoIntersection1) {
   Triangle3D<double> t2{{-1.934114, -2.56997, -1},
                         {-5.02241, 1.85908, 0},
                         {0, 0, 5}};
+  Triangle_3 cgal_t1(Point_3(t1.a_.x_, t1.a_.y_, t1.a_.z_),
+                     Point_3(t1.b_.x_, t1.b_.y_, t1.b_.z_),
+                     Point_3(t1.c_.x_, t1.c_.y_, t1.c_.z_));
+  Triangle_3 cgal_t2(Point_3(t2.a_.x_, t2.a_.y_, t2.a_.z_),
+                     Point_3(t2.b_.x_, t2.b_.y_, t2.b_.z_),
+                     Point_3(t2.c_.x_, t2.c_.y_, t2.c_.z_));
 
+  ASSERT_FALSE(CGAL::do_intersect(cgal_t1, cgal_t2));
   ASSERT_FALSE(t1.intersects(t2));
 }
 
@@ -236,7 +250,14 @@ TEST(Triangle3D, Intersects_NonCoplanar_GeoGebra_Intersection1) {
   Triangle3D<double> t2{{-28.99101, 14.7833, 0},
                         {-10.71675, -2.03107, -1},
                         {-15, -20, 2.1}};
+  Triangle_3 cgal_t1(Point_3(t1.a_.x_, t1.a_.y_, t1.a_.z_),
+                     Point_3(t1.b_.x_, t1.b_.y_, t1.b_.z_),
+                     Point_3(t1.c_.x_, t1.c_.y_, t1.c_.z_));
+  Triangle_3 cgal_t2(Point_3(t2.a_.x_, t2.a_.y_, t2.a_.z_),
+                     Point_3(t2.b_.x_, t2.b_.y_, t2.b_.z_),
+                     Point_3(t2.c_.x_, t2.c_.y_, t2.c_.z_));
 
+  ASSERT_TRUE(CGAL::do_intersect(cgal_t1, cgal_t2));
   ASSERT_TRUE(t1.intersects(t2));
 }
 
