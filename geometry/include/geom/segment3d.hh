@@ -33,8 +33,8 @@ struct Segment3D {
   }
 
   bool intersects(const Segment3D<T>& other) const noexcept {
-    auto&& copy(*this);
-    auto&& other_copy(other);
+    auto copy = *this;
+    auto other_copy = other;
     auto&& this_line = copy.line();
     auto&& other_line = other_copy.line();
 

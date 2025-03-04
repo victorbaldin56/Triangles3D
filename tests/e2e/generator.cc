@@ -132,8 +132,8 @@ class TestGenerator {
                                        const char* prefix,
                                        unsigned test_num,
                                        const char* extension) {
-    auto&& res = dir;
-    auto&& filename = std::string(prefix) + std::to_string(test_num) + extension;
+    auto res = dir;
+    auto filename = std::string(prefix) + std::to_string(test_num) + extension;
     res.append(filename);
     return res;
   }
