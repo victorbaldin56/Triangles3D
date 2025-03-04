@@ -80,6 +80,86 @@ TEST(Plane, getIntersectionPoint) {
   ASSERT_FALSE(point2.valid());
 }
 
+TEST(Segment3D, Intersects_3D_SimpleIntersection) {
+  // Two segments intersecting at a single point in 3D space
+  Segment3D<double> seg1{{0.0, 0.0, 0.0}, {2.0, 2.0, 2.0}};
+  Segment3D<double> seg2{{0.0, 2.0, 0.0}, {2.0, 0.0, 2.0}};
+
+  ASSERT_TRUE(seg1.intersects(seg2));  // Segments intersect at (1.0, 1.0, 1.0)
+}
+
+TEST(Segment3D, Intersects_3D_NoIntersection) {
+  // Two segments in 3D space that do not intersect
+  Segment3D<double> seg1{{0.0, 0.0, 0.0}, {1.0, 1.0, 1.0}};
+  Segment3D<double> seg2{{2.0, 2.0, 2.0}, {3.0, 3.0, 3.0}};
+
+  ASSERT_FALSE(seg1.intersects(seg2));  // Segments are parallel and disjoint
+}
+
+TEST(Segment3D, Intersects_3D_CollinearNoOverlap) {
+  // Two collinear segments in 3D space with no overlap
+  Segment3D<double> seg1{{0.0, 0.0, 0.0}, {1.0, 1.0, 1.0}};
+  Segment3D<double> seg2{{2.0, 2.0, 2.0}, {3.0, 3.0, 3.0}};
+
+  ASSERT_FALSE(seg1.intersects(seg2));  // Segments are collinear but disjoint
+}
+
+TEST(Segment3D, Intersects_3D_CollinearOverlap) {
+  // Two collinear segments in 3D space with overlap
+  Segment3D<double> seg1{{0.0, 0.0, 0.0}, {2.0, 2.0, 2.0}};
+  Segment3D<double> seg2{{1.0, 1.0, 1.0}, {3.0, 3.0, 3.0}};
+
+  ASSERT_TRUE(seg1.intersects(seg2));
+}
+
+TEST(Segment3D, Intersects_3D_SharedEndpoint) {
+  // Two segments in 3D space sharing an endpoint
+  Segment3D<double> seg1{{0.0, 0.0, 0.0}, {1.0, 1.0, 1.0}};
+  Segment3D<double> seg2{{1.0, 1.0, 1.0}, {2.0, 2.0, 2.0}};
+
+  ASSERT_TRUE(seg1.intersects(seg2));
+}
+
+TEST(Segment3D, Intersects_3D_ParallelNoIntersection) {
+  // Two parallel segments in 3D space that do not intersect
+  Segment3D<double> seg1{{0.0, 0.0, 0.0}, {1.0, 1.0, 0.0}};
+  Segment3D<double> seg2{{0.0, 0.0, 1.0}, {1.0, 1.0, 1.0}};
+
+  ASSERT_FALSE(seg1.intersects(seg2));  // Segments are parallel and disjoint
+}
+
+TEST(Segment3D, Intersects_3D_SkewNoIntersection) {
+  // Two skew segments in 3D space that do not intersect
+  Segment3D<double> seg1{{0.0, 0.0, 0.0}, {1.0, 1.0, 0.0}};
+  Segment3D<double> seg2{{0.0, 1.0, 1.0}, {1.0, 0.0, 1.0}};
+
+  ASSERT_FALSE(seg1.intersects(seg2));
+}
+
+TEST(Segment3D, Intersects_3D_DegenerateSegment) {
+  // One segment is degenerate (a single point)
+  Segment3D<double> seg1{{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
+  Segment3D<double> seg2{{0.0, 0.0, 0.0}, {2.0, 2.0, 2.0}};
+
+  ASSERT_TRUE(seg1.intersects(seg2));  // Degenerate segment lies on seg2
+}
+
+TEST(Segment3D, Intersects_3D_BothDegenerate) {
+  // Both segments are degenerate (single points)
+  Segment3D<double> seg1{{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
+  Segment3D<double> seg2{{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
+
+  ASSERT_TRUE(seg1.intersects(seg2));  // Both segments are the same point
+}
+
+TEST(Segment3D, Intersects_3D_DegenerateNoIntersection) {
+  // Both segments are degenerate (single points) but different
+  Segment3D<double> seg1{{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
+  Segment3D<double> seg2{{2.0, 2.0, 2.0}, {2.0, 2.0, 2.0}};
+
+  ASSERT_FALSE(seg1.intersects(seg2));  // Segments are different points
+}
+
 TEST(Triangle3D, Intersects_SimpleCase) {
   Triangle3D<double> t1{{0.3, 0.7, 1.2}, {1.5, 0.4, 2.1}, {0.8, 1.9, 3.4}};
   Triangle3D<double> t2{{0.3, 0.7, 1.2}, {1.5, 0.4, 2.1}, {0.8, 1.9, 3.4}};
