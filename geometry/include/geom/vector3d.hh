@@ -65,7 +65,7 @@ struct Vector3D {
     return *this;
   }
 
-  static Vector3D<T> zeroVector() noexcept { return {0, 0, 0}; }
+  static Vector3D<T> nullVector() noexcept { return {0, 0, 0}; }
 };
 
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
@@ -114,7 +114,7 @@ T tripleProduct(const Vector3D<T>& a,
 
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 bool collinear(const Vector3D<T>& a, const Vector3D<T>& b) noexcept {
-  return crossProduct(a, b).isClose(Vector3D<T>::zeroVector());
+  return crossProduct(a, b).isClose(Vector3D<T>::nullVector());
 }
 
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>

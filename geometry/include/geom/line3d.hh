@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include "vector3d.hh"
 
 namespace geometry {
@@ -27,10 +29,19 @@ class Line3D {
   }
 
   Vector3D<T> getIntersectionPoint(const Line3D<T>& other) const noexcept {
-    Vector3D<T> dir_cross = crossProduct(direction_, other.direction_);
-    Vector3D<T> origin_cross = crossProduct(origin_, other.origin_);
-    return origin_ +
-           direction_ * dot(dir_cross, origin_cross) / dir_cross.norm2();
+    auto&& dir_cross = crossProduct(direction_, other.direction_);
+    if (dir_cross.isClose(Vector3D<T>::nullVector())) {
+      return Vector3D<T>{};
+    }
+
+    auto&& w = other.origin_ - origin_;
+    auto&& numerator = dot(crossProduct(w, other.direction_), dir_cross);
+    auto&& t = numerator;
+    auto&& res = origin_ + direction_ * t;
+
+    assert(!res.valid() || contains(res));
+    assert(!res.valid() || other.contains(res));
+    return res;
   }
 
   bool isClose(const Line3D<T>& other) const noexcept {

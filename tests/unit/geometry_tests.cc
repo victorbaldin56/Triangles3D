@@ -46,6 +46,48 @@ TEST(Line3D, isClose) {
   ASSERT_TRUE(l1.isClose(l2));
 }
 
+TEST(Line3D, Intersection_CoplanarSimple) {
+  Segment3D<double> seg1{{0.0, 2.0, 0.0}, {-1.0, -1.0, 0.0}};
+  Segment3D<double> seg2{{0.0, -2.0, 0.0}, {-1.0, 1.0, 0.0}};
+
+  auto&& l1 = seg1.line();
+  auto&& l2 = seg2.line();
+  auto&& ip = l1.getIntersectionPoint(l2);
+
+  ASSERT_TRUE(ip.valid());
+  ASSERT_TRUE(ip.isClose({-2.0 / 3.0, 0.0, 0.0}));
+}
+
+TEST(Line3D, Intersection_NonParallelCoplanar) {
+  Line3D<double> line1(
+    {1.0, 0.0, 0.0},
+    {0.0, 0.0, 0.0}
+  );
+
+  Line3D<double> line2(
+    {0.0, 1.0, 0.0},
+    {0.0, 0.0, 0.0}
+  );
+
+  auto&& intersection = line1.getIntersectionPoint(line2);
+  ASSERT_TRUE(intersection.isClose({0.0, 0.0, 0.0}));
+}
+
+TEST(Line3D, Intersection_SkewLines) {
+  Line3D<double> line1(
+    {1.0, 0.0, 0.0},
+    {0.0, 0.0, 0.0}
+  );
+
+  Line3D<double> line2(
+    {0.0, 1.0, 0.0},
+    {0.0, 0.0, 1.0}
+  );
+
+  auto&& intersection = line1.getIntersectionPoint(line2);
+  ASSERT_FALSE(intersection.valid());
+}
+
 TEST(Plane, constructor) {
   Plane<double> p1{{16, 7, 8}, {7.8, 19100, 89}, {100, 2.2, 4.3}};
   Plane<double> p2{{0, 0, 0}, {1, 0, 0}, {-1000, 0, 0}};
@@ -158,6 +200,13 @@ TEST(Segment3D, Intersects_3D_DegenerateNoIntersection) {
   Segment3D<double> seg2{{2.0, 2.0, 2.0}, {2.0, 2.0, 2.0}};
 
   ASSERT_FALSE(seg1.intersects(seg2));  // Segments are different points
+}
+
+TEST(Segment3D, Intersects_3D_AxisSymmetric) {
+  Segment3D<double> seg1{{0.0, 2.0, 0.0}, {-1.0, -1.0, 0.0}};
+  Segment3D<double> seg2{{0.0, -2.0, 0.0}, {-1.0, 1.0, 0.0}};
+
+  ASSERT_TRUE(seg1.intersects(seg2));
 }
 
 TEST(Triangle3D, Intersects_SimpleCase) {
