@@ -22,7 +22,8 @@ int main() {
 #else
   for (auto i = std::size_t(0); i < count; ++i) {
     for (auto j = i + 1; j < count; ++j) {
-      if (triangles[i].intersects(triangles[j])) {
+      auto&& ans = triangles[i].intersects(triangles[j]);
+      if (ans) {
         res.insert(i + 1);
         res.insert(j + 1);
       }

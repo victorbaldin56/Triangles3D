@@ -57,7 +57,12 @@ class TestGenerator {
     auto&& res = std::vector<Triangle_3>(count);
     std::transform(res.begin(), res.end(), res.begin(),
                    [this, count](const auto& e) {
-      return generateRandomTriangle(count);
+      auto&& t =
+          Triangle_3(Point_3(0, 0, 0), Point_3(0, 0, 0), Point_3(0, 0, 0));
+      while (t.is_degenerate()) {
+        t = generateRandomTriangle(count);
+      }
+      return t;
     });
 
     return res;
@@ -74,6 +79,7 @@ class TestGenerator {
     auto&& tr_x = transfer_width * trans_dist(rng_);
     auto&& tr_y = transfer_width * trans_dist(rng_);
     auto&& tr_z = transfer_width * trans_dist(rng_);
+
     return Triangle_3(
         generateRandomPoint(tr_x, tr_y, tr_z),
         generateRandomPoint(tr_x, tr_y, tr_z),
@@ -143,7 +149,7 @@ class TestGenerator {
   static constexpr auto kInputDir = "input";
   static constexpr auto kAnsDir = "ans";
   static constexpr auto kMinTriangles = 1u;
-  static constexpr auto kMaxTriangles = 100u;
+  static constexpr auto kMaxTriangles = 300u;
   static constexpr auto kMinCoord = 0.0;
   static constexpr auto kMaxCoord = 1.0;
   static constexpr auto kCenterCoord = (kMinCoord + kMaxCoord) / 2;
