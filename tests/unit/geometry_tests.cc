@@ -3,7 +3,6 @@
 
 #include "gtest/gtest.h"
 
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include "geom/plane.hh"
 #include "geom/triangle3d.hh"
 #include "geom/vector3d.hh"
@@ -640,7 +639,6 @@ TEST(Triangle3D, Intersects_DegenerateSegment_CollinearOutside) {
 }
 
 int main(int argc, char** argv) {
-  spdlog::set_level(spdlog::level::trace);
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

@@ -2,8 +2,6 @@
 
 #include <cassert>
 
-#include "spdlog/spdlog.h"
-
 #include "line3d.hh"
 #include "segment3d.hh"
 #include "vector3d.hh"
@@ -51,12 +49,6 @@ class Plane {
 
     auto&& origin = line.origin();
     auto&& dir = line.direction();
-    SPDLOG_TRACE("n_.x_ = {}, n_.y_ = {}, n_.z_ = {}",
-                 n_.x_, n_.y_, n_.z_);
-    SPDLOG_TRACE("origin.x_ = {}, origin.y_ = {}, origin.z_ = {}",
-                 origin.x_, origin.y_, origin.z_);
-    SPDLOG_TRACE("dir.x_ = {}, dir.y_ = {}, dir.z_ = {}",
-                 dir.x_, dir.y_, dir.z_);
     auto&& denominator = dot(n_, dir);
     if (comparator::isClose(denominator, static_cast<T>(0))) {
       // check if the line lies on the plane
@@ -91,9 +83,6 @@ class Plane {
 
   bool contains(const Vector3D<T>& p) const noexcept {
     auto&& dotpn = dot(p, n_);
-    SPDLOG_TRACE("Plane3D::contains(p.x_ = {}, p.y_ = {}, p.z_ = {})",
-                 p.x_, p.y_, p.z_);
-    SPDLOG_TRACE("dotpn = {}, d_ = {}", dotpn, d_);
     return comparator::isClose(dotpn, d_);
   }
 

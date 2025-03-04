@@ -1,10 +1,14 @@
 #include <stdexcept>
 #include <vector>
 
+//#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include "geom/triangle3d.hh"
 #include "geom/octree.hh"
 
 int main() try {
+  // for trace & debugging
+  spdlog::set_level(static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
+
   std::cin.exceptions(std::ios::failbit | std::ios::eofbit);
   auto count = std::size_t(0);
   std::cin >> count;
@@ -34,8 +38,9 @@ int main() try {
 
   std::copy(res.begin(), res.end(),
             std::ostream_iterator<std::size_t>(std::cout, " "));
+  std::cout << std::endl;
   return 0;
 } catch (std::exception& ex) {
-  std::cerr << ex.what() << '\n';
+  std::cerr << ex.what() << std::endl;
   return EXIT_FAILURE;
 }

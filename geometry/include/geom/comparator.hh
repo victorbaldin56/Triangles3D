@@ -12,7 +12,7 @@ constexpr T kAbsTol =
 template <typename T>
 constexpr T kRelTol =
     std::numeric_limits<T>::is_exact ? static_cast<T>(0)
-                                     : static_cast<T>(1e-8);
+                                     : static_cast<T>(1e-10);
 
 template <typename T>
 inline bool isClose(const T& a, const T& b,
