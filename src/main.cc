@@ -1,7 +1,6 @@
 #include <stdexcept>
 #include <vector>
 
-//#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include "geom/triangle3d.hh"
 #include "geom/octree.hh"
 
@@ -19,23 +18,8 @@ int main() try {
                 count, triangles.begin());
   }
 
-  auto res = std::set<std::size_t>();
-
-#if 1
   auto octree = geometry::Octree<double>(triangles.begin(), triangles.end());
-  res = octree.getIntersections();
-#else
-  for (auto i = std::size_t(0); i < count; ++i) {
-    for (auto j = i + 1; j < count; ++j) {
-      auto&& ans = triangles[i].intersects(triangles[j]);
-      if (ans) {
-        res.insert(i + 1);
-        res.insert(j + 1);
-      }
-    }
-  }
-#endif
-
+  auto res = octree.getIntersections();
   std::copy(res.begin(), res.end(),
             std::ostream_iterator<std::size_t>(std::cout, " "));
   std::cout << std::endl;
