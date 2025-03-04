@@ -35,7 +35,7 @@ TEST(Vector3D, crossProduct) {
 
 TEST(Vector3D, normalize) {
   Vector3D<double> v{1000, 99, 9.7};
-  auto n = v.normalize();
+  auto&& n = v.normalize();
   ASSERT_TRUE(n.isClose(1 / std::sqrt(dot(v, v)) * v));
   ASSERT_TRUE(comparator::isClose(n.norm(), 1.0));
 }
@@ -112,13 +112,13 @@ TEST(Plane, getIntersectionPoint) {
   Segment3D<double> s1{{5, -1, 0}, {7, 1, 0}};
   Segment3D<double> s2{{0, 0, 1}, {0, 1, 2}};
 
-  auto point0 = p.getIntersectionPoint(s1.line());
-  auto point1 = p.getIntersectionPoint(s1);
+  auto&& point0 = p.getIntersectionPoint(s1.line());
+  auto&& point1 = p.getIntersectionPoint(s1);
   ASSERT_TRUE(point0.isClose({6, 0, 0}));
   ASSERT_TRUE(point1.valid());
   ASSERT_TRUE(point1.isClose({6, 0, 0}));
 
-  auto point2 = p.getIntersectionPoint(s2);
+  auto&& point2 = p.getIntersectionPoint(s2);
   ASSERT_FALSE(point2.valid());
 }
 
@@ -517,6 +517,111 @@ TEST(Triangle3D, Intersects_CoplanarEdgeIntersectionNoVertexContainment) {
 
   ASSERT_TRUE(t1.intersectsEdges(t2));
   ASSERT_TRUE(t1.intersects(t2));
+}
+
+TEST(Triangle3D, Intersects_DegeneratePoint_Inside) {
+  Triangle3D<double> normal{
+    {0.0, 0.0, 0.0},
+    {2.0, 0.0, 0.0},
+    {0.0, 2.0, 0.0}
+  };
+  // Degenerate to point inside triangle
+  Triangle3D<double> point{
+    {1.0, 1.0, 0.0},
+    {1.0, 1.0, 0.0},
+    {1.0, 1.0, 0.0}
+  };
+  ASSERT_TRUE(normal.intersects(point));
+}
+
+TEST(Triangle3D, Intersects_DegeneratePoint_OnEdge) {
+  Triangle3D<double> normal{
+    {0.0, 0.0, 0.0},
+    {2.0, 0.0, 0.0},
+    {0.0, 2.0, 0.0}
+  };
+  // Degenerate to point on triangle's edge
+  Triangle3D<double> point{
+    {1.0, 0.0, 0.0},
+    {1.0, 0.0, 0.0},
+    {1.0, 0.0, 0.0}
+  };
+  ASSERT_TRUE(normal.intersects(point));
+}
+
+TEST(Triangle3D, Intersects_DegeneratePoint_Outside) {
+  Triangle3D<double> normal{
+    {0.0, 0.0, 0.0},
+    {2.0, 0.0, 0.0},
+    {0.0, 2.0, 0.0}
+  };
+  // Degenerate to point outside triangle
+  Triangle3D<double> point{
+    {3.0, 3.0, 0.0},
+    {3.0, 3.0, 0.0},
+    {3.0, 3.0, 0.0}
+  };
+  ASSERT_FALSE(normal.intersects(point));
+}
+
+TEST(Triangle3D, Intersects_DegenerateSegment_Crossing) {
+  Triangle3D<double> normal{
+    {0.0, 0.0, 0.0},
+    {2.0, 0.0, 0.0},
+    {0.0, 2.0, 0.0}
+  };
+  // Degenerate to segment crossing the triangle
+  Triangle3D<double> segment{
+    {-1.0, 1.0, 0.0},
+    {1.0, -1.0, 0.0},
+    {0.5, 0.0, 0.0}  // Midpoint ensures segment decay
+  };
+  ASSERT_TRUE(normal.intersects(segment));
+}
+
+TEST(Triangle3D, Intersects_DegenerateSegment_SharedEdge) {
+  Triangle3D<double> normal{
+    {0.0, 0.0, 0.0},
+    {2.0, 0.0, 0.0},
+    {0.0, 2.0, 0.0}
+  };
+  // Degenerate to shared edge
+  Triangle3D<double> segment{
+    {0.0, 0.0, 0.0},
+    {2.0, 0.0, 0.0},
+    {1.0, 0.0, 0.0}  // Midpoint ensures segment decay
+  };
+  ASSERT_TRUE(normal.intersects(segment));
+}
+
+TEST(Triangle3D, Intersects_DegenerateSegment_Outside) {
+  Triangle3D<double> normal{
+    {0.0, 0.0, 0.0},
+    {2.0, 0.0, 0.0},
+    {0.0, 2.0, 0.0}
+  };
+  // Degenerate to segment outside triangle
+  Triangle3D<double> segment{
+    {3.0, 0.0, 0.0},
+    {3.0, 2.0, 0.0},
+    {3.0, 1.0, 0.0}  // Midpoint ensures segment decay
+  };
+  ASSERT_FALSE(normal.intersects(segment));
+}
+
+TEST(Triangle3D, Intersects_DegenerateSegment_CollinearOutside) {
+  Triangle3D<double> normal{
+    {0.0, 0.0, 0.0},
+    {2.0, 0.0, 0.0},
+    {0.0, 2.0, 0.0}
+  };
+  // Collinear segment outside triangle
+  Triangle3D<double> segment{
+    {3.0, 0.0, 0.0},
+    {5.0, 0.0, 0.0},
+    {4.0, 0.0, 0.0}  // Midpoint ensures segment decay
+  };
+  ASSERT_FALSE(normal.intersects(segment));
 }
 
 int main(int argc, char** argv) {

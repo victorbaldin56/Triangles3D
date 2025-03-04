@@ -5,19 +5,19 @@
 
 int main() {
   std::cin.exceptions(std::ios::failbit | std::ios::eofbit);
-  auto count = std::size_t(0);
+  auto&& count = std::size_t(0);
   std::cin >> count;
 
-  auto triangles = std::vector<geometry::Triangle3D<double>>(count);
+  auto&& triangles = std::vector<geometry::Triangle3D<double>>(count);
   if (count) {
     std::copy_n(std::istream_iterator<geometry::Triangle3D<double>>(std::cin),
                 count, triangles.begin());
   }
 
-  auto res = std::set<std::size_t>();
+  auto&& res = std::set<std::size_t>();
 
 #if 0
-  auto octree = geometry::Octree<double>(triangles.begin(), triangles.end());
+  auto&& octree = geometry::Octree<double>(triangles.begin(), triangles.end());
   res = octree.getIntersections();
 #else
   for (auto i = std::size_t(0); i < count; ++i) {

@@ -15,10 +15,10 @@ struct Triangle3D {
   /**
    * Decays degenerate triangle to segment.
    */
-  Segment3D<T> toSegment() const {
-    auto ab = Segment3D<T>{a_, b_};
-    auto bc = Segment3D<T>{b_, c_};
-    auto ac = Segment3D<T>{a_, c_};
+  Segment3D<T> toSegment3D() const {
+    auto&& ab = Segment3D<T>{a_, b_};
+    auto&& bc = Segment3D<T>{b_, c_};
+    auto&& ac = Segment3D<T>{a_, c_};
 
     if (ab.getRange().contains(c_)) {
       return ab;
@@ -36,9 +36,9 @@ struct Triangle3D {
    * Returns a minimal range containing the whole triangle.
    */
   Range3D<T> getRange() const noexcept {
-    auto xs = {a_.x_, b_.x_, c_.x_};
-    auto ys = {a_.y_, b_.y_, c_.y_};
-    auto zs = {a_.z_, b_.z_, c_.z_};
+    auto&& xs = {a_.x_, b_.x_, c_.x_};
+    auto&& ys = {a_.y_, b_.y_, c_.y_};
+    auto&& zs = {a_.z_, b_.z_, c_.z_};
     return {std::min(xs), std::max(xs),
             std::min(ys), std::max(ys),
             std::min(zs), std::max(zs)};
@@ -69,7 +69,6 @@ struct Triangle3D {
     }) != edges_end);
   }
 
-  // FIXME: шестиконечная звезда
   bool intersectsInPlane(const Triangle3D<T>& other) const noexcept {
     return contains(other.a_) || contains(other.b_) || contains(other.c_) ||
            other.contains(a_) || other.contains(b_) || other.contains(c_) ||
@@ -77,26 +76,33 @@ struct Triangle3D {
   }
 
   bool intersects(const Triangle3D<T>& other) const noexcept {
-    auto this_p = Plane<T>(a_, b_, c_);
-    auto other_p = Plane<T>(other.a_, other.b_, other.c_);
+    auto&& this_p = Plane<T>(a_, b_, c_);
+    auto&& other_p = Plane<T>(other.a_, other.b_, other.c_);
 
-    auto this_valid = this_p.valid();
-    auto other_valid = other_p.valid();
+    auto&& this_valid = this_p.valid();
+    auto&& other_valid = other_p.valid();
 
     if (!this_valid && !other_valid) {
-      auto this_seg = toSegment();
-      auto other_seg = other.toSegment();
+      auto&& this_seg = toSegment3D();
+      auto&& other_seg = other.toSegment3D();
       return this_seg.intersects(other_seg);
     }
 
     if (this_valid && !other_valid) {
-      // FIXME: line can lie on plane!!
-      auto intersection = this_p.getIntersectionPoint(other.toSegment());
+      auto&& seg = other.toSegment3D();
+      if (this_p.contains(seg)) {
+        return intersectsInPlane(other);
+      }
+      auto&& intersection = this_p.getIntersectionPoint(seg);
       return contains(intersection);
     }
 
     if (!this_valid && other_valid) {
-      auto intersection = other_p.getIntersectionPoint(toSegment());
+      auto&& seg = toSegment3D();
+      if (other_p.contains(seg)) {
+        return other.intersectsInPlane(*this);
+      }
+      auto&& intersection = other_p.getIntersectionPoint(seg);
       return other.contains(intersection);
     }
 
@@ -105,21 +111,21 @@ struct Triangle3D {
       return intersectsInPlane(other);
     }
 
-    auto ab = Segment3D<T>{a_, b_};
-    auto bc = Segment3D<T>{b_, c_};
-    auto ac = Segment3D<T>{a_, c_};
+    auto&& ab = Segment3D<T>{a_, b_};
+    auto&& bc = Segment3D<T>{b_, c_};
+    auto&& ac = Segment3D<T>{a_, c_};
 
-    auto oab = Segment3D<T>{other.a_, other.b_};
-    auto obc = Segment3D<T>{other.b_, other.c_};
-    auto oac = Segment3D<T>{other.a_, other.c_};
+    auto&& oab = Segment3D<T>{other.a_, other.b_};
+    auto&& obc = Segment3D<T>{other.b_, other.c_};
+    auto&& oac = Segment3D<T>{other.a_, other.c_};
 
-    auto abi = other_p.getIntersectionPoint(ab);
-    auto bci = other_p.getIntersectionPoint(bc);
-    auto aci = other_p.getIntersectionPoint(ac);
+    auto&& abi = other_p.getIntersectionPoint(ab);
+    auto&& bci = other_p.getIntersectionPoint(bc);
+    auto&& aci = other_p.getIntersectionPoint(ac);
 
-    auto oabi = this_p.getIntersectionPoint(oab);
-    auto obci = this_p.getIntersectionPoint(obc);
-    auto oaci = this_p.getIntersectionPoint(oac);
+    auto&& oabi = this_p.getIntersectionPoint(oab);
+    auto&& obci = this_p.getIntersectionPoint(obc);
+    auto&& oaci = this_p.getIntersectionPoint(oac);
 
     return other.contains(abi) || other.contains(bci) || other.contains(aci) ||
            contains(oabi) || contains(obci) || contains(oaci);

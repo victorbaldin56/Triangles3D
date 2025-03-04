@@ -38,12 +38,12 @@ class Plane {
   bool valid() const noexcept { return n_.valid() && std::isfinite(d_); }
 
   Line3D<T> getIntersectionLine(const Plane<T>& other) const noexcept {
-    T normal_dot = dot(n_, other.n_);
-    T denom = 1 - normal_dot * normal_dot;
-    T c1 = (d_ - other.d_ * normal_dot) / denom;
-    T c2 = (other.d_ - d_ * normal_dot) / denom;
+    auto&& normal_dot = dot(n_, other.n_);
+    auto&& denom = 1 - normal_dot * normal_dot;
+    auto&& c1 = (d_ - other.d_ * normal_dot) / denom;
+    auto&& c2 = (other.d_ - d_ * normal_dot) / denom;
 
-    return Line3D<T>{crossProduct(n_, other.n_), c1 * n_ + c2 * other.n_};
+    return Line3D<T>(crossProduct(n_, other.n_), c1 * n_ + c2 * other.n_);
   }
 
   Vector3D<T> getIntersectionPoint(const Line3D<T>& line) const noexcept {
@@ -60,9 +60,6 @@ class Plane {
     auto&& denominator = dot(n_, dir);
     if (comparator::isClose(denominator, static_cast<T>(0))) {
       // check if the line lies on the plane
-      if (comparator::isClose(dot(n_, origin), d_)) {
-        return origin;  // any point on the line is valid, return the origin
-      }
       return Vector3D<T>{};  // no intersection
     }
 
@@ -81,15 +78,15 @@ class Plane {
       }
       return Vector3D<T>{};
     }
-    auto p = getIntersectionPoint(l);
+    auto&& p = getIntersectionPoint(l);
     assert(!p.valid() || contains(p));
     assert(!p.valid() || l.contains(p));
 
-    auto range = seg.getRange();
+    auto&& range = seg.getRange();
     if (range.contains(p)) {
       return p;
     }
-    return Vector3D<T>();
+    return Vector3D<T>{};
   }
 
   bool contains(const Vector3D<T>& p) const noexcept {
@@ -98,6 +95,10 @@ class Plane {
                  p.x_, p.y_, p.z_);
     SPDLOG_TRACE("dotpn = {}, d_ = {}", dotpn, d_);
     return comparator::isClose(dotpn, d_);
+  }
+
+  bool contains(const Segment3D<T>& s) const noexcept {
+    return contains(s.begin_) && contains(s.end_);
   }
 
   bool isClose(const Plane<T>& other) const noexcept {

@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 
 std::ostream& operator>>(std::ostream& os, const Triangle_3& t) {
   for (auto i = 0; i < 3; ++i) {
-    auto v = t.vertex(i);
+    auto&& v = t.vertex(i);
     os << v.x() << " " << v.y() << " " << v.z() << '\n';
   }
   return os;
@@ -41,11 +41,11 @@ class TestGenerator {
 
  private:
   void generateTest(unsigned test_num) {
-    auto cnt_dst =
+    auto&& cnt_dst =
         std::uniform_int_distribution<unsigned>(kMinTriangles, kMaxTriangles);
-    auto triangles_count = cnt_dst(rng_);
-    auto triangles = generateRandomTriangles(triangles_count);
-    auto ans = getReferenceAnswer(triangles);
+    auto&& triangles_count = cnt_dst(rng_);
+    auto&& triangles = generateRandomTriangles(triangles_count);
+    auto&& ans = getReferenceAnswer(triangles);
 
     writeTrianglesToFile(triangles, test_num);
     writeAnswerToFile(ans, test_num);
@@ -54,7 +54,7 @@ class TestGenerator {
   }
 
   std::vector<Triangle_3> generateRandomTriangles(unsigned count) {
-    auto res = std::vector<Triangle_3>(count);
+    auto&& res = std::vector<Triangle_3>(count);
     std::transform(res.begin(), res.end(), res.begin(),
                    [this, count](const auto& e) {
       return generateRandomTriangle(count);
@@ -64,16 +64,16 @@ class TestGenerator {
   }
 
   Triangle_3 generateRandomTriangle(unsigned triangles_count) {
-    auto triangles_per_edge = static_cast<int>(std::cbrt(triangles_count));
-    auto transfer_width =
+    auto&& triangles_per_edge = static_cast<int>(std::cbrt(triangles_count));
+    auto&& transfer_width =
         (kMaxCoord - kMinCoord) / ((triangles_per_edge + 1) * 2);
-    auto trans_dist =
+    auto&& trans_dist =
         std::uniform_int_distribution<int>(
             -triangles_per_edge, triangles_per_edge);
 
-    auto tr_x = transfer_width * trans_dist(rng_);
-    auto tr_y = transfer_width * trans_dist(rng_);
-    auto tr_z = transfer_width * trans_dist(rng_);
+    auto&& tr_x = transfer_width * trans_dist(rng_);
+    auto&& tr_y = transfer_width * trans_dist(rng_);
+    auto&& tr_z = transfer_width * trans_dist(rng_);
     return Triangle_3(
         generateRandomPoint(tr_x, tr_y, tr_z),
         generateRandomPoint(tr_x, tr_y, tr_z),
@@ -81,19 +81,19 @@ class TestGenerator {
   }
 
   Point_3 generateRandomPoint(double tr_x, double tr_y, double tr_z) {
-    auto x_dst = std::uniform_real_distribution<double>(-tr_x, tr_x);
-    auto y_dst = std::uniform_real_distribution<double>(-tr_y, tr_y);
-    auto z_dst = std::uniform_real_distribution<double>(-tr_z, tr_z);
-    auto x = x_dst(rng_) + tr_x + kCenterCoord;
-    auto y = y_dst(rng_) + tr_y + kCenterCoord;
-    auto z = z_dst(rng_) + tr_z + kCenterCoord;
+    auto&& x_dst = std::uniform_real_distribution<double>(-tr_x, tr_x);
+    auto&& y_dst = std::uniform_real_distribution<double>(-tr_y, tr_y);
+    auto&& z_dst = std::uniform_real_distribution<double>(-tr_z, tr_z);
+    auto&& x = x_dst(rng_) + tr_x + kCenterCoord;
+    auto&& y = y_dst(rng_) + tr_y + kCenterCoord;
+    auto&& z = z_dst(rng_) + tr_z + kCenterCoord;
     return Point_3(x, y, z);
   }
 
   std::set<unsigned> getReferenceAnswer(
       const std::vector<Triangle_3>& triangles) {
-    auto res = std::set<unsigned>();
-    auto size = triangles.size();
+    auto&& res = std::set<unsigned>();
+    auto&& size = triangles.size();
     for (auto i = 0u; i < size; ++i) {
       for (auto j = i + 1; j < size; ++j) {
         if (CGAL::do_intersect(triangles[i], triangles[j])) {
@@ -107,9 +107,9 @@ class TestGenerator {
 
   void writeTrianglesToFile(const std::vector<Triangle_3>& triangles,
                             unsigned test_num) {
-    auto filepath =
+    auto&& filepath =
         getOutputFileName(input_directory_, "test_", test_num, ".in");
-    auto os = std::fstream();
+    auto&& os = std::fstream();
     os.exceptions(std::ios::failbit);
     os.open(filepath, std::ios::trunc | std::ios::out);
 
@@ -119,9 +119,9 @@ class TestGenerator {
   }
 
   void writeAnswerToFile(const std::set<unsigned>& ans, unsigned test_num) {
-    auto filepath =
+    auto&& filepath =
         getOutputFileName(ans_directory_, "ans_", test_num, ".out");
-    auto os = std::fstream();
+    auto&& os = std::fstream();
     os.exceptions(std::ios::failbit);
     os.open(filepath, std::ios::trunc | std::ios::out);
     std::copy(ans.begin(), ans.end(),
@@ -132,8 +132,8 @@ class TestGenerator {
                                        const char* prefix,
                                        unsigned test_num,
                                        const char* extension) {
-    auto res = dir;
-    auto filename = std::string(prefix) + std::to_string(test_num) + extension;
+    auto&& res = dir;
+    auto&& filename = std::string(prefix) + std::to_string(test_num) + extension;
     res.append(filename);
     return res;
   }
@@ -157,7 +157,7 @@ class TestGenerator {
 };
 
 int main() {
-  auto gen = TestGenerator();
+  auto&& gen = TestGenerator();
   gen.run();
   return 0;
 }

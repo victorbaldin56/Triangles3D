@@ -38,7 +38,7 @@ class Octree final {
       node_stack_.push(this->shared_from_this());
 
       while (!node_stack_.empty()) {
-        auto current_node = node_stack_.top();
+        auto&& current_node = node_stack_.top();
         node_stack_.pop();
 
         if (current_node->triangles_.empty()) {
@@ -73,7 +73,7 @@ class Octree final {
         for (auto it = triangles_.begin(); it != triangles_.end(); ++it) {
           (void)std::find_if(children_.begin(), children_.end(),
                              [&it, current_node, this](auto& ch) {
-            auto tr = *it;
+            auto&& tr = *it;
 
             if (ch->coords_.contains(tr.first.getRange())) {
               ch->triangles_.push_back(tr);
@@ -89,16 +89,16 @@ class Octree final {
     }
 
     std::set<std::size_t> getIntersections() {
-      auto res = std::set<std::size_t>();
+      auto&& res = std::set<std::size_t>();
 
       while (!node_stack_.empty()) {
-        auto current_node = node_stack_.top();
+        auto&& current_node = node_stack_.top();
         node_stack_.pop();
 
         for (auto it = triangles_.cbegin(); it != triangles_.cend(); ++it) {
-          auto tr1 = *it;
+          auto&& tr1 = *it;
           for (auto jt = it; jt != triangles_.cend(); ++jt) {
-            auto tr2 = *jt;
+            auto&& tr2 = *jt;
             if (tr1.second == tr2.second) {
               continue;
             }
@@ -131,7 +131,7 @@ class Octree final {
       node_stack_.push(this->shared_from_this());
 
       while (!node_stack_.empty()) {
-        auto current_node = node_stack_.top();
+        auto&& current_node = node_stack_.top();
         node_stack_.pop();
 
         std::for_each(children_.begin(), children_.end(),
@@ -158,12 +158,12 @@ class Octree final {
       typename
           = std::enable_if<std::is_base_of_v<std::input_iterator_tag, It>>>
   Octree(It begin, It end) {
-    auto range = begin->getRange();
+    auto&& range = begin->getRange();
     InternalContainer triangles;
 
     std::size_t count = 1;
     for (auto it = begin; it != end; ++it) {
-      auto cur = it->getRange();
+      auto&& cur = it->getRange();
 
       if (cur.min_x_ < range.min_x_) {
         range.min_x_ = cur.min_x_;
