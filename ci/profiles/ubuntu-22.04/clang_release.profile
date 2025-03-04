@@ -4,6 +4,7 @@ os=Linux
 compiler=clang
 compiler.version=14
 compiler.libcxx=libc++
+compiler.cppstd=gnu17
 build_type=Release
 
 [buildenv]
