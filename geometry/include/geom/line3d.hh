@@ -29,9 +29,6 @@ class Line3D {
   }
 
   Vector3D<T> getIntersectionPoint(const Line3D<T>& other) const noexcept {
-    T triple_product =
-        tripleProduct(origin_ - other.origin_, direction_, other.direction_);
-
     Vector3D<T> dir_cross = crossProduct(direction_, other.direction_);
     Vector3D<T> origin_cross = crossProduct(origin_, other.origin_);
     return origin_ +

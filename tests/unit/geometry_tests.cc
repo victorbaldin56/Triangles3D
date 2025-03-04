@@ -393,6 +393,7 @@ TEST(Triangle3D, Intersects_CoplanarEdgeIntersectionNoVertexContainment) {
   ASSERT_FALSE(t2.contains(t1.b_));
   ASSERT_FALSE(t2.contains(t1.c_));
 
+  ASSERT_TRUE(t1.intersectsEdges(t2));
   ASSERT_TRUE(t1.intersects(t2));
 }
 
