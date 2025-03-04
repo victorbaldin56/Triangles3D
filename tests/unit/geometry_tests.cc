@@ -14,9 +14,6 @@ using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
 using Triangle_3 = Kernel::Triangle_3;
 using Point_3 = Kernel::Point_3;
 
-constexpr double kAbsTol = 0;
-constexpr double kRelTol = 1e-3;
-
 TEST(Vector3D, add) {
   Vector3D<double> v1{2, 1, 3};
   Vector3D<double> v2{1, 4.1, 5};
@@ -125,14 +122,12 @@ TEST(Triangle3D, Intersects_IntersectingAtEdge) {
   ASSERT_TRUE(t1.intersects(t2));  // Triangles intersect along an edge
 }
 
-#if 0
 TEST(Triangle3D, Intersects_IntersectingAtSinglePoint) {
   Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};
   Triangle3D<double> t2{{1.1, 1.2, 1.3}, {1.1, 1.2, -1.3}, {2.2, 2.2, 0.3}};
 
   ASSERT_TRUE(t1.intersects(t2));  // Triangles intersect at a single point
 }
-#endif
 
 TEST(Triangle3D, Intersects_OneInsideTheOther) {
   Triangle3D<double> t1{{0.1, 0.2, 0.3}, {2.1, 0.2, 0.3}, {0.1, 2.2, 0.3}};
@@ -262,7 +257,6 @@ TEST(Triangle3D, Intersects_NonCoplanar_GeoGebra_Intersection1) {
   ASSERT_TRUE(t1.intersects(t2));
 }
 
-#if 1
 TEST(Triangle3D, Intersects_DegenerateTriangle) {
   Triangle3D<double> t1{{0.1, 0.2, 0.3},
                         {0.1, 0.2, 0.3},
@@ -273,7 +267,6 @@ TEST(Triangle3D, Intersects_DegenerateTriangle) {
 
   ASSERT_TRUE(t1.intersects(t2));  // Degenerate triangle intersects at a point
 }
-#endif
 
 TEST(Triangle3D, Intersects_DegenerateTriangleNoIntersection) {
   Triangle3D<double> t1{{0.1, 0.2, 0.3},
