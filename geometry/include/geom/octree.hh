@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <bitset>
 #include <iterator>
 #include <list>
 #include <memory>
@@ -16,7 +17,6 @@ namespace geometry {
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 class Octree final {
   struct Node;
-
   using pNode = std::shared_ptr<Node>;
   using InternalContainer = std::list<std::pair<Triangle3D<T>, std::size_t>>;
 
@@ -26,26 +26,25 @@ class Octree final {
     InternalContainer triangles_;
     pNode parent_;
     std::array<pNode, 8> children_;
-    std::stack<pNode> node_stack_;
-    bool valid_;
+    std::bitset<8> valid_children_;
 
     Node(const Range3D<T>& coords,
-         const InternalContainer& cont,
          const pNode& parent)
-        : coords_(coords), triangles_(cont), parent_(parent) {}
+        : coords_(coords), parent_(parent) {}
 
     void divide() {
-      node_stack_.push(this->shared_from_this());
+      auto&& node_stack = std::stack<pNode>();
+      node_stack.push(this->shared_from_this());
 
-      while (!node_stack_.empty()) {
-        auto&& current_node = node_stack_.top();
-        node_stack_.pop();
+      while (!node_stack.empty()) {
+        auto current_node = node_stack.top();
+        node_stack.pop();
 
         if (current_node->triangles_.empty()) {
           continue;
         }
 
-        Range3D<T> new_coords = coords_;
+        auto new_coords = coords_;
         for (auto i = 0; i < 8; ++i) {
           if (i & 0x1) {
             new_coords.min_x_ += coords_.dimX() / 2;
@@ -65,35 +64,33 @@ class Octree final {
             new_coords.max_z_ -= coords_.dimZ() / 2;
           }
 
-          children_[i] =
-              std::make_shared<Node>(
-                  new_coords, InternalContainer(), current_node);
+          children_[i] = std::make_shared<Node>(new_coords, current_node);
         }
 
         for (auto it = triangles_.begin(); it != triangles_.end(); ++it) {
-          (void)std::find_if(children_.begin(), children_.end(),
-                             [&it, current_node, this](auto& ch) {
-            auto&& tr = *it;
+          for (auto i = 0; i < 8; ++i) {
+            auto tr = *it;
+            auto&& ch = children_[i];
 
             if (ch->coords_.contains(tr.first.getRange())) {
               ch->triangles_.push_back(tr);
-              ch->valid_ = true;
-              node_stack_.push(ch);
+              valid_children_[i] = true;
+              node_stack.push(ch);
               it = current_node->triangles_.erase(it);
-              return true;
+              break;
             }
-            return false;
-          });
+          };
         }
       }
     }
 
     std::set<std::size_t> getIntersections() {
+      auto&& node_stack = std::stack<pNode>();
       auto&& res = std::set<std::size_t>();
 
-      while (!node_stack_.empty()) {
-        auto&& current_node = node_stack_.top();
-        node_stack_.pop();
+      while (!node_stack.empty()) {
+        auto current_node = node_stack.top();
+        node_stack.pop();
 
         for (auto it = triangles_.cbegin(); it != triangles_.cend(); ++it) {
           auto&& tr1 = *it;
@@ -111,12 +108,11 @@ class Octree final {
           getIntersectionsAmongChildren(res, tr1);
         }
 
-        std::for_each(children_.cbegin(), children_.cend(),
-                      [this](const auto& ch) {
-          if (ch->valid_) {
-            node_stack_.push(ch);
+        for (auto i = 0; i < 8; ++i) {
+          if (valid_children_[i]) {
+            node_stack.push(children_[i]);
           }
-        });
+        };
       }
       return res;
     }
@@ -124,30 +120,26 @@ class Octree final {
     void getIntersectionsAmongChildren(
         std::set<std::size_t>& res,
         const std::pair<Triangle3D<T>, std::size_t>& triangle) {
-      if (!valid_) {
-        return;
-      }
+      auto&& node_stack = std::stack<pNode>();
+      node_stack.push(this->shared_from_this());
 
-      node_stack_.push(this->shared_from_this());
+      while (!node_stack.empty()) {
+        auto&& current_node = node_stack.top();
+        node_stack.pop();
 
-      while (!node_stack_.empty()) {
-        auto&& current_node = node_stack_.top();
-        node_stack_.pop();
-
-        std::for_each(children_.begin(), children_.end(),
-                     [this, triangle, &res](const auto& ch) {
-          if (ch->valid_) {
+        for (auto ch = 0; ch < 8; ++ch) {
+          if (valid_children_[ch]) {
             std::for_each(triangles_.begin(), triangles_.end(),
-                          [triangle, &res](const auto& other) {
+                          [triangle, &res, &node_stack](const auto& other) {
               if (other.first.intersects(triangle.first)) {
                 res.insert(other.second);
                 res.insert(triangle.second);
               }
             });
 
-            node_stack_.push(ch);
+            node_stack.push(children_[ch]);
           }
-        });
+        };
       }
     }
   };
@@ -159,9 +151,9 @@ class Octree final {
           = std::enable_if<std::is_base_of_v<std::input_iterator_tag, It>>>
   Octree(It begin, It end) {
     auto&& range = begin->getRange();
-    InternalContainer triangles;
+    root_ = std::make_shared<Node>(Range3D<T>{}, nullptr);
 
-    std::size_t count = 1;
+    std::size_t count = 0;
     for (auto it = begin; it != end; ++it) {
       auto&& cur = it->getRange();
 
@@ -185,10 +177,10 @@ class Octree final {
       if (range.max_x_ < cur.max_x_) {
         range.max_z_ = cur.max_z_;
       }
-      triangles.push_back(std::make_pair(*it, count++));
+      root_->triangles_.push_back(std::make_pair(*it, ++count));
     }
 
-    root_ = std::make_shared<Node>(range, triangles, nullptr);
+    root_->coords_ = range;
     root_->divide();
   }
 

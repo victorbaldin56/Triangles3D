@@ -16,7 +16,7 @@ int main() {
 
   auto&& res = std::set<std::size_t>();
 
-#if 0
+#if 1
   auto&& octree = geometry::Octree<double>(triangles.begin(), triangles.end());
   res = octree.getIntersections();
 #else
