@@ -377,6 +377,25 @@ TEST(
   ASSERT_FALSE(t1.intersects(t2));  // Point does not lie on the segment
 }
 
+TEST(Triangle3D, Intersects_CoplanarEdgeIntersectionNoVertexContainment) {
+  Triangle3D<double> t1{{ 0.0,  2.0, 0.0},
+                        {-1.0, -1.0, 0.0},
+                        { 1.0, -1.0, 0.0}};
+  Triangle3D<double> t2{{ 0.0, -2.0, 0.0},
+                        {-1.0,  1.0, 0.0},
+                        { 1.0,  1.0, 0.0}};
+
+  ASSERT_FALSE(t1.contains(t2.a_));
+  ASSERT_FALSE(t1.contains(t2.b_));
+  ASSERT_FALSE(t1.contains(t2.c_));
+
+  ASSERT_FALSE(t2.contains(t1.a_));
+  ASSERT_FALSE(t2.contains(t1.b_));
+  ASSERT_FALSE(t2.contains(t1.c_));
+
+  ASSERT_TRUE(t1.intersects(t2));
+}
+
 int main(int argc, char** argv) {
   spdlog::set_level(spdlog::level::trace);
   testing::InitGoogleTest(&argc, argv);

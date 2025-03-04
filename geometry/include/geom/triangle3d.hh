@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 
 #include "plane.hh"
 #include "segment3d.hh"
@@ -50,10 +51,29 @@ struct Triangle3D {
     return comparator::isClose(area(), t1.area() + t2.area() + t3.area());
   }
 
+  std::array<Segment3D<T>, 3> getEdges() const noexcept {
+    return {Segment3D<T>{a_, b_}, Segment3D<T>{b_, c_}, Segment3D<T>{a_, c_}};
+  }
+
+  bool intersectsEdges(const Triangle3D<T>& other) const noexcept {
+    auto&& edges = getEdges();
+    auto&& other_edges = other.getEdges();
+    auto&& edges_begin = edges.begin();
+    auto&& edges_end = edges.end();
+
+    return (std::find_if(edges_begin, edges_end,
+                         [other_edges](const auto& e) {
+      return e.intersects(other_edges[0]) ||
+             e.intersects(other_edges[1]) ||
+             e.intersects(other_edges[2]);
+    }) != edges_end);
+  }
+
   // FIXME: шестиконечная звезда
   bool intersectsInPlane(const Triangle3D<T>& other) const noexcept {
     return contains(other.a_) || contains(other.b_) || contains(other.c_) ||
-           other.contains(a_) || other.contains(b_) || other.contains(c_);
+           other.contains(a_) || other.contains(b_) || other.contains(c_) ||
+           intersectsEdges(other);
   }
 
   bool intersects(const Triangle3D<T>& other) const noexcept {
