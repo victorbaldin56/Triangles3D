@@ -69,10 +69,21 @@ struct Triangle3D {
     }) != edges_end);
   }
 
+  bool intersectsEdges(const Segment3D<T>& seg) const noexcept {
+    auto&& edges = getEdges();
+    return seg.intersects(edges[0]) ||
+           seg.intersects(edges[1]) ||
+           seg.intersects(edges[2]);
+  }
+
   bool intersectsInPlane(const Triangle3D<T>& other) const noexcept {
     return contains(other.a_) || contains(other.b_) || contains(other.c_) ||
            other.contains(a_) || other.contains(b_) || other.contains(c_) ||
            intersectsEdges(other);
+  }
+
+  bool intersectsInPlane(const Segment3D<T>& seg) const noexcept {
+    return contains(seg.begin_) || contains(seg.end_) || intersectsEdges(seg);
   }
 
   bool intersects(const Triangle3D<T>& other) const noexcept {
@@ -91,7 +102,7 @@ struct Triangle3D {
     if (this_valid && !other_valid) {
       auto&& seg = other.toSegment3D();
       if (this_p.contains(seg)) {
-        return intersectsInPlane(other);
+        return intersectsInPlane(seg);
       }
       auto&& intersection = this_p.getIntersectionPoint(seg);
       return contains(intersection);
@@ -100,7 +111,7 @@ struct Triangle3D {
     if (!this_valid && other_valid) {
       auto&& seg = toSegment3D();
       if (other_p.contains(seg)) {
-        return other.intersectsInPlane(*this);
+        return other.intersectsInPlane(seg);
       }
       auto&& intersection = other_p.getIntersectionPoint(seg);
       return other.contains(intersection);

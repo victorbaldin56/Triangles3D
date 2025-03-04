@@ -564,6 +564,21 @@ TEST(Triangle3D, Intersects_DegeneratePoint_Outside) {
   ASSERT_FALSE(normal.intersects(point));
 }
 
+TEST(Triangle3D, Intersects_DegenerateSegment_Inside) {
+  Triangle3D<double> normal{
+    {0.0, 0.0, 0.0},
+    {2.0, 0.0, 0.0},
+    {0.0, 2.0, 0.0}
+  };
+  // Degenerate to segment crossing the triangle
+  Triangle3D<double> segment{
+    {0.75, 0.25, 0.0},
+    {0.25, 0.75, 0.0},
+    {0.5, 0.5, 0.0}  // Midpoint ensures segment decay
+  };
+  ASSERT_TRUE(normal.intersects(segment));
+}
+
 TEST(Triangle3D, Intersects_DegenerateSegment_Crossing) {
   Triangle3D<double> normal{
     {0.0, 0.0, 0.0},
