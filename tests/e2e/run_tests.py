@@ -34,7 +34,7 @@ def test(test_num):
       if (output != ref_output):
         print(f"Test {test_num} failed\n"
               f"Expected: {ref_output}\n"
-              f"Actual: {output}\n")
+              f"Actual:   {output}\n")
         fail = True
       else:
         print(f"Test {test_num} passed")
