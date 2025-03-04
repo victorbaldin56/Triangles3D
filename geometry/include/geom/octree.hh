@@ -20,6 +20,7 @@ template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 class Octree final {
   struct Node;
   using pNode = std::shared_ptr<Node>;
+  using pConstNode = std::shared_ptr<const Node>;
 
   // because we need to erase elements from middle
   using InternalContainer = std::list<std::pair<Triangle3D<T>, std::size_t>>;
@@ -106,8 +107,8 @@ class Octree final {
       }
     }
 
-    std::set<std::size_t> getIntersections() {
-      auto node_stack = std::stack<pNode>();
+    std::set<std::size_t> getIntersections() const {
+      auto node_stack = std::stack<pConstNode>();
       node_stack.push(this->shared_from_this());
 
       auto res = std::set<std::size_t>();
@@ -149,12 +150,12 @@ class Octree final {
 
     void getIntersectionsAmongChildren(
         std::set<std::size_t>& res,
-        const std::pair<Triangle3D<T>, std::size_t>& triangle) {
+        const std::pair<Triangle3D<T>, std::size_t>& triangle) const {
       if (valid_children_ == 0) {
         return;
       }
 
-      auto node_stack = std::stack<pNode>();
+      auto node_stack = std::stack<pConstNode>();
       node_stack.push(this->shared_from_this());
 
       while (!node_stack.empty()) {
@@ -225,7 +226,7 @@ class Octree final {
     root_->partition();
   }
 
-  std::set<std::size_t> getIntersections() {
+  std::set<std::size_t> getIntersections() const {
     return root_->getIntersections();
   }
 
