@@ -54,7 +54,7 @@ struct Vector3D {
 
   Vector3D<T> operator+() const noexcept { return *this; }
   Vector3D<T> operator-() const noexcept {
-    return Vector3D<T>{*this} *= static_cast<T>(-1);
+    return Vector3D<T>(*this) *= static_cast<T>(-1);
   }
 
   Vector3D<T>& normalize() noexcept {
