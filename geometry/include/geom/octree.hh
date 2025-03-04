@@ -192,6 +192,10 @@ class Octree final {
       typename
           = std::enable_if<std::is_base_of_v<std::input_iterator_tag, It>>>
   Octree(It begin, It end) {
+    if (begin == end) {
+      return;
+    }
+
     auto&& range = begin->getRange();
     root_ = std::make_shared<Node>(Range3D<T>{});
 
@@ -227,7 +231,10 @@ class Octree final {
   }
 
   std::set<std::size_t> getIntersections() const {
-    return root_->getIntersections();
+    if (root_) {
+      return root_->getIntersections();
+    }
+    return std::set<std::size_t>();
   }
 
  private:

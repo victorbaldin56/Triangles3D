@@ -6,6 +6,7 @@
 #include "geom/plane.hh"
 #include "geom/triangle3d.hh"
 #include "geom/vector3d.hh"
+#include "geom/octree.hh"
 
 using namespace geometry;
 
@@ -636,6 +637,12 @@ TEST(Triangle3D, Intersects_DegenerateSegment_CollinearOutside) {
     {4.0, 0.0, 0.0}  // Midpoint ensures segment decay
   };
   ASSERT_FALSE(normal.intersects(segment));
+}
+
+TEST(Octree, Construction_FromEmptyRange) {
+  std::vector<Triangle3D<double>> v;
+  Octree<double> tree(v.begin(), v.end());
+  ASSERT_TRUE(tree.getIntersections().empty());
 }
 
 int main(int argc, char** argv) {
