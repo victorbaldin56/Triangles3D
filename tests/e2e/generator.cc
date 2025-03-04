@@ -57,6 +57,8 @@ class TestGenerator {
     auto&& res = std::vector<Triangle_3>(count);
     std::transform(res.begin(), res.end(), res.begin(),
                    [this, count](const auto& e) {
+      // unfortunately, CGAL is unable to correctly handle degenerate triangles
+      // in do_intersect()...
       auto&& t =
           Triangle_3(Point_3(0, 0, 0), Point_3(0, 0, 0), Point_3(0, 0, 0));
       while (t.is_degenerate()) {
@@ -149,7 +151,7 @@ class TestGenerator {
   static constexpr auto kInputDir = "input";
   static constexpr auto kAnsDir = "ans";
   static constexpr auto kMinTriangles = 1u;
-  static constexpr auto kMaxTriangles = 300u;
+  static constexpr auto kMaxTriangles = 1000u;
   static constexpr auto kMinCoord = 0.0;
   static constexpr auto kMaxCoord = 1.0;
   static constexpr auto kCenterCoord = (kMinCoord + kMaxCoord) / 2;
