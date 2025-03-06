@@ -7,30 +7,56 @@ in 3D space.
 
 To build you need the following installed:
 
+Ensure that you installed with your package manager the following:
+
 * Git
 * CMake
-* Any C++ compiler supported by CMake
+* C++ compiler + libstdc++ with support of at least C++17
+* Python 3
+* `pip`
 
 ## Build
 
-To build:
+After installing dependencies listed above, follow these steps:
 
-1. Clone repo:
+1. Clone:
 
    ```sh
-   git clone --recursive https://github.com/victorbaldin56/Triangles3D.git
+   git clone https://github.com/victorbaldin56/Triangles3D.git
+   cd Triangles3D
    ```
 
-1. Generate build files:
+1. Create virtual environment for Python:
 
    ```sh
-   cmake -S . -B build
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+1. Install Conan:
+
+   ```sh
+   pip3 install conan
+   conan profile detect --force
+   ```
+
+1. Install Conan requirements and toolchain:
+
+   ```sh
+   conan install . --output-folder=build --build=missing
+   ```
+
+1. Configure CMake:
+
+   ```sh
+   cd build
+   cmake .. --preset conan-release
    ```
 
 1. Build:
 
    ```sh
-   cmake --build build
+   cmake --build . -j
    ```
 
 ## Usage
