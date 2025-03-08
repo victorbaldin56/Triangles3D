@@ -21,8 +21,7 @@ int main() try {
   auto octree = geometry::Octree<double>(triangles.begin(), triangles.end());
   auto res = octree.getIntersections();
   std::copy(res.begin(), res.end(),
-            std::ostream_iterator<std::size_t>(std::cout, " "));
-  std::cout << std::endl;
+            std::ostream_iterator<std::size_t>(std::cout, "\n"));
   return 0;
 } catch (std::exception& ex) {
   std::cerr << ex.what() << std::endl;

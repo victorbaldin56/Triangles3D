@@ -223,7 +223,7 @@ class Octree final {
       if (range.max_x_ < cur.max_x_) {
         range.max_z_ = cur.max_z_;
       }
-      root_->triangles_.emplace_back(*it, ++count);
+      root_->triangles_.emplace_back(*it, count++);
     }
 
     root_->coords_ = range;

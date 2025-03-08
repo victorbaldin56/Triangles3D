@@ -105,8 +105,8 @@ class TestGenerator {
     for (auto i = 0u; i < size; ++i) {
       for (auto j = i + 1; j < size; ++j) {
         if (CGAL::do_intersect(triangles[i], triangles[j])) {
-          res.insert(i + 1);
-          res.insert(j + 1);
+          res.insert(i);
+          res.insert(j);
         }
       }
     }
@@ -133,7 +133,7 @@ class TestGenerator {
     os.exceptions(std::ios::failbit);
     os.open(filepath, std::ios::trunc | std::ios::out);
     std::copy(ans.begin(), ans.end(),
-              std::ostream_iterator<unsigned>(os, " "));
+              std::ostream_iterator<unsigned>(os, "\n"));
   }
 
   static std::string getOutputFileName(const fs::path& dir,

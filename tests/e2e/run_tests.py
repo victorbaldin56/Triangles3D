@@ -14,7 +14,7 @@ def ansFilePath(test_num):
 
 def getAns(ans_file):
   with open(ans_file, 'r') as af:
-    return list(map(int, af.readline().split()))
+    return af.read()
 
 def test(test_num):
   fail = False
@@ -29,7 +29,7 @@ def test(test_num):
       )
       if process.returncode != 0:
         raise RuntimeError(f'Driver failed: {process.stderr}')
-      output = list(map(int, process.stdout.strip().split()))
+      output = process.stdout
       ref_output = getAns(ans_path)
       if (output != ref_output):
         print(f"Test {test_num} failed\n"
