@@ -50,10 +50,19 @@ After installing dependencies listed above, follow these steps:
 
    ```sh
    cd build
+   ```
+
+   * CMake >= 3.23
+   ```
    cmake .. --preset conan-release
    ```
 
-1. Build:
+   * CMake < 3.23
+   ```
+   cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+   ```
+
+2. Build:
 
    ```sh
    cmake --build . -j
