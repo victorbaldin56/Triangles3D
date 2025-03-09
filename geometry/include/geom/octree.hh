@@ -1,12 +1,16 @@
 #pragma once
 
 #include <array>
+#include <condition_variable>
 #include <bitset>
 #include <iterator>
 #include <list>
 #include <memory>
+#include <mutex>
+#include <queue>
 #include <set>
 #include <stack>
+#include <thread>
 #include <type_traits>
 
 #include "spdlog/spdlog.h"
@@ -38,82 +42,116 @@ class Octree final {
     Node(const Range3D<T>& coords) noexcept : coords_(coords) {}
 
     void partition() {
-      auto node_stack = std::stack<pNode>();
-      node_stack.push(this->shared_from_this());
+      auto queue = std::queue<pNode>();
+      auto queue_mutex = std::mutex();
+      auto cond_var = std::condition_variable();
+      bool done = false;
+      auto num_threads = std::thread::hardware_concurrency();
+      auto threads = std::vector<std::thread>();
+      threads.reserve(num_threads);
 
-      while (!node_stack.empty()) {
-        SPDLOG_TRACE("Stack size = {}", node_stack.size());
+      queue.push(this->shared_from_this());
 
-        auto current_node = node_stack.top();
-        node_stack.pop();
-
-        SPDLOG_TRACE("current_node.get() = {}",
-                     static_cast<void*>(current_node.get()));
-
-        auto begin_size = current_node->triangles_.size();
-        if (begin_size <= kMinSize) {
-          continue;
-        }
-
-        auto&& coords = current_node->coords_;
-        auto mid_x = (coords.min_x_ + coords.max_x_) / 2;
-        auto mid_y = (coords.min_y_ + coords.max_y_) / 2;
-        auto mid_z = (coords.min_z_ + coords.max_z_) / 2;
-
-        for (auto i = 0; i < 8; ++i) {
-          auto new_coords = coords;
-
-          if (i & 0x1) {
-            new_coords.max_x_ = mid_x;
-          } else {
-            new_coords.min_x_ = mid_x;
+      auto worker = [&] {
+        while (true) {
+          SPDLOG_TRACE("Stack size = {}", queue.size());
+          auto current_node = pNode();
+          {
+            auto lock = std::unique_lock<std::mutex>(queue_mutex);
+            cond_var.wait(lock, [&] { return !queue.empty() || done; });
+            if (done && queue.empty()) {
+              return;
+            }
+            current_node = queue.front();
+            queue.pop();
           }
 
-          if (i & 0x2) {
-            new_coords.max_y_ = mid_y;
-          } else {
-            new_coords.min_y_ = mid_y;
+          SPDLOG_TRACE("current_node.get() = {}",
+                      static_cast<void*>(current_node.get()));
+
+          auto begin_size = current_node->triangles_.size();
+          if (begin_size <= kMinSize) {
+            continue;
           }
 
-          if (i & 0x4) {
-            new_coords.max_z_ = mid_z;
-          } else {
-            new_coords.min_z_ = mid_z;
-          }
-
-          current_node->children_[i] = std::make_shared<Node>(new_coords);
-        }
-
-        auto&& current_triangles = current_node->triangles_;
-        auto triangles_begin = current_triangles.begin();
-        auto triangles_end = current_triangles.end();
-
-        current_triangles.remove_if([&current_node](auto& tr) {
-          auto moved = false;
-          auto range = tr.first.getRange();
+          auto&& coords = current_node->coords_;
+          auto mid_x = (coords.min_x_ + coords.max_x_) / 2;
+          auto mid_y = (coords.min_y_ + coords.max_y_) / 2;
+          auto mid_z = (coords.min_z_ + coords.max_z_) / 2;
 
           for (auto i = 0; i < 8; ++i) {
-            auto&& ch = current_node->children_[i];
-            if (ch->coords_.contains(range)) {
-              SPDLOG_TRACE("Moving triangle {} to child {}", tr.second, i);
+            auto new_coords = coords;
 
-              current_node->valid_children_[i] = true;
-              ch->triangles_.push_front(tr);
-              moved = true;
+            if (i & 0x1) {
+              new_coords.max_x_ = mid_x;
+            } else {
+              new_coords.min_x_ = mid_x;
             }
-          }
-          return moved;
-        });
 
-        for (auto ch = 0; ch < 8; ++ch) {
-          if (!current_node->children_[ch]->triangles_.empty()) {
-            current_node->valid_children_[ch] = true;
-            node_stack.push(current_node->children_[ch]);
-          } else {
-            current_node->valid_children_[ch] = false;
+            if (i & 0x2) {
+              new_coords.max_y_ = mid_y;
+            } else {
+              new_coords.min_y_ = mid_y;
+            }
+
+            if (i & 0x4) {
+              new_coords.max_z_ = mid_z;
+            } else {
+              new_coords.min_z_ = mid_z;
+            }
+
+            current_node->children_[i] = std::make_shared<Node>(new_coords);
+          }
+
+          auto&& current_triangles = current_node->triangles_;
+          auto triangles_begin = current_triangles.begin();
+          auto triangles_end = current_triangles.end();
+
+          current_triangles.remove_if([&current_node](auto& tr) {
+            auto moved = false;
+            auto range = tr.first.getRange();
+
+            for (auto i = 0; i < 8; ++i) {
+              auto&& ch = current_node->children_[i];
+              if (ch->coords_.contains(range)) {
+                SPDLOG_TRACE("Moving triangle {} to child {}", tr.second, i);
+
+                current_node->valid_children_[i] = true;
+                ch->triangles_.push_front(tr);
+                moved = true;
+              }
+            }
+            return moved;
+          });
+
+          {
+            auto lock = std::lock_guard<std::mutex>(queue_mutex);
+            for (auto ch = 0; ch < 8; ++ch) {
+              if (!current_node->children_[ch]->triangles_.empty()) {
+                current_node->valid_children_[ch] = true;
+                queue.push(current_node->children_[ch]);
+              } else {
+                current_node->valid_children_[ch] = false;
+              }
+            }
+            cond_var.notify_all();
           }
         }
+      };
+
+      while (threads.size() < num_threads) {
+        threads.emplace_back(worker);
       }
+
+      // Wait for queue to empty
+      {
+        auto lock = std::unique_lock<std::mutex>(queue_mutex);
+        cond_var.wait(lock, [&] { return queue.empty(); });
+        done = true;
+      }
+
+      cond_var.notify_all();
+      std::for_each(threads.begin(), threads.end(), [](auto& t) { t.join(); });
     }
 
     std::set<std::size_t> getIntersections() const {
