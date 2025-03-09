@@ -55,24 +55,30 @@ class Octree final {
           continue;
         }
 
-        auto new_coords = current_node->coords_;
+        auto&& coords = current_node->coords_;
+        auto mid_x = (coords.min_x_ + coords.max_x_) / 2;
+        auto mid_y = (coords.min_y_ + coords.max_y_) / 2;
+        auto mid_z = (coords.min_z_ + coords.max_z_) / 2;
+
         for (auto i = 0; i < 8; ++i) {
+          auto new_coords = coords;
+
           if (i & 0x1) {
-            new_coords.max_x_ -= coords_.dimX() / 2;
+            new_coords.max_x_ = mid_x;
           } else {
-            new_coords.min_x_ += coords_.dimX() / 2;
+            new_coords.min_x_ = mid_x;
           }
 
-          if (i & 0x3) {
-            new_coords.max_y_ -= coords_.dimY() / 2;
+          if (i & 0x2) {
+            new_coords.max_y_ = mid_y;
           } else {
-            new_coords.min_y_ += coords_.dimY() / 2;
+            new_coords.min_y_ = mid_y;
           }
 
-          if (i & 0x7) {
-            new_coords.max_z_ -= coords_.dimZ() / 2;
+          if (i & 0x4) {
+            new_coords.max_z_ = mid_z;
           } else {
-            new_coords.min_z_ += coords_.dimZ() / 2;
+            new_coords.min_z_ = mid_z;
           }
 
           current_node->children_[i] = std::make_shared<Node>(new_coords);
@@ -83,21 +89,24 @@ class Octree final {
         auto triangles_end = current_triangles.end();
 
         current_triangles.remove_if([&current_node](auto& tr) {
+          auto moved = false;
+          auto range = tr.first.getRange();
+
           for (auto i = 0; i < 8; ++i) {
             auto&& ch = current_node->children_[i];
-            if (ch->coords_.contains(tr.first.getRange())) {
+            if (ch->coords_.contains(range)) {
               SPDLOG_TRACE("Moving triangle {} to child {}", tr.second, i);
 
               current_node->valid_children_[i] = true;
-              ch->triangles_.push_back(tr);
-              return true;
+              ch->triangles_.push_front(tr);
+              moved = true;
             }
           }
-          return false;
+          return moved;
         });
 
         for (auto ch = 0; ch < 8; ++ch) {
-          if (current_node->children_[ch]->triangles_.size() >= kMinSize) {
+          if (!current_node->children_[ch]->triangles_.empty()) {
             current_node->valid_children_[ch] = true;
             node_stack.push(current_node->children_[ch]);
           } else {
@@ -191,7 +200,7 @@ class Octree final {
       typename It,
       typename
           = std::enable_if<std::is_base_of_v<std::input_iterator_tag, It>>>
-  Octree(It begin, It end) {
+  Octree(It begin, It end, std::size_t min_size = kMinSize) {
     if (begin == end) {
       return;
     }
@@ -199,7 +208,7 @@ class Octree final {
     auto&& range = begin->getRange();
     root_ = std::make_shared<Node>(Range3D<T>{});
 
-    auto count = std::size_t(0);
+    auto count = std::size_t{0};
     for (auto it = begin; it != end; ++it) {
       auto&& cur = it->getRange();
 
@@ -220,10 +229,10 @@ class Octree final {
       if (cur.min_z_ < range.min_z_) {
         range.min_z_ = cur.min_z_;
       }
-      if (range.max_x_ < cur.max_x_) {
+      if (range.max_z_ < cur.max_z_) {
         range.max_z_ = cur.max_z_;
       }
-      root_->triangles_.emplace_back(*it, ++count);
+      root_->triangles_.emplace_front(*it, count++);
     }
 
     root_->coords_ = range;
@@ -242,7 +251,7 @@ class Octree final {
 
  private:
   /** min number of triangles inside node */
-  static constexpr auto kMinSize = std::size_t(1);
+  static constexpr auto kMinSize = std::size_t{0x1};
 };
 
 }  // namespace geometry
