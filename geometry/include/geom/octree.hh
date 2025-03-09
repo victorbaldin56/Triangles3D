@@ -104,7 +104,7 @@ class Octree final {
         });
 
         for (auto ch = 0; ch < 8; ++ch) {
-          if (current_node->children_[ch]->triangles_.size() >= kMinSize) {
+          if (!current_node->children_[ch]->triangles_.empty()) {
             current_node->valid_children_[ch] = true;
             node_stack.push(current_node->children_[ch]);
           } else {
