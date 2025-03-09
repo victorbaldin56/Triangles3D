@@ -60,8 +60,9 @@ class Octree final {
         auto mid_y = (coords.min_y_ + coords.max_y_) / 2;
         auto mid_z = (coords.min_z_ + coords.max_z_) / 2;
 
-        auto new_coords = coords;
         for (auto i = 0; i < 8; ++i) {
+          auto new_coords = coords;
+
           if (i & 0x1) {
             new_coords.max_x_ = mid_x;
           } else {
@@ -89,14 +90,15 @@ class Octree final {
 
         current_triangles.remove_if([&current_node](auto& tr) {
           auto moved = false;
+          auto range = tr.first.getRange();
 
           for (auto i = 0; i < 8; ++i) {
             auto&& ch = current_node->children_[i];
-            if (ch->coords_.contains(tr.first.getRange())) {
+            if (ch->coords_.contains(range)) {
               SPDLOG_TRACE("Moving triangle {} to child {}", tr.second, i);
 
               current_node->valid_children_[i] = true;
-              ch->triangles_.push_back(tr);
+              ch->triangles_.push_front(tr);
               moved = true;
             }
           }
@@ -206,7 +208,7 @@ class Octree final {
     auto&& range = begin->getRange();
     root_ = std::make_shared<Node>(Range3D<T>{});
 
-    auto count = std::size_t(0);
+    auto count = std::size_t{0};
     for (auto it = begin; it != end; ++it) {
       auto&& cur = it->getRange();
 
@@ -230,7 +232,7 @@ class Octree final {
       if (range.max_z_ < cur.max_z_) {
         range.max_z_ = cur.max_z_;
       }
-      root_->triangles_.emplace_back(*it, count++);
+      root_->triangles_.emplace_front(*it, count++);
     }
 
     root_->coords_ = range;
@@ -249,7 +251,7 @@ class Octree final {
 
  private:
   /** min number of triangles inside node */
-  static constexpr auto kMinSize = std::size_t{0x10};
+  static constexpr auto kMinSize = std::size_t{0x1};
 };
 
 }  // namespace geometry

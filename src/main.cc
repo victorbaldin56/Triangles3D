@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include <vector>
 
-//#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+// #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include "geom/triangle3d.hh"
 #include "geom/octree.hh"
 
