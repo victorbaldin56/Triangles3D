@@ -160,41 +160,54 @@ class Octree final {
     std::set<std::size_t> getIntersections() const {
       auto node_stack = std::stack<pConstNode>();
       node_stack.push(this->shared_from_this());
+      auto stack_mutex = boost::mutex();
 
       auto res = std::set<std::size_t>();
+      auto res_mutex = boost::mutex();
 
-      while (!node_stack.empty()) {
-        auto current_node = node_stack.top();
-        node_stack.pop();
-
-        auto triangles_begin = current_node->triangles_.begin();
-        auto triangles_end = current_node->triangles_.end();
-
-        for (auto it = triangles_begin; it != triangles_end; ++it) {
-          auto&& tr1 = *it;
-          for (auto jt = it; jt != triangles_end; ++jt) {
-            auto&& tr2 = *jt;
-            if (tr1.second == tr2.second) {
-              continue;
-            }
-            if (tr1.first.intersects(tr2.first)) {
-              res.insert(tr1.second);
-              res.insert(tr2.second);
-
-              SPDLOG_TRACE("Triangles {} and {} intersect",
-                           tr1.second, tr2.second);
-            }
+      auto task = [&] {
+        while (!node_stack.empty()) {
+          auto current_node = pConstNode();
+          {
+            auto lock = boost::lock_guard<boost::mutex>(stack_mutex);
+            current_node = node_stack.top();
+            node_stack.pop();
           }
 
-          current_node->getIntersectionsAmongChildren(res, tr1);
-        }
+          auto triangles_begin = current_node->triangles_.begin();
+          auto triangles_end = current_node->triangles_.end();
 
-        for (auto i = 0; i < 8; ++i) {
-          if (current_node->valid_children_[i]) {
-            node_stack.push(current_node->children_[i]);
+          for (auto it = triangles_begin; it != triangles_end; ++it) {
+            auto&& tr1 = *it;
+            for (auto jt = it; jt != triangles_end; ++jt) {
+              auto&& tr2 = *jt;
+              if (tr1.second == tr2.second) {
+                continue;
+              }
+              if (tr1.first.intersects(tr2.first)) {
+                auto lock = boost::lock_guard<boost::mutex>(res_mutex);
+                res.insert(tr1.second);
+                res.insert(tr2.second);
+
+                SPDLOG_TRACE("Triangles {} and {} intersect",
+                            tr1.second, tr2.second);
+              }
+            }
+
+            current_node->getIntersectionsAmongChildren(res, tr1);
+          }
+
+          for (auto i = 0; i < 8; ++i) {
+            if (current_node->valid_children_[i]) {
+              node_stack.push(current_node->children_[i]);
+            }
           }
         }
-      }
+      };
+
+      boost::asio::post(thread_pool, task);
+      thread_pool.join();
+
       return res;
     }
 
@@ -206,33 +219,45 @@ class Octree final {
       }
 
       auto node_stack = std::stack<pConstNode>();
+      auto stack_mutex = boost::mutex();
       node_stack.push(this->shared_from_this());
 
-      while (!node_stack.empty()) {
-        auto current_node = node_stack.top();
-        node_stack.pop();
+      auto res_mutex = boost::mutex();
 
-        for (auto ch = 0; ch < 8; ++ch) {
-          if (current_node->valid_children_[ch]) {
-            auto&& current_triangles = current_node->children_[ch]->triangles_;
-            auto triangles_begin = current_triangles.begin();
-            auto triangles_end = current_triangles.end();
+      auto task = [&] {
+        while (!node_stack.empty()) {
+          auto current_node = pConstNode();
+          {
+            auto lock = boost::lock_guard<boost::mutex>(stack_mutex);
+            current_node = node_stack.top();
+            node_stack.pop();
+          }
 
-            std::for_each(triangles_begin, triangles_end,
-                          [triangle, &res](const auto& other) {
-              if (other.first.intersects(triangle.first)) {
-                res.insert(other.second);
-                res.insert(triangle.second);
+          for (auto ch = 0; ch < 8; ++ch) {
+            if (current_node->valid_children_[ch]) {
+              auto&& current_triangles = current_node->children_[ch]->triangles_;
+              auto triangles_begin = current_triangles.begin();
+              auto triangles_end = current_triangles.end();
 
-                SPDLOG_TRACE("Triangles {} and {} intersect",
-                              triangle.second, other.second);
-              }
-            });
+              std::for_each(triangles_begin, triangles_end,
+                            [&](const auto& other) {
+                if (other.first.intersects(triangle.first)) {
+                  auto lock = boost::lock_guard<boost::mutex>(res_mutex);
+                  res.insert(other.second);
+                  res.insert(triangle.second);
 
-            node_stack.push(current_node->children_[ch]);
+                  SPDLOG_TRACE("Triangles {} and {} intersect",
+                                triangle.second, other.second);
+                }
+              });
+
+              node_stack.push(current_node->children_[ch]);
+            }
           }
         }
-      }
+      };
+
+      boost::asio::post(thread_pool, task);
     }
   };
 
