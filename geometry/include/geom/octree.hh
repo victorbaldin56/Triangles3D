@@ -23,14 +23,6 @@
 
 namespace geometry {
 
-namespace detail {
-
-boost::asio::thread_pool createThreadPool() {
-  return boost::asio::thread_pool(boost::thread::hardware_concurrency());
-}
-
-}  // namespace detail
-
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 class Octree final {
   struct Node;
@@ -49,11 +41,15 @@ class Octree final {
     InternalContainer triangles_;
     std::array<pNode, 8> children_;
     std::bitset<8> valid_children_;
+    mutable boost::asio::thread_pool working_thread_pool_;
 
-    Node(const Range3D<T>& coords) noexcept : coords_(coords) {}
+    Node(const Range3D<T>& coords) noexcept
+        : coords_(coords),
+          working_thread_pool_(boost::thread::hardware_concurrency()) {}
+
+    ~Node() { working_thread_pool_.join(); }
 
     void partition() {
-      auto thread_pool = detail::createThreadPool();
       auto queue = std::queue<pNode>();
       auto queue_mutex = boost::mutex();
       auto cond_var = boost::condition_variable();
@@ -149,7 +145,7 @@ class Octree final {
         }
       };
 
-      boost::asio::post(thread_pool, task);
+      boost::asio::post(working_thread_pool_, task);
 
       // Wait for queue to empty
       {
@@ -159,11 +155,10 @@ class Octree final {
       }
 
       cond_var.notify_all();
-      thread_pool.join();
+      working_thread_pool_.wait();
     }
 
     std::set<std::size_t> getIntersections() const {
-      auto thread_pool = detail::createThreadPool();
       auto node_stack = std::stack<pConstNode>();
       node_stack.push(this->shared_from_this());
       auto stack_mutex = boost::mutex();
@@ -211,8 +206,8 @@ class Octree final {
         }
       };
 
-      boost::asio::post(thread_pool, task);
-      thread_pool.join();
+      boost::asio::post(working_thread_pool_, task);
+      working_thread_pool_.wait();
 
       return res;
     }
@@ -224,7 +219,6 @@ class Octree final {
         return;
       }
 
-      auto thread_pool = detail::createThreadPool();
       auto node_stack = std::stack<pConstNode>();
       auto stack_mutex = boost::mutex();
       node_stack.push(this->shared_from_this());
@@ -264,8 +258,7 @@ class Octree final {
         }
       };
 
-      boost::asio::post(thread_pool, task);
-      thread_pool.join();
+      boost::asio::post(working_thread_pool_, task);
     }
   };
 
