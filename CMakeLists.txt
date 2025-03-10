@@ -4,7 +4,7 @@ project("Triangles3D")
 find_package(spdlog REQUIRED)
 
 add_subdirectory(geometry)
-add_subdirectory(src)
+add_subdirectory(driver)
 
 if (${BUILD_TESTING})
   find_package(GTest REQUIRED)

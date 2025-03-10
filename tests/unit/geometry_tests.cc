@@ -641,7 +641,7 @@ TEST(Triangle3D, Intersects_DegenerateSegment_CollinearOutside) {
 
 TEST(Octree, Construction_FromEmptyRange) {
   std::vector<Triangle3D<double>> v;
-  Octree<double> tree(v.begin(), v.end());
+  Octree<double> tree(v.begin(), 0);
   ASSERT_TRUE(tree.getIntersections().empty());
 }
 

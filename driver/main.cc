@@ -8,20 +8,13 @@
 int main() try {
   // for trace & debugging
   spdlog::set_level(static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
-
-  std::cin.exceptions(std::ios::failbit | std::ios::eofbit);
   auto count = std::size_t{};
   std::cin >> count;
 
-  auto triangles = std::vector<geometry::Triangle3D<double>>();
-  triangles.reserve(count);
-  while (triangles.size() < count) {
-    auto cur = geometry::Triangle3D<double>{};
-    std::cin >> cur;
-    triangles.push_back(cur);
-  }
-
-  auto octree = geometry::Octree<double>(triangles.begin(), triangles.end());
+  auto octree =
+      geometry::Octree<double>(
+          std::istream_iterator<geometry::Triangle3D<double>>(std::cin),
+          count);
   auto res = octree.getIntersections();
   std::copy(res.begin(), res.end(),
             std::ostream_iterator<std::size_t>(std::cout, "\n"));
