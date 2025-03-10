@@ -208,32 +208,18 @@ class Octree final {
     auto&& range = begin->getRange();
     root_ = std::make_shared<Node>(Range3D<T>{});
 
-    auto count = std::size_t{0};
-    for (auto it = begin; count != n; ++it, ++count) {
-      auto&& tr = *it;
+    for (auto count = std::size_t{0}; count != n; ++begin, ++count) {
+      auto&& tr = *begin;
       auto&& cur = tr.getRange();
 
-      if (cur.min_x_ < range.min_x_) {
-        range.min_x_ = cur.min_x_;
-      }
-      if (range.max_x_ < cur.max_x_) {
-        range.max_x_ = cur.max_x_;
-      }
+      range.min_x_ = std::min(range.min_x_, cur.min_x_);
+      range.max_x_ = std::max(range.max_x_, cur.max_x_);
+      range.min_y_ = std::min(range.min_y_, cur.min_y_);
+      range.max_y_ = std::max(range.max_y_, cur.max_y_);
+      range.min_z_ = std::min(range.min_z_, cur.min_z_);
+      range.max_z_ = std::max(range.max_z_, cur.max_z_);
 
-      if (cur.min_y_ < range.min_y_) {
-        range.min_y_ = cur.min_y_;
-      }
-      if (range.max_y_ < cur.max_y_) {
-        range.max_y_ = cur.max_y_;
-      }
-
-      if (cur.min_z_ < range.min_z_) {
-        range.min_z_ = cur.min_z_;
-      }
-      if (range.max_z_ < cur.max_z_) {
-        range.max_z_ = cur.max_z_;
-      }
-      root_->triangles_.emplace_front(tr, count++);
+      root_->triangles_.emplace_front(tr, count);
     }
 
     root_->coords_ = range;

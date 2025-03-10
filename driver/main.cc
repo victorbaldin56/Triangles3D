@@ -8,8 +8,6 @@
 int main() try {
   // for trace & debugging
   spdlog::set_level(static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
-
-  std::cin.exceptions(std::ios::failbit | std::ios::eofbit);
   auto count = std::size_t{};
   std::cin >> count;
 
