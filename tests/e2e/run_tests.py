@@ -2,7 +2,7 @@ import os
 import subprocess
 
 CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
-PATH_TO_EXECUTABLE = CURRENT_PATH + '/../../build/src/triangles'
+PATH_TO_EXECUTABLE = CURRENT_PATH + '/../../build/driver/triangles'
 PATH_TO_INPUT = CURRENT_PATH + '/input/'
 PATH_TO_ANSWERS = CURRENT_PATH + '/ans/'
 
