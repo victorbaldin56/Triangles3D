@@ -25,7 +25,7 @@ namespace geometry {
 
 namespace detail {
 
-boost::asio::thread_pool createThreadPool() {
+inline boost::asio::thread_pool createThreadPool() {
   return boost::asio::thread_pool(boost::thread::hardware_concurrency());
 }
 
@@ -224,48 +224,34 @@ class Octree final {
         return;
       }
 
-      auto thread_pool = detail::createThreadPool();
       auto node_stack = std::stack<pConstNode>();
-      auto stack_mutex = boost::mutex();
       node_stack.push(this->shared_from_this());
 
-      auto res_mutex = boost::mutex();
+      while (!node_stack.empty()) {
+        auto current_node = node_stack.top();
+        node_stack.pop();
 
-      auto task = [&] {
-        while (!node_stack.empty()) {
-          auto current_node = pConstNode();
-          {
-            auto lock = boost::lock_guard<boost::mutex>(stack_mutex);
-            current_node = node_stack.top();
-            node_stack.pop();
-          }
+        for (auto ch = 0; ch < 8; ++ch) {
+          if (current_node->valid_children_[ch]) {
+            auto&& current_triangles = current_node->children_[ch]->triangles_;
+            auto triangles_begin = current_triangles.begin();
+            auto triangles_end = current_triangles.end();
 
-          for (auto ch = 0; ch < 8; ++ch) {
-            if (current_node->valid_children_[ch]) {
-              auto&& current_triangles = current_node->children_[ch]->triangles_;
-              auto triangles_begin = current_triangles.begin();
-              auto triangles_end = current_triangles.end();
+            std::for_each(triangles_begin, triangles_end,
+                          [&](const auto& other) {
+              if (other.first.intersects(triangle.first)) {
+                res.insert(other.second);
+                res.insert(triangle.second);
 
-              std::for_each(triangles_begin, triangles_end,
-                            [&](const auto& other) {
-                if (other.first.intersects(triangle.first)) {
-                  auto lock = boost::lock_guard<boost::mutex>(res_mutex);
-                  res.insert(other.second);
-                  res.insert(triangle.second);
+                SPDLOG_TRACE("Triangles {} and {} intersect",
+                              triangle.second, other.second);
+              }
+            });
 
-                  SPDLOG_TRACE("Triangles {} and {} intersect",
-                                triangle.second, other.second);
-                }
-              });
-
-              node_stack.push(current_node->children_[ch]);
-            }
+            node_stack.push(current_node->children_[ch]);
           }
         }
-      };
-
-      boost::asio::post(thread_pool, task);
-      thread_pool.join();
+      }
     }
   };
 
