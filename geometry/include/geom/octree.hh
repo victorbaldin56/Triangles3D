@@ -12,7 +12,6 @@
 
 #include "boost/asio/post.hpp"
 #include "boost/asio/thread_pool.hpp"
-#include "boost/thread/condition_variable.hpp"
 #include "boost/thread/mutex.hpp"
 #include "boost/thread/thread.hpp"
 
@@ -54,26 +53,20 @@ class Octree final {
 
     void partition() {
       auto thread_pool = detail::createThreadPool();
-      auto queue = std::queue<pNode>();
+      auto node_stack = std::stack<pNode>();
       auto queue_mutex = boost::mutex();
-      auto cond_var = boost::condition_variable();
-      bool done = false;
       auto num_threads = boost::thread::hardware_concurrency();
 
-      queue.push(this->shared_from_this());
+      node_stack.push(this->shared_from_this());
 
       auto task = [&] {
-        while (true) {
+        while (!node_stack.empty()) {
           SPDLOG_TRACE("Stack size = {}", queue.size());
           auto current_node = pNode();
           {
             auto lock = boost::unique_lock<boost::mutex>(queue_mutex);
-            cond_var.wait(lock, [&] { return !queue.empty() || done; });
-            if (done && queue.empty()) {
-              return;
-            }
-            current_node = queue.front();
-            queue.pop();
+            current_node = node_stack.top();
+            node_stack.pop();
           }
 
           SPDLOG_TRACE("current_node.get() = {}",
@@ -139,26 +132,16 @@ class Octree final {
             for (auto ch = 0; ch < 8; ++ch) {
               if (!current_node->children_[ch]->triangles_.empty()) {
                 current_node->valid_children_[ch] = true;
-                queue.push(current_node->children_[ch]);
+                node_stack.push(current_node->children_[ch]);
               } else {
                 current_node->valid_children_[ch] = false;
               }
             }
-            cond_var.notify_all();
           }
         }
       };
 
       boost::asio::post(thread_pool, task);
-
-      // Wait for queue to empty
-      {
-        auto lock = boost::unique_lock<boost::mutex>(queue_mutex);
-        cond_var.wait(lock, [&] { return queue.empty(); });
-        done = true;
-      }
-
-      cond_var.notify_all();
       thread_pool.join();
     }
 
