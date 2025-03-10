@@ -23,9 +23,13 @@
 
 namespace geometry {
 
-// ?
-static auto thread_pool =
-    boost::asio::thread_pool(boost::thread::hardware_concurrency());
+namespace detail {
+
+boost::asio::thread_pool createThreadPool() {
+  return boost::asio::thread_pool(boost::thread::hardware_concurrency());
+}
+
+}  // namespace detail
 
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 class Octree final {
@@ -49,6 +53,7 @@ class Octree final {
     Node(const Range3D<T>& coords) noexcept : coords_(coords) {}
 
     void partition() {
+      auto thread_pool = detail::createThreadPool();
       auto queue = std::queue<pNode>();
       auto queue_mutex = boost::mutex();
       auto cond_var = boost::condition_variable();
@@ -158,6 +163,7 @@ class Octree final {
     }
 
     std::set<std::size_t> getIntersections() const {
+      auto thread_pool = detail::createThreadPool();
       auto node_stack = std::stack<pConstNode>();
       node_stack.push(this->shared_from_this());
       auto stack_mutex = boost::mutex();
@@ -218,6 +224,7 @@ class Octree final {
         return;
       }
 
+      auto thread_pool = detail::createThreadPool();
       auto node_stack = std::stack<pConstNode>();
       auto stack_mutex = boost::mutex();
       node_stack.push(this->shared_from_this());
@@ -258,6 +265,7 @@ class Octree final {
       };
 
       boost::asio::post(thread_pool, task);
+      thread_pool.join();
     }
   };
 
