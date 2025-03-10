@@ -12,6 +12,7 @@ class Triangles3DRecipe(ConanFile):
 
   def requirements(self):
     self.requires("spdlog/1.15.1")
+    self.requires("boost/1.83.0")
     if self.options.testing:
       self.test_requires("gtest/1.15.0")
       self.test_requires("cgal/6.0.1")

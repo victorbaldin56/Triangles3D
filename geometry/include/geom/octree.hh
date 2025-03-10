@@ -1,17 +1,20 @@
 #pragma once
 
 #include <array>
-#include <condition_variable>
 #include <bitset>
 #include <iterator>
 #include <list>
 #include <memory>
-#include <mutex>
 #include <queue>
 #include <set>
 #include <stack>
-#include <thread>
 #include <type_traits>
+
+#include "boost/asio/post.hpp"
+#include "boost/asio/thread_pool.hpp"
+#include "boost/thread/condition_variable.hpp"
+#include "boost/thread/mutex.hpp"
+#include "boost/thread/thread.hpp"
 
 #include "spdlog/spdlog.h"
 
@@ -19,6 +22,9 @@
 #include "triangle3d.hh"
 
 namespace geometry {
+
+static auto thread_pool =
+    boost::asio::thread_pool(boost::thread::hardware_concurrency());
 
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 class Octree final {
@@ -43,12 +49,10 @@ class Octree final {
 
     void partition() {
       auto queue = std::queue<pNode>();
-      auto queue_mutex = std::mutex();
-      auto cond_var = std::condition_variable();
+      auto queue_mutex = boost::mutex();
+      auto cond_var = boost::condition_variable();
       bool done = false;
-      auto num_threads = std::thread::hardware_concurrency();
-      auto threads = std::vector<std::thread>();
-      threads.reserve(num_threads);
+      auto num_threads = boost::thread::hardware_concurrency();
 
       queue.push(this->shared_from_this());
 
@@ -57,7 +61,7 @@ class Octree final {
           SPDLOG_TRACE("Stack size = {}", queue.size());
           auto current_node = pNode();
           {
-            auto lock = std::unique_lock<std::mutex>(queue_mutex);
+            auto lock = boost::unique_lock<boost::mutex>(queue_mutex);
             cond_var.wait(lock, [&] { return !queue.empty() || done; });
             if (done && queue.empty()) {
               return;
@@ -125,7 +129,7 @@ class Octree final {
           });
 
           {
-            auto lock = std::lock_guard<std::mutex>(queue_mutex);
+            auto lock = boost::lock_guard<boost::mutex>(queue_mutex);
             for (auto ch = 0; ch < 8; ++ch) {
               if (!current_node->children_[ch]->triangles_.empty()) {
                 current_node->valid_children_[ch] = true;
@@ -139,19 +143,17 @@ class Octree final {
         }
       };
 
-      while (threads.size() < num_threads) {
-        threads.emplace_back(worker);
-      }
+      boost::asio::post(thread_pool, worker);
 
       // Wait for queue to empty
       {
-        auto lock = std::unique_lock<std::mutex>(queue_mutex);
+        auto lock = boost::unique_lock<boost::mutex>(queue_mutex);
         cond_var.wait(lock, [&] { return queue.empty(); });
         done = true;
       }
 
       cond_var.notify_all();
-      std::for_each(threads.begin(), threads.end(), [](auto& t) { t.join(); });
+      thread_pool.join();
     }
 
     std::set<std::size_t> getIntersections() const {
