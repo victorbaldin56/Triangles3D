@@ -23,6 +23,7 @@
 
 namespace geometry {
 
+// ?
 static auto thread_pool =
     boost::asio::thread_pool(boost::thread::hardware_concurrency());
 
@@ -56,7 +57,7 @@ class Octree final {
 
       queue.push(this->shared_from_this());
 
-      auto worker = [&] {
+      auto task = [&] {
         while (true) {
           SPDLOG_TRACE("Stack size = {}", queue.size());
           auto current_node = pNode();
@@ -143,7 +144,7 @@ class Octree final {
         }
       };
 
-      boost::asio::post(thread_pool, worker);
+      boost::asio::post(thread_pool, task);
 
       // Wait for queue to empty
       {
