@@ -210,7 +210,8 @@ class Octree final {
 
     auto count = std::size_t{0};
     for (auto it = begin; count != n; ++it, ++count) {
-      auto&& cur = it->getRange();
+      auto&& tr = *it;
+      auto&& cur = tr.getRange();
 
       if (cur.min_x_ < range.min_x_) {
         range.min_x_ = cur.min_x_;
@@ -232,7 +233,7 @@ class Octree final {
       if (range.max_z_ < cur.max_z_) {
         range.max_z_ = cur.max_z_;
       }
-      root_->triangles_.emplace_front(*it, count++);
+      root_->triangles_.emplace_front(tr, count++);
     }
 
     root_->coords_ = range;
