@@ -5,9 +5,15 @@
 #include <iterator>
 #include <list>
 #include <memory>
+#include <queue>
 #include <set>
 #include <stack>
 #include <type_traits>
+
+#include "boost/asio/post.hpp"
+#include "boost/asio/thread_pool.hpp"
+#include "boost/thread/mutex.hpp"
+#include "boost/thread/thread.hpp"
 
 #include "spdlog/spdlog.h"
 
@@ -15,6 +21,14 @@
 #include "triangle3d.hh"
 
 namespace geometry {
+
+namespace detail {
+
+inline boost::asio::thread_pool createThreadPool() {
+  return boost::asio::thread_pool(boost::thread::hardware_concurrency());
+}
+
+}  // namespace detail
 
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
 class Octree final {
@@ -38,122 +52,151 @@ class Octree final {
     Node(const Range3D<T>& coords) noexcept : coords_(coords) {}
 
     void partition() {
+      auto thread_pool = detail::createThreadPool();
       auto node_stack = std::stack<pNode>();
+      auto queue_mutex = boost::mutex();
+      auto num_threads = boost::thread::hardware_concurrency();
+
       node_stack.push(this->shared_from_this());
 
-      while (!node_stack.empty()) {
-        SPDLOG_TRACE("Stack size = {}", node_stack.size());
-
-        auto current_node = node_stack.top();
-        node_stack.pop();
-
-        SPDLOG_TRACE("current_node.get() = {}",
-                     static_cast<void*>(current_node.get()));
-
-        auto begin_size = current_node->triangles_.size();
-        if (begin_size <= kMinSize) {
-          continue;
-        }
-
-        auto&& coords = current_node->coords_;
-        auto mid_x = (coords.min_x_ + coords.max_x_) / 2;
-        auto mid_y = (coords.min_y_ + coords.max_y_) / 2;
-        auto mid_z = (coords.min_z_ + coords.max_z_) / 2;
-
-        for (auto i = 0; i < 8; ++i) {
-          auto new_coords = coords;
-
-          if (i & 0x1) {
-            new_coords.max_x_ = mid_x;
-          } else {
-            new_coords.min_x_ = mid_x;
+      auto task = [&] {
+        while (!node_stack.empty()) {
+          SPDLOG_TRACE("Stack size = {}", queue.size());
+          auto current_node = pNode();
+          {
+            auto lock = boost::unique_lock<boost::mutex>(queue_mutex);
+            current_node = node_stack.top();
+            node_stack.pop();
           }
 
-          if (i & 0x2) {
-            new_coords.max_y_ = mid_y;
-          } else {
-            new_coords.min_y_ = mid_y;
+          SPDLOG_TRACE("current_node.get() = {}",
+                      static_cast<void*>(current_node.get()));
+
+          auto begin_size = current_node->triangles_.size();
+          if (begin_size <= kMinSize) {
+            continue;
           }
 
-          if (i & 0x4) {
-            new_coords.max_z_ = mid_z;
-          } else {
-            new_coords.min_z_ = mid_z;
-          }
-
-          current_node->children_[i] = std::make_shared<Node>(new_coords);
-        }
-
-        auto&& current_triangles = current_node->triangles_;
-        auto triangles_begin = current_triangles.begin();
-        auto triangles_end = current_triangles.end();
-
-        current_triangles.remove_if([&current_node](auto& tr) {
-          auto moved = false;
-          auto range = tr.first.getRange();
+          auto&& coords = current_node->coords_;
+          auto mid_x = (coords.min_x_ + coords.max_x_) / 2;
+          auto mid_y = (coords.min_y_ + coords.max_y_) / 2;
+          auto mid_z = (coords.min_z_ + coords.max_z_) / 2;
 
           for (auto i = 0; i < 8; ++i) {
-            auto&& ch = current_node->children_[i];
-            if (ch->coords_.contains(range)) {
-              SPDLOG_TRACE("Moving triangle {} to child {}", tr.second, i);
+            auto new_coords = coords;
 
-              current_node->valid_children_[i] = true;
-              ch->triangles_.push_front(tr);
-              moved = true;
+            if (i & 0x1) {
+              new_coords.max_x_ = mid_x;
+            } else {
+              new_coords.min_x_ = mid_x;
+            }
+
+            if (i & 0x2) {
+              new_coords.max_y_ = mid_y;
+            } else {
+              new_coords.min_y_ = mid_y;
+            }
+
+            if (i & 0x4) {
+              new_coords.max_z_ = mid_z;
+            } else {
+              new_coords.min_z_ = mid_z;
+            }
+
+            current_node->children_[i] = std::make_shared<Node>(new_coords);
+          }
+
+          auto&& current_triangles = current_node->triangles_;
+          auto triangles_begin = current_triangles.begin();
+          auto triangles_end = current_triangles.end();
+
+          current_triangles.remove_if([&current_node](auto& tr) {
+            auto moved = false;
+            auto range = tr.first.getRange();
+
+            for (auto i = 0; i < 8; ++i) {
+              auto&& ch = current_node->children_[i];
+              if (ch->coords_.contains(range)) {
+                SPDLOG_TRACE("Moving triangle {} to child {}", tr.second, i);
+
+                current_node->valid_children_[i] = true;
+                ch->triangles_.push_front(tr);
+                moved = true;
+              }
+            }
+            return moved;
+          });
+
+          {
+            auto lock = boost::lock_guard<boost::mutex>(queue_mutex);
+            for (auto ch = 0; ch < 8; ++ch) {
+              if (!current_node->children_[ch]->triangles_.empty()) {
+                current_node->valid_children_[ch] = true;
+                node_stack.push(current_node->children_[ch]);
+              } else {
+                current_node->valid_children_[ch] = false;
+              }
             }
           }
-          return moved;
-        });
-
-        for (auto ch = 0; ch < 8; ++ch) {
-          if (!current_node->children_[ch]->triangles_.empty()) {
-            current_node->valid_children_[ch] = true;
-            node_stack.push(current_node->children_[ch]);
-          } else {
-            current_node->valid_children_[ch] = false;
-          }
         }
-      }
+      };
+
+      boost::asio::post(thread_pool, task);
+      thread_pool.join();
     }
 
     std::set<std::size_t> getIntersections() const {
+      auto thread_pool = detail::createThreadPool();
       auto node_stack = std::stack<pConstNode>();
       node_stack.push(this->shared_from_this());
+      auto stack_mutex = boost::mutex();
 
       auto res = std::set<std::size_t>();
+      auto res_mutex = boost::mutex();
 
-      while (!node_stack.empty()) {
-        auto current_node = node_stack.top();
-        node_stack.pop();
-
-        auto triangles_begin = current_node->triangles_.begin();
-        auto triangles_end = current_node->triangles_.end();
-
-        for (auto it = triangles_begin; it != triangles_end; ++it) {
-          auto&& tr1 = *it;
-          for (auto jt = it; jt != triangles_end; ++jt) {
-            auto&& tr2 = *jt;
-            if (tr1.second == tr2.second) {
-              continue;
-            }
-            if (tr1.first.intersects(tr2.first)) {
-              res.insert(tr1.second);
-              res.insert(tr2.second);
-
-              SPDLOG_TRACE("Triangles {} and {} intersect",
-                           tr1.second, tr2.second);
-            }
+      auto task = [&] {
+        while (!node_stack.empty()) {
+          auto current_node = pConstNode();
+          {
+            auto lock = boost::lock_guard<boost::mutex>(stack_mutex);
+            current_node = node_stack.top();
+            node_stack.pop();
           }
 
-          current_node->getIntersectionsAmongChildren(res, tr1);
-        }
+          auto triangles_begin = current_node->triangles_.begin();
+          auto triangles_end = current_node->triangles_.end();
 
-        for (auto i = 0; i < 8; ++i) {
-          if (current_node->valid_children_[i]) {
-            node_stack.push(current_node->children_[i]);
+          for (auto it = triangles_begin; it != triangles_end; ++it) {
+            auto&& tr1 = *it;
+            for (auto jt = it; jt != triangles_end; ++jt) {
+              auto&& tr2 = *jt;
+              if (tr1.second == tr2.second) {
+                continue;
+              }
+              if (tr1.first.intersects(tr2.first)) {
+                auto lock = boost::lock_guard<boost::mutex>(res_mutex);
+                res.insert(tr1.second);
+                res.insert(tr2.second);
+
+                SPDLOG_TRACE("Triangles {} and {} intersect",
+                            tr1.second, tr2.second);
+              }
+            }
+
+            current_node->getIntersectionsAmongChildren(res, tr1);
+          }
+
+          for (auto i = 0; i < 8; ++i) {
+            if (current_node->valid_children_[i]) {
+              node_stack.push(current_node->children_[i]);
+            }
           }
         }
-      }
+      };
+
+      boost::asio::post(thread_pool, task);
+      thread_pool.join();
+
       return res;
     }
 
@@ -178,7 +221,7 @@ class Octree final {
             auto triangles_end = current_triangles.end();
 
             std::for_each(triangles_begin, triangles_end,
-                          [triangle, &res](const auto& other) {
+                          [&](const auto& other) {
               if (other.first.intersects(triangle.first)) {
                 res.insert(other.second);
                 res.insert(triangle.second);
