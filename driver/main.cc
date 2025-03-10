@@ -13,11 +13,10 @@ int main() try {
   auto count = std::size_t{};
   std::cin >> count;
 
-  auto triangles = std::vector<geometry::Triangle3D<double>>();
-  triangles.reserve(count);
-  std::copy_n(std::istream_iterator<geometry::Triangle3D<double>>(std::cin),
-              count, std::back_inserter(triangles));
-  auto octree = geometry::Octree<double>(triangles.begin(), triangles.end());
+  auto octree =
+      geometry::Octree<double>(
+          std::istream_iterator<geometry::Triangle3D<double>>(std::cin),
+          count);
   auto res = octree.getIntersections();
   std::copy(res.begin(), res.end(),
             std::ostream_iterator<std::size_t>(std::cout, "\n"));

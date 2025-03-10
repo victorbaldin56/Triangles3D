@@ -198,10 +198,10 @@ class Octree final {
  public:
   template <
       typename It,
-      typename
-          = std::enable_if<std::is_base_of_v<std::input_iterator_tag, It>>>
-  Octree(It begin, It end, std::size_t min_size = kMinSize) {
-    if (begin == end) {
+      typename =
+          std::enable_if<std::is_base_of_v<std::input_iterator_tag, It>>>
+  Octree(It begin, std::size_t n, std::size_t min_size = kMinSize) {
+    if (!n) {
       return;
     }
 
@@ -209,7 +209,7 @@ class Octree final {
     root_ = std::make_shared<Node>(Range3D<T>{});
 
     auto count = std::size_t{0};
-    for (auto it = begin; it != end; ++it) {
+    for (auto it = begin; count != n; ++it, ++count) {
       auto&& cur = it->getRange();
 
       if (cur.min_x_ < range.min_x_) {
