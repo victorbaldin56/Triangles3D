@@ -238,7 +238,7 @@ class Octree final {
 
  private:
   /** min number of triangles inside node */
-  static constexpr auto kMinSize = std::size_t{0x1};
+  static constexpr auto kMinSize = std::size_t{0x100};
 };
 
 }  // namespace geometry
