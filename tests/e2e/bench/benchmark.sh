@@ -7,7 +7,7 @@ MAX_TIME=1000  # 1 second threshold
 for input in "$INPUT_DIR"/*.in; do
   echo "Testing $input..."
   start=$(date +%s%3N)
-  $APP < "$input"
+  $APP < "$input" > /dev/null
   elapsed=$(echo "$(date +%s%3N) - $start" | bc)
   echo "$elapsed ms"
 
