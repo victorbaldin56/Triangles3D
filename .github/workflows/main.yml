@@ -62,4 +62,7 @@ jobs:
 
     - name: Benchmark
       if: ${{ matrix.build_type == 'release' }}
-      run: APP=${{ github.workspace }}/build/driver/triangles bash ${{ github.workspace }}/tests/e2e/bench/benchmark.sh
+      run: |
+        export APP=${{ github.workspace }}/build/driver/triangles
+        pushd ${{ github.workspace }}/tests/e2e/bench/
+        bash benchmark.sh
