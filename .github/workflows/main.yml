@@ -62,5 +62,3 @@ jobs:
         export APP=${{ github.workspace }}/build/driver/triangles
         pushd ${{ github.workspace }}/tests/e2e/bench/
         bash benchmark.sh
-
-  deploy:
