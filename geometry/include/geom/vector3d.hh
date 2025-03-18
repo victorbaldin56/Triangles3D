@@ -9,7 +9,7 @@
 namespace geometry {
 
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
-struct Vector3D {
+struct Vector3D final {
   T x_ = NAN, y_ = NAN, z_ = NAN;
 
   bool valid() const noexcept {

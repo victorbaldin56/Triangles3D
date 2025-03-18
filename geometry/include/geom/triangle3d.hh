@@ -9,7 +9,7 @@
 namespace geometry {
 
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
-struct Triangle3D {
+struct Triangle3D final {
   Vector3D<T> a_, b_, c_;
 
   /**
