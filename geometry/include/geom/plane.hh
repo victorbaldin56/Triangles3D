@@ -9,7 +9,7 @@
 namespace geometry {
 
 template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
-class Plane {
+class Plane final {
   Vector3D<T> n_;
   T d_;
 
