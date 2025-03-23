@@ -7,7 +7,8 @@
 
 int main() try {
   // for trace & debugging
-  spdlog::set_level(static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
+  spdlog::set_level(
+      static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
   auto count = std::size_t{};
   std::cin >> count;
 
