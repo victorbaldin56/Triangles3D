@@ -15,7 +15,7 @@ int main() try {
   auto octree =
       geometry::Octree<double>(
           std::istream_iterator<geometry::Triangle3D<double>>(std::cin),
-          count);
+          std::istream_iterator<geometry::Triangle3D<double>>());
   auto res = octree.getIntersections();
   std::copy(res.begin(), res.end(),
             std::ostream_iterator<std::size_t>(std::cout, "\n"));

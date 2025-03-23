@@ -31,7 +31,7 @@ class Octree final {
     std::array<std::unique_ptr<Node>, 8> children_;
     std::bitset<8> valid_children_;
 
-    Node(const Range3D<T>& coords) noexcept : coords_(coords) {}
+    Node(const Range3D<T>& coords = {}) noexcept : coords_(coords) {}
 
     void partition() {
       std::stack<Node*> node_stack;
@@ -196,15 +196,15 @@ class Octree final {
           std::enable_if_t<
               std::is_base_of_v<std::input_iterator_tag,
               typename std::iterator_traits<It>::iterator_category>>>
-  Octree(It begin, std::size_t n, std::size_t min_size = kMinSize) {
-    if (!n) {
-      return;
-    }
+  Octree(It begin, It end, std::size_t min_size = kMinSize)
+      : root_(std::make_unique<Node>()) {
+    constexpr auto kMinT = std::numeric_limits<T>::min();
+    constexpr auto kMaxT = std::numeric_limits<T>::max();
 
-    auto range = begin->getRange();
-    root_ = std::make_unique<Node>(Range3D<T>{});
-
-    for (std::size_t count = 0; count != n; ++begin, ++count) {
+    Range3D<T> range{.min_x_ = kMaxT, .max_x_ = kMinT,
+                     .min_y_ = kMaxT, .max_y_ = kMinT,
+                     .min_z_ = kMaxT, .max_z_ = kMinT};
+    for (std::size_t count = 0; begin != end; ++count, ++begin) {
       auto cur = begin->getRange();
 
       range.min_x_ = std::min(range.min_x_, cur.min_x_);
@@ -222,10 +222,7 @@ class Octree final {
   }
 
   std::set<std::size_t> getIntersections() const {
-    if (root_) {
-      return root_->getIntersections();
-    }
-    return std::set<std::size_t>();
+    return root_->getIntersections();
   }
 
  private:
