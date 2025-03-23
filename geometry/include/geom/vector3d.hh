@@ -71,18 +71,18 @@ struct Vector3D final {
 };
 
 template <typename T>
-Vector3D<T> operator+(Vector3D<T> a, const Vector3D<T>& b) noexcept {
-  return a += b;
+Vector3D<T> operator+(const Vector3D<T>& a, const Vector3D<T>& b) noexcept {
+  return Vector3D(a) += b;
 }
 
 template <typename T>
-Vector3D<T> operator-(Vector3D<T> a, const Vector3D<T>& b) noexcept {
-  return a -= b;
+Vector3D<T> operator-(const Vector3D<T>& a, const Vector3D<T>& b) noexcept {
+  return Vector3D(a) -= b;
 }
 
 template <typename T>
-Vector3D<T> operator*(T scalar, Vector3D<T> v) noexcept {
-  return v *= scalar;
+Vector3D<T> operator*(T scalar, const Vector3D<T>& v) noexcept {
+  return Vector3D(v) *= scalar;
 }
 
 template <typename T>
@@ -91,8 +91,8 @@ Vector3D<T> operator*(const Vector3D<T>& v, T scalar) noexcept {
 }
 
 template <typename T>
-Vector3D<T> operator/(Vector3D<T> v, T scalar) noexcept {
-  return v /= scalar;
+Vector3D<T> operator/(const Vector3D<T>& v, T scalar) noexcept {
+  return Vector3D(v) /= scalar;
 }
 
 template <typename T>

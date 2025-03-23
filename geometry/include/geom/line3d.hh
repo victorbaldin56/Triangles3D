@@ -12,8 +12,8 @@ class Line3D final {
 
  public:
   Line3D() {}
-  Line3D(Vector3D<T> direction, const Vector3D<T>& origin) noexcept
-      : direction_(direction.normalize()), origin_(origin) {}
+  Line3D(const Vector3D<T>& direction, const Vector3D<T>& origin) noexcept
+      : direction_(Vector3D(direction).normalize()), origin_(origin) {}
 
   // getters
  public:
