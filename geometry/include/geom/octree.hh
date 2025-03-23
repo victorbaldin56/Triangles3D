@@ -126,22 +126,20 @@ class Octree final {
         auto triangles_end = current_node->triangles_.end();
 
         for (auto it = triangles_begin; it != triangles_end; ++it) {
-          auto&& tr1 = *it;
           for (auto jt = it; jt != triangles_end; ++jt) {
-            auto&& tr2 = *jt;
-            if (tr1.second == tr2.second) {
+            if (it->second == jt->second) {
               continue;
             }
-            if (tr1.first.intersects(tr2.first)) {
-              res.insert(tr1.second);
-              res.insert(tr2.second);
+            if (it->first.intersects(jt->first)) {
+              res.insert(it->second);
+              res.insert(jt->second);
 
               SPDLOG_TRACE("Triangles {} and {} intersect",
-                           tr1.second, tr2.second);
+                           it->second, jt->second);
             }
           }
 
-          current_node->getIntersectionsAmongChildren(res, tr1);
+          current_node->getIntersectionsAmongChildren(res, *it);
         }
 
         for (auto i = 0; i < 8; ++i) {
@@ -207,8 +205,7 @@ class Octree final {
     root_ = std::make_unique<Node>(Range3D<T>{});
 
     for (std::size_t count = 0; count != n; ++begin, ++count) {
-      auto&& tr = *begin;
-      auto cur = tr.getRange();
+      auto cur = begin->getRange();
 
       range.min_x_ = std::min(range.min_x_, cur.min_x_);
       range.max_x_ = std::max(range.max_x_, cur.max_x_);
@@ -217,7 +214,7 @@ class Octree final {
       range.min_z_ = std::min(range.min_z_, cur.min_z_);
       range.max_z_ = std::max(range.max_z_, cur.max_z_);
 
-      root_->triangles_.emplace_front(tr, count);
+      root_->triangles_.emplace_front(*begin, count);
     }
 
     root_->coords_ = range;
