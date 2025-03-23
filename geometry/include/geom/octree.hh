@@ -204,7 +204,8 @@ class Octree final {
     Range3D<T> range{.min_x_ = kMaxT, .max_x_ = kMinT,
                      .min_y_ = kMaxT, .max_y_ = kMinT,
                      .min_z_ = kMaxT, .max_z_ = kMinT};
-    for (std::size_t count = 0; begin != end; ++count, ++begin) {
+    std::size_t count = 0;
+    for (; begin != end; ++count, ++begin) {
       auto cur = begin->getRange();
 
       range.min_x_ = std::min(range.min_x_, cur.min_x_);
@@ -217,6 +218,7 @@ class Octree final {
       root_->triangles_.emplace_front(*begin, count);
     }
 
+    cnt_ = count;
     root_->coords_ = range;
     root_->partition();
   }
@@ -225,8 +227,11 @@ class Octree final {
     return root_->getIntersections();
   }
 
+  auto size() const noexcept { return cnt_; }
+
  private:
   std::unique_ptr<Node> root_;
+  std::size_t cnt_;
 
  private:
   /** min number of triangles inside node */
