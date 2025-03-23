@@ -8,7 +8,7 @@
 
 namespace geometry {
 
-template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
+template <typename T>
 class Plane final {
   Vector3D<T> n_;
   T d_;
@@ -16,8 +16,7 @@ class Plane final {
   // constructors
  public:
   Plane() noexcept {}
-  Plane(const Vector3D<T>& a,
-        const Vector3D<T>& b,
+  Plane(const Vector3D<T>& a, const Vector3D<T>& b,
         const Vector3D<T>& c) noexcept
       : n_(crossProduct(a - b, a - c).normalize()),
         // normalization applied here to make easier comparison between planes
@@ -28,7 +27,7 @@ class Plane final {
 
   // getters
  public:
-  const Vector3D<T>& normal() const & noexcept { return n_; }
+  const Vector3D<T>& normal() const& noexcept { return n_; }
   Vector3D<T>&& normal() && noexcept { return n_; }
   T distance() const noexcept { return d_; }
 
@@ -36,10 +35,10 @@ class Plane final {
   bool valid() const noexcept { return n_.valid() && std::isfinite(d_); }
 
   Line3D<T> getIntersectionLine(const Plane<T>& other) const noexcept {
-    auto&& normal_dot = dot(n_, other.n_);
-    auto&& denom = 1 - normal_dot * normal_dot;
-    auto&& c1 = (d_ - other.d_ * normal_dot) / denom;
-    auto&& c2 = (other.d_ - d_ * normal_dot) / denom;
+    auto normal_dot = dot(n_, other.n_);
+    auto denom = 1 - normal_dot * normal_dot;
+    auto c1 = (d_ - other.d_ * normal_dot) / denom;
+    auto c2 = (other.d_ - d_ * normal_dot) / denom;
 
     return Line3D<T>(crossProduct(n_, other.n_), c1 * n_ + c2 * other.n_);
   }
@@ -49,14 +48,14 @@ class Plane final {
 
     auto&& origin = line.origin();
     auto&& dir = line.direction();
-    auto&& denominator = dot(n_, dir);
+    auto denominator = dot(n_, dir);
     if (comparator::isClose(denominator, static_cast<T>(0))) {
       // check if the line lies on the plane
       return Vector3D<T>{};  // no intersection
     }
 
-    auto&& t = (d_ - dot(origin, n_)) / denominator;
-    auto&& res = origin + dir * t;
+    auto t = (d_ - dot(origin, n_)) / denominator;
+    auto res = origin + dir * t;
     assert(line.contains(res));
     assert(contains(res));
     return res;
@@ -70,11 +69,11 @@ class Plane final {
       }
       return Vector3D<T>{};
     }
-    auto&& p = getIntersectionPoint(l);
+    auto p = getIntersectionPoint(l);
     assert(!p.valid() || contains(p));
     assert(!p.valid() || l.contains(p));
 
-    auto&& range = seg.getRange();
+    auto range = seg.getRange();
     if (range.contains(p)) {
       return p;
     }
@@ -82,7 +81,7 @@ class Plane final {
   }
 
   bool contains(const Vector3D<T>& p) const noexcept {
-    auto&& dotpn = dot(p, n_);
+    auto dotpn = dot(p, n_);
     return comparator::isClose(dotpn, d_);
   }
 
@@ -91,10 +90,8 @@ class Plane final {
   }
 
   bool isClose(const Plane<T>& other) const noexcept {
-    return (n_.isClose(other.n_) &&
-            comparator::isClose(d_, other.d_)) ||
-           (n_.isClose(-other.n_) &&
-            comparator::isClose(d_, -other.d_));
+    return (n_.isClose(other.n_) && comparator::isClose(d_, other.d_)) ||
+           (n_.isClose(-other.n_) && comparator::isClose(d_, -other.d_));
   }
 };
 

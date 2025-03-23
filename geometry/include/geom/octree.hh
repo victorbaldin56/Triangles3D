@@ -9,37 +9,32 @@
 #include <stack>
 #include <type_traits>
 
-#include "spdlog/spdlog.h"
-
 #include "range3d.hh"
+#include "spdlog/spdlog.h"
 #include "triangle3d.hh"
 
 namespace geometry {
 
-template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
+template <typename T>
 class Octree final {
-  struct Node;
-  using pNode = std::shared_ptr<Node>;
-  using pConstNode = std::shared_ptr<const Node>;
-
   // because we need to erase elements from middle
   using InternalContainer = std::list<std::pair<Triangle3D<T>, std::size_t>>;
 
  private:
   /**
-   * Octree node representing octant. Managed by std::shared_ptr.
+   * Octree node representing octant.
    */
-  struct Node final : public std::enable_shared_from_this<Node> {
+  struct Node final {
     Range3D<T> coords_;
     InternalContainer triangles_;
-    std::array<pNode, 8> children_;
+    std::array<std::unique_ptr<Node>, 8> children_;
     std::bitset<8> valid_children_;
 
-    Node(const Range3D<T>& coords) noexcept : coords_(coords) {}
+    Node(const Range3D<T>& coords = {}) noexcept : coords_(coords) {}
 
     void partition() {
-      auto node_stack = std::stack<pNode>();
-      node_stack.push(this->shared_from_this());
+      std::stack<Node*> node_stack;
+      node_stack.push(this);
 
       while (!node_stack.empty()) {
         SPDLOG_TRACE("Stack size = {}", node_stack.size());
@@ -81,7 +76,7 @@ class Octree final {
             new_coords.min_z_ = mid_z;
           }
 
-          current_node->children_[i] = std::make_shared<Node>(new_coords);
+          current_node->children_[i] = std::make_unique<Node>(new_coords);
         }
 
         auto&& current_triangles = current_node->triangles_;
@@ -108,7 +103,7 @@ class Octree final {
         for (auto ch = 0; ch < 8; ++ch) {
           if (!current_node->children_[ch]->triangles_.empty()) {
             current_node->valid_children_[ch] = true;
-            node_stack.push(current_node->children_[ch]);
+            node_stack.push(current_node->children_[ch].get());
           } else {
             current_node->valid_children_[ch] = false;
           }
@@ -117,10 +112,10 @@ class Octree final {
     }
 
     std::set<std::size_t> getIntersections() const {
-      auto node_stack = std::stack<pConstNode>();
-      node_stack.push(this->shared_from_this());
+      std::stack<const Node*> node_stack;
+      node_stack.push(this);
 
-      auto res = std::set<std::size_t>();
+      std::set<std::size_t> res;
 
       while (!node_stack.empty()) {
         auto current_node = node_stack.top();
@@ -130,27 +125,25 @@ class Octree final {
         auto triangles_end = current_node->triangles_.end();
 
         for (auto it = triangles_begin; it != triangles_end; ++it) {
-          auto&& tr1 = *it;
           for (auto jt = it; jt != triangles_end; ++jt) {
-            auto&& tr2 = *jt;
-            if (tr1.second == tr2.second) {
+            if (it->second == jt->second) {
               continue;
             }
-            if (tr1.first.intersects(tr2.first)) {
-              res.insert(tr1.second);
-              res.insert(tr2.second);
+            if (it->first.intersects(jt->first)) {
+              res.insert(it->second);
+              res.insert(jt->second);
 
-              SPDLOG_TRACE("Triangles {} and {} intersect",
-                           tr1.second, tr2.second);
+              SPDLOG_TRACE("Triangles {} and {} intersect", it->second,
+                           jt->second);
             }
           }
 
-          current_node->getIntersectionsAmongChildren(res, tr1);
+          current_node->getIntersectionsAmongChildren(res, *it);
         }
 
         for (auto i = 0; i < 8; ++i) {
           if (current_node->valid_children_[i]) {
-            node_stack.push(current_node->children_[i]);
+            node_stack.push(current_node->children_[i].get());
           }
         }
       }
@@ -164,8 +157,8 @@ class Octree final {
         return;
       }
 
-      auto node_stack = std::stack<pConstNode>();
-      node_stack.push(this->shared_from_this());
+      std::stack<const Node*> node_stack;
+      node_stack.push(this);
 
       while (!node_stack.empty()) {
         auto current_node = node_stack.top();
@@ -179,16 +172,16 @@ class Octree final {
 
             std::for_each(triangles_begin, triangles_end,
                           [triangle, &res](const auto& other) {
-              if (other.first.intersects(triangle.first)) {
-                res.insert(other.second);
-                res.insert(triangle.second);
+                            if (other.first.intersects(triangle.first)) {
+                              res.insert(other.second);
+                              res.insert(triangle.second);
 
-                SPDLOG_TRACE("Triangles {} and {} intersect",
-                              triangle.second, other.second);
-              }
-            });
+                              SPDLOG_TRACE("Triangles {} and {} intersect",
+                                           triangle.second, other.second);
+                            }
+                          });
 
-            node_stack.push(current_node->children_[ch]);
+            node_stack.push(current_node->children_[ch].get());
           }
         }
       }
@@ -196,21 +189,24 @@ class Octree final {
   };
 
  public:
-  template <
-      typename It,
-      typename =
-          std::enable_if<std::is_base_of_v<std::input_iterator_tag, It>>>
-  Octree(It begin, std::size_t n, std::size_t min_size = kMinSize) {
-    if (!n) {
-      return;
-    }
+  template <typename It,
+            typename = std::enable_if_t<std::is_base_of_v<
+                std::input_iterator_tag,
+                typename std::iterator_traits<It>::iterator_category>>>
+  Octree(It begin, It end, std::size_t min_size = kMinSize)
+      : root_(std::make_unique<Node>()) {
+    constexpr auto kMinT = std::numeric_limits<T>::min();
+    constexpr auto kMaxT = std::numeric_limits<T>::max();
 
-    auto&& range = begin->getRange();
-    root_ = std::make_shared<Node>(Range3D<T>{});
-
-    for (auto count = std::size_t{0}; count != n; ++begin, ++count) {
-      auto&& tr = *begin;
-      auto&& cur = tr.getRange();
+    Range3D<T> range{.min_x_ = kMaxT,
+                     .max_x_ = kMinT,
+                     .min_y_ = kMaxT,
+                     .max_y_ = kMinT,
+                     .min_z_ = kMaxT,
+                     .max_z_ = kMinT};
+    std::size_t count = 0;
+    for (; begin != end; ++count, ++begin) {
+      auto cur = begin->getRange();
 
       range.min_x_ = std::min(range.min_x_, cur.min_x_);
       range.max_x_ = std::max(range.max_x_, cur.max_x_);
@@ -219,26 +215,27 @@ class Octree final {
       range.min_z_ = std::min(range.min_z_, cur.min_z_);
       range.max_z_ = std::max(range.max_z_, cur.max_z_);
 
-      root_->triangles_.emplace_front(tr, count);
+      root_->triangles_.emplace_front(*begin, count);
     }
 
+    cnt_ = count;
     root_->coords_ = range;
     root_->partition();
   }
 
   std::set<std::size_t> getIntersections() const {
-    if (root_) {
-      return root_->getIntersections();
-    }
-    return std::set<std::size_t>();
+    return root_->getIntersections();
   }
 
+  auto size() const noexcept { return cnt_; }
+
  private:
-  pNode root_;
+  std::unique_ptr<Node> root_;
+  std::size_t cnt_;
 
  private:
   /** min number of triangles inside node */
-  static constexpr auto kMinSize = std::size_t{0x100};
+  static constexpr std::size_t kMinSize = 0x100;
 };
 
 }  // namespace geometry
