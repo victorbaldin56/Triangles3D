@@ -28,7 +28,7 @@ struct Segment3D final {
   }
 
   bool intersectsOnLine(const Segment3D<T>& other) const noexcept {
-    auto&& range = getRange();
+    auto range = getRange();
     return range.contains(other.begin_) || range.contains(other.end_);
   }
 
