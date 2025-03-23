@@ -22,7 +22,7 @@ class Octree final {
 
  private:
   /**
-   * Octree node representing octant. Managed by std::shared_ptr.
+   * Octree node representing octant.
    */
   struct Node final {
     Range3D<T> coords_;
