@@ -210,9 +210,9 @@ class Octree final {
     auto&& range = begin->getRange();
     root_ = std::make_shared<Node>(Range3D<T>{});
 
-    for (auto count = std::size_t{0}; count != n; ++begin, ++count) {
+    for (std::size_t count = 0; count != n; ++begin, ++count) {
       auto&& tr = *begin;
-      auto&& cur = tr.getRange();
+      auto cur = tr.getRange();
 
       range.min_x_ = std::min(range.min_x_, cur.min_x_);
       range.max_x_ = std::max(range.max_x_, cur.max_x_);
@@ -240,7 +240,7 @@ class Octree final {
 
  private:
   /** min number of triangles inside node */
-  static constexpr auto kMinSize = std::size_t{0x100};
+  static constexpr std::size_t kMinSize = 0x100;
 };
 
 }  // namespace geometry
