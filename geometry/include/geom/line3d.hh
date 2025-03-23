@@ -6,7 +6,7 @@
 
 namespace geometry {
 
-template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
+template <typename T>
 class Line3D final {
   Vector3D<T> direction_, origin_;
 
@@ -17,10 +17,8 @@ class Line3D final {
 
   // getters
  public:
-  const Vector3D<T>& direction() const & noexcept { return direction_; }
-  Vector3D<T>&& direction() && noexcept { return direction_; }
-  const Vector3D<T>& origin() const & noexcept { return origin_; }
-  Vector3D<T>&& origin() && noexcept { return origin_; }
+  const Vector3D<T>& direction() const noexcept { return direction_; }
+  const Vector3D<T>& origin() const noexcept { return origin_; }
 
  public:
   bool valid() const noexcept { return direction_.valid() && origin_.valid(); }

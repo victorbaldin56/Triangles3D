@@ -4,8 +4,10 @@
 
 namespace geometry {
 
-template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
+template <typename T>
 struct Range3D final {
+  static_assert(std::is_floating_point_v<T>);
+
   T min_x_, max_x_;  // min_x >= max_x means empty range
   T min_y_, max_y_;  // min_y >= max_y means empty range
   T min_z_, max_z_;  // min_z >= max_z means empty range

@@ -8,7 +8,7 @@
 
 namespace geometry {
 
-template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
+template <typename T>
 struct Triangle3D final {
   Vector3D<T> a_, b_, c_;
 
@@ -143,13 +143,13 @@ struct Triangle3D final {
   }
 };
 
-template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
+template <typename T>
 std::istream& operator>>(std::istream& is, Triangle3D<T>& t) {
   is >> t.a_ >> t.b_ >> t.c_;
   return is;
 }
 
-template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
+template <typename T>
 std::ostream& operator<<(std::ostream& os, const Triangle3D<T>& t) {
   os << t.a_ << t.b_ << t.c_;
   return os;

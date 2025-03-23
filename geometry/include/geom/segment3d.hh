@@ -5,7 +5,7 @@
 
 namespace geometry {
 
-template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
+template <typename T>
 struct Segment3D final {
   Vector3D<T> begin_;
   Vector3D<T> end_;

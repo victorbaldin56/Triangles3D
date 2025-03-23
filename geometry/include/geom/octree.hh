@@ -16,7 +16,7 @@
 
 namespace geometry {
 
-template <typename T, typename = std::enable_if<std::is_floating_point_v<T>>>
+template <typename T>
 class Octree final {
   struct Node;
   using pNode = std::shared_ptr<Node>;
@@ -199,7 +199,9 @@ class Octree final {
   template <
       typename It,
       typename =
-          std::enable_if<std::is_base_of_v<std::input_iterator_tag, It>>>
+          std::enable_if_t<
+              std::is_base_of_v<std::input_iterator_tag,
+              typename std::iterator_traits<It>::iterator_category>>>
   Octree(It begin, std::size_t n, std::size_t min_size = kMinSize) {
     if (!n) {
       return;
