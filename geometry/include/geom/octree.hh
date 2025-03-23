@@ -9,9 +9,8 @@
 #include <stack>
 #include <type_traits>
 
-#include "spdlog/spdlog.h"
-
 #include "range3d.hh"
+#include "spdlog/spdlog.h"
 #include "triangle3d.hh"
 
 namespace geometry {
@@ -134,8 +133,8 @@ class Octree final {
               res.insert(it->second);
               res.insert(jt->second);
 
-              SPDLOG_TRACE("Triangles {} and {} intersect",
-                           it->second, jt->second);
+              SPDLOG_TRACE("Triangles {} and {} intersect", it->second,
+                           jt->second);
             }
           }
 
@@ -173,14 +172,14 @@ class Octree final {
 
             std::for_each(triangles_begin, triangles_end,
                           [triangle, &res](const auto& other) {
-              if (other.first.intersects(triangle.first)) {
-                res.insert(other.second);
-                res.insert(triangle.second);
+                            if (other.first.intersects(triangle.first)) {
+                              res.insert(other.second);
+                              res.insert(triangle.second);
 
-                SPDLOG_TRACE("Triangles {} and {} intersect",
-                              triangle.second, other.second);
-              }
-            });
+                              SPDLOG_TRACE("Triangles {} and {} intersect",
+                                           triangle.second, other.second);
+                            }
+                          });
 
             node_stack.push(current_node->children_[ch].get());
           }
@@ -190,20 +189,21 @@ class Octree final {
   };
 
  public:
-  template <
-      typename It,
-      typename =
-          std::enable_if_t<
-              std::is_base_of_v<std::input_iterator_tag,
-              typename std::iterator_traits<It>::iterator_category>>>
+  template <typename It,
+            typename = std::enable_if_t<std::is_base_of_v<
+                std::input_iterator_tag,
+                typename std::iterator_traits<It>::iterator_category>>>
   Octree(It begin, It end, std::size_t min_size = kMinSize)
       : root_(std::make_unique<Node>()) {
     constexpr auto kMinT = std::numeric_limits<T>::min();
     constexpr auto kMaxT = std::numeric_limits<T>::max();
 
-    Range3D<T> range{.min_x_ = kMaxT, .max_x_ = kMinT,
-                     .min_y_ = kMaxT, .max_y_ = kMinT,
-                     .min_z_ = kMaxT, .max_z_ = kMinT};
+    Range3D<T> range{.min_x_ = kMaxT,
+                     .max_x_ = kMinT,
+                     .min_y_ = kMaxT,
+                     .max_y_ = kMinT,
+                     .min_z_ = kMaxT,
+                     .max_z_ = kMinT};
     std::size_t count = 0;
     for (; begin != end; ++count, ++begin) {
       auto cur = begin->getRange();

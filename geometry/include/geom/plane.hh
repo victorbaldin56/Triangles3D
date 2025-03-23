@@ -16,8 +16,7 @@ class Plane final {
   // constructors
  public:
   Plane() noexcept {}
-  Plane(const Vector3D<T>& a,
-        const Vector3D<T>& b,
+  Plane(const Vector3D<T>& a, const Vector3D<T>& b,
         const Vector3D<T>& c) noexcept
       : n_(crossProduct(a - b, a - c).normalize()),
         // normalization applied here to make easier comparison between planes
@@ -28,7 +27,7 @@ class Plane final {
 
   // getters
  public:
-  const Vector3D<T>& normal() const & noexcept { return n_; }
+  const Vector3D<T>& normal() const& noexcept { return n_; }
   Vector3D<T>&& normal() && noexcept { return n_; }
   T distance() const noexcept { return d_; }
 
@@ -91,10 +90,8 @@ class Plane final {
   }
 
   bool isClose(const Plane<T>& other) const noexcept {
-    return (n_.isClose(other.n_) &&
-            comparator::isClose(d_, other.d_)) ||
-           (n_.isClose(-other.n_) &&
-            comparator::isClose(d_, -other.d_));
+    return (n_.isClose(other.n_) && comparator::isClose(d_, other.d_)) ||
+           (n_.isClose(-other.n_) && comparator::isClose(d_, -other.d_));
   }
 };
 

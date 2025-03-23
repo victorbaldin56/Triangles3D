@@ -2,8 +2,8 @@
 #include <vector>
 
 // #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
-#include "geom/triangle3d.hh"
 #include "geom/octree.hh"
+#include "geom/triangle3d.hh"
 
 int main() try {
   // for trace and debugging
