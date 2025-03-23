@@ -12,7 +12,7 @@ struct Segment3D final {
 
   Line3D<T> line() const noexcept { return Line3D<T>(end_ - begin_, begin_); }
   Vector3D<T> getIntersectionPoint(const Line3D<T>& l) const noexcept {
-    auto&& this_line = line();
+    auto this_line = line();
     if (!this_line.valid()) {
       if (l.contains(begin_)) {
         return begin_;
@@ -20,7 +20,7 @@ struct Segment3D final {
       return Vector3D<T>{};
     }
 
-    auto&& intersection_point = this_line.getIntersectionPoint(l);
+    auto intersection_point = this_line.getIntersectionPoint(l);
     if (getRange().contains(intersection_point)) {
       return intersection_point;
     }
@@ -35,8 +35,8 @@ struct Segment3D final {
   bool intersects(const Segment3D<T>& other) const noexcept {
     auto copy = *this;
     auto other_copy = other;
-    auto&& this_line = copy.line();
-    auto&& other_line = other_copy.line();
+    auto this_line = copy.line();
+    auto other_line = other_copy.line();
 
     if (!other_line.valid()) {
       if (!this_line.valid()) {
@@ -50,7 +50,7 @@ struct Segment3D final {
       return intersectsOnLine(other_copy);
     }
 
-    auto&& intersection = getIntersectionPoint(other_line);
+    auto intersection = getIntersectionPoint(other_line);
     return other_copy.getRange().contains(intersection);
   }
 

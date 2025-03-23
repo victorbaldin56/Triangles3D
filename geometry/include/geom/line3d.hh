@@ -27,21 +27,21 @@ class Line3D final {
   }
 
   Vector3D<T> getIntersectionPoint(const Line3D<T>& other) const noexcept {
-    auto&& w = other.origin_ - origin_;
+    auto w = other.origin_ - origin_;
     // looks like we have to handle skew case explicitly
-    auto&& triple = tripleProduct(direction_, other.direction_, w);
+    auto triple = tripleProduct(direction_, other.direction_, w);
     if (!comparator::isClose(triple, static_cast<T>(0))) {
       return Vector3D<T>{};
     }
 
-    auto&& dir_cross = crossProduct(direction_, other.direction_);
+    auto dir_cross = crossProduct(direction_, other.direction_);
     if (dir_cross.isClose(Vector3D<T>::nullVector())) {
       return Vector3D<T>{};
     }
 
-    auto&& numerator = dot(crossProduct(w, other.direction_), dir_cross);
-    auto&& t = numerator / dir_cross.norm2();
-    auto&& res = origin_ + direction_ * t;
+    auto numerator = dot(crossProduct(w, other.direction_), dir_cross);
+    auto t = numerator / dir_cross.norm2();
+    auto res = origin_ + direction_ * t;
 
     assert(!res.valid() || contains(res));
     assert(!res.valid() || other.contains(res));
