@@ -29,6 +29,11 @@ class Shader final {
     install();
   }
 
+  Shader(Shader&& other) noexcept = default;
+  Shader& operator=(Shader&& rhs) noexcept = default;
+
+  auto id() const noexcept { return *handle_; }
+
  private:
   void install() {
     auto rbuf = code_.c_str();
