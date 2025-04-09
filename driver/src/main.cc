@@ -3,12 +3,11 @@
 
 // #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include "driver/cmd_parser.hh"
+#include "driver/triangles_gl.hh"
 #include "geom/octree.hh"
 #include "geom/triangle3d.hh"
 
 int main(int argc, char** argv) try {
-  using Triangle = geometry::Triangle3D<double>;
-
   cmd::CmdParser parser(argc, argv);
   auto cfg = parser.run();
 
@@ -22,8 +21,9 @@ int main(int argc, char** argv) try {
     throw std::runtime_error("Unexpected EOF");
   }
 
-  std::vector<Triangle> triangles((std::istream_iterator<Triangle>(std::cin)),
-                                  (std::istream_iterator<Triangle>()));
+  std::vector<geometry::Triangle3D<double>> triangles(
+      (std::istream_iterator<geometry::Triangle3D<double>>(std::cin)),
+      (std::istream_iterator<geometry::Triangle3D<double>>()));
   if (triangles.size() != count) {
     throw std::runtime_error(
         "Number of inputted triangles and initially inputted count mismatch");
