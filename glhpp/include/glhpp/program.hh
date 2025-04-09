@@ -6,7 +6,7 @@ namespace glhpp {
 
 class Program final {
   struct ProgramDeleter {
-    auto operator()(GLuint* ptr) {
+    auto operator()(GLuint* ptr) const noexcept {
       glDeleteProgram(*ptr);
       delete ptr;
     }
