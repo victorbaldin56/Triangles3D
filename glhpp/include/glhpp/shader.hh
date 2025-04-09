@@ -8,37 +8,34 @@
 
 #include "GL/glew.h"
 #include "detail/error_handler.hh"
+#include "detail/gl_handle.hh"
 
 namespace glhpp {
 
 class Shader final {
-  // FIXME
   struct ShaderDeleter {
-    auto operator()(GLuint* shader_ptr) const noexcept {
-      glDeleteShader(*shader_ptr);
-      delete shader_ptr;
-    }
+    auto operator()(GLuint id) const noexcept { glDeleteShader(id); }
   };
 
-  using ShaderGuard = std::unique_ptr<GLuint, ShaderDeleter>;
+  using ShaderGuard = detail::GlHandle<ShaderDeleter>;
 
  public:
   Shader(const std::filesystem::path& path, GLenum type)
       : code_(loadFile(path)),
         type_(type),
-        handle_(new GLuint(GLHPP_DETAIL_ERROR_HANDLER(glCreateShader, type))) {
+        handle_(GLHPP_DETAIL_ERROR_HANDLER(glCreateShader, type)) {
     install();
   }
 
   Shader(Shader&& other) noexcept = default;
   Shader& operator=(Shader&& rhs) noexcept = default;
 
-  auto id() const noexcept { return *handle_; }
+  auto id() const noexcept { return handle_.get(); }
 
  private:
   void install() {
     auto rbuf = code_.c_str();
-    auto id = *handle_;
+    auto id = handle_.get();
     GLHPP_DETAIL_ERROR_HANDLER(glShaderSource, id, 1, &rbuf, nullptr);
     GLHPP_DETAIL_ERROR_HANDLER(glCompileShader, id);
 
@@ -65,5 +62,4 @@ class Shader final {
   GLenum type_;
   ShaderGuard handle_;
 };
-
 }

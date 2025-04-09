@@ -6,21 +6,18 @@ namespace glhpp {
 
 class Program final {
   struct ProgramDeleter {
-    auto operator()(GLuint* ptr) const noexcept {
-      glDeleteProgram(*ptr);
-      delete ptr;
-    }
+    auto operator()(GLuint id) const noexcept { glDeleteProgram(id); }
   };
 
-  using ProgramGuard = std::unique_ptr<GLuint, ProgramDeleter>;
+  using ProgramGuard = detail::GlHandle<ProgramDeleter>;
 
  public:
   Program(const std::vector<Shader>& shaders)
-      : handle_(new GLuint(GLHPP_DETAIL_ERROR_HANDLER(glCreateProgram))),
+      : handle_(GLHPP_DETAIL_ERROR_HANDLER(glCreateProgram)),
         shaders_(shaders) {
-    auto id = *handle_;
+    auto id = handle_.get();
     std::for_each(shaders_.begin(), shaders_.end(), [&](auto&& s) {
-      GLHPP_DETAIL_ERROR_HANDLER(glAttachShader, *handle_, s.id());
+      GLHPP_DETAIL_ERROR_HANDLER(glAttachShader, id, s.id());
     });
     GLHPP_DETAIL_ERROR_HANDLER(glLinkProgram, id);
 
@@ -31,7 +28,7 @@ class Program final {
   Program(Program&& other) noexcept = default;
   Program& operator=(Program&& rhs) noexcept = default;
 
-  auto id() const noexcept { return *handle_; }
+  auto id() const noexcept { return handle_.get(); }
 
  private:
   ProgramGuard handle_;
