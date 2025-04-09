@@ -6,6 +6,7 @@ find_package(SFML REQUIRED)
 find_package(spdlog REQUIRED)
 
 add_subdirectory(geometry)
+add_subdirectory(triangles_gl)
 add_subdirectory(driver)
 
 option(ENABLE_TESTS "Enable testing" ON)
