@@ -2,12 +2,12 @@
 
 #include <filesystem>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <vector>
 
 #include "GL/glew.h"
-
-#include "detail/handler.hh"
+#include "detail/error_handler.hh"
 
 namespace glhpp {
 
