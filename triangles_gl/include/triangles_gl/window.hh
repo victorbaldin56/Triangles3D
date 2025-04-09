@@ -8,8 +8,8 @@ class Window final {
   sf::Window wnd_;
 
  public:
-  Window(unsigned width, unsigned height)
-      : wnd_(sf::VideoMode(width, height), "Triangles3D", sf::Style::Close) {}
+  Window(unsigned width, unsigned height, const std::string& title)
+      : wnd_(sf::VideoMode(width, height), title) {}
 
   void handleEvents();
 };

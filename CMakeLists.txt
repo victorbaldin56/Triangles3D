@@ -4,8 +4,12 @@ project("Triangles3D")
 find_package(Boost REQUIRED)
 find_package(SFML REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(opengl_system REQUIRED)
+find_package(glm REQUIRED)
+find_package(glew REQUIRED)
 
 add_subdirectory(geometry)
+add_subdirectory(glhpp)
 add_subdirectory(triangles_gl)
 add_subdirectory(driver)
 

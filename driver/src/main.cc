@@ -32,7 +32,7 @@ int main(int argc, char** argv) try {
   geometry::Octree<double> octree(triangles.cbegin(), triangles.cend());
   auto res = octree.getIntersections();
   if (cfg.draw) {
-    triangles_gl::Window wnd(700, 700);
+    triangles_gl::Window wnd(700, 700, "Triangles3D");
     wnd.handleEvents();
   } else {
     std::copy(res.begin(), res.end(),
