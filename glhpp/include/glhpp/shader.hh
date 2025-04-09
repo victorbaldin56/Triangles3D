@@ -12,6 +12,7 @@
 namespace glhpp {
 
 class Shader final {
+  // FIXME
   struct ShaderDeleter {
     auto operator()(GLuint* shader_ptr) const noexcept {
       glDeleteShader(*shader_ptr);

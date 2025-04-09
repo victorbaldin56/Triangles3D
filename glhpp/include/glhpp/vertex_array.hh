@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <memory>
 
 #include "GL/glew.h"
@@ -25,6 +26,10 @@ class VertexArray final {
   using Vbo = std::unique_ptr<GLuint, VboDeleter>;
 
  public:
+  VertexArray(const void* vertices, std::size_t sz) {
+    // TODO
+  }
+
  private:
   Vao vao_;
   Vbo vbo_;
