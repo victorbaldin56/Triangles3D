@@ -2,10 +2,14 @@
 #include <vector>
 
 // #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#include "driver/cmd_parser.hh"
 #include "geom/octree.hh"
 #include "geom/triangle3d.hh"
 
-int main() try {
+int main(int argc, char** argv) try {
+  cmd::CmdParser parser(argc, argv);
+  auto cfg = parser.run();
+
   // for trace and debugging
   spdlog::set_level(
       static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
@@ -24,8 +28,11 @@ int main() try {
         "Number of inputted triangles and initially inputted count mismatch");
   }
   auto res = octree.getIntersections();
-  std::copy(res.begin(), res.end(),
-            std::ostream_iterator<std::size_t>(std::cout, "\n"));
+  if (cfg.draw) {
+  } else {
+    std::copy(res.begin(), res.end(),
+              std::ostream_iterator<std::size_t>(std::cout, "\n"));
+  }
   return 0;
 } catch (std::exception& ex) {
   std::cerr << ex.what() << std::endl;
