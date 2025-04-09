@@ -7,6 +7,8 @@
 #include "geom/triangle3d.hh"
 
 int main(int argc, char** argv) try {
+  using Triangle = geometry::Triangle3D<double>;
+
   cmd::CmdParser parser(argc, argv);
   auto cfg = parser.run();
 
@@ -20,13 +22,14 @@ int main(int argc, char** argv) try {
     throw std::runtime_error("Unexpected EOF");
   }
 
-  geometry::Octree<double> octree(
-      (std::istream_iterator<geometry::Triangle3D<double>>(std::cin)),
-      (std::istream_iterator<geometry::Triangle3D<double>>()));
-  if (octree.size() != count) {
+  std::vector<Triangle> triangles((std::istream_iterator<Triangle>(std::cin)),
+                                  (std::istream_iterator<Triangle>()));
+  if (triangles.size() != count) {
     throw std::runtime_error(
         "Number of inputted triangles and initially inputted count mismatch");
   }
+
+  geometry::Octree<double> octree(triangles.cbegin(), triangles.cend());
   auto res = octree.getIntersections();
   if (cfg.draw) {
   } else {
