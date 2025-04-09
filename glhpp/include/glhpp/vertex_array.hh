@@ -24,6 +24,7 @@ class VertexArray final {
   using Vao = std::unique_ptr<GLuint, VaoDeleter>;
   using Vbo = std::unique_ptr<GLuint, VboDeleter>;
 
+ public:
  private:
   Vao vao_;
   Vbo vbo_;
