@@ -7,7 +7,7 @@
 #include "glhpp/error.hh"
 
 #define GLHPP_DETAIL_ERROR_HANDLER(func, ...) \
-  glhpp::detail::errorHandler(func, #func, __VA_ARGS__)
+  glhpp::detail::errorHandler(func, #func __VA_OPT__(, ) __VA_ARGS__)
 
 namespace glhpp::detail {
 
