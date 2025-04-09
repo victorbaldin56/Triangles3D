@@ -4,8 +4,17 @@
 #include <memory>
 
 #include "GL/glew.h"
+#include "geom/vector3d.hh"
 
 namespace glhpp {
+
+struct Vertex final {
+  using Point = geometry::Vector3D<GLfloat>;
+
+  Point point;
+  Point normal;
+  GLbyte color;
+};
 
 class VertexArray final {
   struct VaoDeleter {
@@ -26,7 +35,7 @@ class VertexArray final {
   using Vbo = std::unique_ptr<GLuint, VboDeleter>;
 
  public:
-  VertexArray(const void* vertices, std::size_t sz) {
+  VertexArray(const std::vector<Vertex> vertices) {
     // TODO
   }
 
