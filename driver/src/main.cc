@@ -3,7 +3,6 @@
 
 // #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include "driver/cmd_parser.hh"
-#include "driver/triangles_gl.hh"
 #include "geom/octree.hh"
 #include "geom/triangle3d.hh"
 
