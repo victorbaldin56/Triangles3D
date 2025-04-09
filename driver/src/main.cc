@@ -1,6 +1,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "SFML/Window.hpp"
+
 // #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include "driver/cmd_parser.hh"
 #include "geom/octree.hh"
@@ -31,6 +33,15 @@ int main(int argc, char** argv) try {
   geometry::Octree<double> octree(triangles.cbegin(), triangles.cend());
   auto res = octree.getIntersections();
   if (cfg.draw) {
+    sf::Window window(sf::VideoMode(1024, 1024), "Triangles3D");
+    while (window.isOpen()) {
+      sf::Event event;
+      while (window.pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+          window.close();
+        }
+      }
+    }
   } else {
     std::copy(res.begin(), res.end(),
               std::ostream_iterator<std::size_t>(std::cout, "\n"));
