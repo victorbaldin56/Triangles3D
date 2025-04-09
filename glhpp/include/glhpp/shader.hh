@@ -12,10 +12,32 @@
 namespace glhpp {
 
 class Shader final {
+  struct ShaderDeleter {
+    auto operator()(GLuint* shader_ptr) const noexcept {
+      glDeleteShader(*shader_ptr);
+      delete shader_ptr;
+    }
+  };
+
+  using ShaderGuard = std::unique_ptr<GLuint, ShaderDeleter>;
+
  public:
   Shader(const std::filesystem::path& path, GLenum type)
-      : code_(loadFile(path)), type_(type) {
-    id_ = GLHPP_DETAIL_ERROR_HANDLER(glCreateShader, type_);
+      : code_(loadFile(path)),
+        type_(type),
+        handle_(new GLuint(GLHPP_DETAIL_ERROR_HANDLER(glCreateShader, type))) {
+    install();
+  }
+
+ private:
+  void install() {
+    auto rbuf = code_.c_str();
+    auto id = *handle_;
+    GLHPP_DETAIL_ERROR_HANDLER(glShaderSource, id, 1, &rbuf, nullptr);
+    GLHPP_DETAIL_ERROR_HANDLER(glCompileShader, id);
+
+    GLint res;
+    GLHPP_DETAIL_ERROR_HANDLER(glGetShaderiv, id, GL_COMPILE_STATUS, &res);
   }
 
  private:
@@ -35,7 +57,7 @@ class Shader final {
  private:
   std::string code_;
   GLenum type_;
-  GLuint id_;
+  ShaderGuard handle_;
 };
 
 }
