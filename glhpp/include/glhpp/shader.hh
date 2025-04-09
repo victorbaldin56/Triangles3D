@@ -20,7 +20,6 @@ class Shader final {
 
  private:
   static std::string loadFile(const std::filesystem::path& path) {
-    std::string code;
     std::ifstream shader_file;
     shader_file.open(path, std::ios::in | std::ios::binary);
     if (!shader_file.is_open()) {
@@ -30,8 +29,7 @@ class Shader final {
     std::stringstream shader_stream;
     shader_stream << shader_file.rdbuf();
     shader_file.close();
-    code = shader_stream.str();
-    return code;
+    return shader_stream.str();
   }
 
  private:
