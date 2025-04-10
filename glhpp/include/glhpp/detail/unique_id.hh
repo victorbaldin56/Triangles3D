@@ -7,17 +7,17 @@
 namespace glhpp::detail {
 
 template <typename Deleter>
-class GlHandle {
+class UniqueId {
  public:
-  GlHandle(GLuint id) : id_(id) {}
-  GlHandle(GlHandle&& other) noexcept
+  UniqueId(GLuint id) : id_(id) {}
+  UniqueId(UniqueId&& other) noexcept
       : id_(std::exchange(other.id_, std::nullopt)) {}
-  GlHandle& operator=(GlHandle&& rhs) noexcept { std::swap(id_, rhs.id_); }
+  UniqueId& operator=(UniqueId&& rhs) noexcept { std::swap(id_, rhs.id_); }
 
-  GlHandle(const GlHandle& other) = delete;
-  GlHandle& operator=(const GlHandle& rhs) = delete;
+  UniqueId(const UniqueId& other) = delete;
+  UniqueId& operator=(const UniqueId& rhs) = delete;
 
-  ~GlHandle() {
+  ~UniqueId() {
     if (id_.has_value()) {
       del_(id_);
     }
@@ -29,5 +29,4 @@ class GlHandle {
   std::optional<GLuint> id_;
   Deleter del_;
 };
-
 }

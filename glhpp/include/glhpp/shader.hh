@@ -8,7 +8,7 @@
 
 #include "GL/glew.h"
 #include "detail/error_handler.hh"
-#include "detail/gl_handle.hh"
+#include "detail/unique_id.hh"
 
 namespace glhpp {
 
@@ -17,7 +17,7 @@ class Shader final {
     auto operator()(GLuint id) const noexcept { glDeleteShader(id); }
   };
 
-  using ShaderGuard = detail::GlHandle<ShaderDeleter>;
+  using ShaderGuard = detail::UniqueId<ShaderDeleter>;
 
  public:
   Shader(const std::filesystem::path& path, GLenum type)

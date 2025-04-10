@@ -9,7 +9,7 @@ class Program final {
     auto operator()(GLuint id) const noexcept { glDeleteProgram(id); }
   };
 
-  using ProgramGuard = detail::GlHandle<ProgramDeleter>;
+  using ProgramGuard = detail::UniqueId<ProgramDeleter>;
 
  public:
   Program(const std::vector<Shader>& shaders)
