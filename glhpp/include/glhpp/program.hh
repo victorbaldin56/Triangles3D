@@ -5,11 +5,11 @@
 namespace glhpp {
 
 class Program final {
-  struct ProgramDeleter {
+  struct Deleter {
     auto operator()(GLuint id) const noexcept { glDeleteProgram(id); }
   };
 
-  using ProgramGuard = detail::UniqueId<ProgramDeleter>;
+  using Handle = detail::UniqueId<Deleter>;
 
  public:
   Program(const std::vector<Shader>& shaders)
@@ -31,7 +31,7 @@ class Program final {
   auto id() const noexcept { return handle_.get(); }
 
  private:
-  ProgramGuard handle_;
+  Handle handle_;
   std::vector<Shader> shaders_;
 };
 

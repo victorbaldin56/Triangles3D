@@ -13,11 +13,11 @@
 namespace glhpp {
 
 class Shader final {
-  struct ShaderDeleter {
+  struct Deleter {
     auto operator()(GLuint id) const noexcept { glDeleteShader(id); }
   };
 
-  using ShaderGuard = detail::UniqueId<ShaderDeleter>;
+  using Handle = detail::UniqueId<Deleter>;
 
  public:
   Shader(const std::filesystem::path& path, GLenum type)
@@ -60,6 +60,6 @@ class Shader final {
  private:
   std::string code_;
   GLenum type_;
-  ShaderGuard handle_;
+  Handle handle_;
 };
 }
