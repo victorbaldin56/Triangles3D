@@ -8,16 +8,13 @@
 
 #include "GL/glew.h"
 #include "detail/error_handler.hh"
-#include "detail/unique_id.hh"
+#include "detail/object_deleter.hh"
 
 namespace glhpp {
 
 class Shader final {
-  struct Deleter {
-    auto operator()(GLuint id) const noexcept { glDeleteShader(id); }
-  };
-
-  using Handle = detail::UniqueId<Deleter>;
+  static void deleteHandle(GLuint p) noexcept { glDeleteShader(p); }
+  using Handle = std::unique_ptr<void, detail::ObjectDeleter<deleteHandle>>;
 
  public:
   Shader(const std::filesystem::path& path, GLenum type)

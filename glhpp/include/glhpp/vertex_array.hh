@@ -5,6 +5,7 @@
 
 #include "GL/glew.h"
 #include "detail/error_handler.hh"
+#include "detail/object_deleter.hh"
 #include "geom/vector3d.hh"
 
 namespace glhpp {
@@ -18,25 +19,17 @@ struct Vertex final {
 };
 
 class VertexArray final {
-  struct VaoDeleter {
-    auto operator()(GLuint* ptr) const noexcept {
-      glDeleteVertexArrays(1, ptr);
-      delete ptr;
-    }
-  };
+  static void deleteVao(GLuint p) noexcept { glDeleteVertexArrays(1, &p); }
+  static void deleteVbo(GLuint p) noexcept { glDeleteBuffers(1, &p); }
 
-  struct VboDeleter {
-    auto operator()(GLuint* ptr) const noexcept {
-      glDeleteBuffers(1, ptr);
-      delete ptr;
-    }
-  };
-
-  using Vao = std::unique_ptr<GLuint, VaoDeleter>;
-  using Vbo = std::unique_ptr<GLuint, VboDeleter>;
+  using Vao = std::unique_ptr<void, detail::ObjectDeleter<deleteVao>>;
+  using Vbo = std::unique_ptr<void, detail::ObjectDeleter<deleteVbo>>;
 
  public:
-  VertexArray(const std::vector<Vertex> vertices) { init(vertices); }
+  VertexArray(const std::vector<Vertex> vertices)
+      : vao_(genVao()), vbo_(genVbo()) {
+    init(vertices);
+  }
   VertexArray(VertexArray&& other) noexcept = default;
   VertexArray& operator=(VertexArray&& rhs) noexcept = default;
 
@@ -50,11 +43,8 @@ class VertexArray final {
   }
 
   void bind() {
-    GLHPP_DETAIL_ERROR_HANDLER(glGenVertexArrays, 1, vao_.get());
-    GLHPP_DETAIL_ERROR_HANDLER(glGenBuffers, 1, vbo_.get());
-
-    GLHPP_DETAIL_ERROR_HANDLER(glBindVertexArray, *vao_);
-    GLHPP_DETAIL_ERROR_HANDLER(glBindBuffer, GL_ARRAY_BUFFER, *vbo_);
+    GLHPP_DETAIL_ERROR_HANDLER(glBindVertexArray, vao_.get());
+    GLHPP_DETAIL_ERROR_HANDLER(glBindBuffer, GL_ARRAY_BUFFER, vbo_.get());
   }
 
   void setVao() {
@@ -73,6 +63,18 @@ class VertexArray final {
                                sizeof(Vertex), point_offset);
     GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribIPointer, 2, 1, GL_BYTE,
                                sizeof(Vertex), point_offset);
+  }
+
+  static GLuint genVao() {
+    GLuint ret;
+    GLHPP_DETAIL_ERROR_HANDLER(glGenVertexArrays, 1, &ret);
+    return ret;
+  }
+
+  static GLuint genVbo() {
+    GLuint ret;
+    GLHPP_DETAIL_ERROR_HANDLER(glGenBuffers, 1, &ret);
+    return ret;
   }
 
  private:

@@ -5,11 +5,8 @@
 namespace glhpp {
 
 class Program final {
-  struct Deleter {
-    auto operator()(GLuint id) const noexcept { glDeleteProgram(id); }
-  };
-
-  using Handle = detail::UniqueId<Deleter>;
+  static void deleteHandle(GLuint p) noexcept { glDeleteProgram(p); }
+  using Handle = std::unique_ptr<void, detail::ObjectDeleter<deleteHandle>>;
 
  public:
   Program(const std::vector<Shader>& shaders)
