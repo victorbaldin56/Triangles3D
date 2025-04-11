@@ -20,8 +20,8 @@ inline auto checkError(const char* func_name, const char* file,
   if (e != GL_NO_ERROR) {
     std::stringstream ss;
     ss << std::string("Error: ") << func_name << " called from " << file << ":"
-       << std::to_string(line) << ", " << caller_func
-       << " failed with OpenGL error 0x" << std::hex << e;
+       << std::to_string(line) << ", function " << caller_func
+       << "() failed with OpenGL error 0x" << std::hex << e;
     throw Error(ss.str());
   }
 }

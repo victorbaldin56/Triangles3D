@@ -2,7 +2,7 @@
 
 #include "glhpp/light.hh"
 #include "glhpp/program.hh"
-#include "glhpp/texture.hh"
+#include "glhpp/shadow_map.hh"
 #include "glhpp/vertex_array.hh"
 
 namespace triangles_gl {
@@ -92,6 +92,6 @@ class Renderer final {
  private:
   glhpp::Program program_;
   glhpp::VertexArray vertex_array_;
-  glhpp::Texture texture_;
+  glhpp::ShadowMap texture_;
 };
 }  // namespace triangles_gl
