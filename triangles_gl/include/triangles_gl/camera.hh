@@ -30,11 +30,13 @@ class Camera final {
     up_ = up_ * q;
   }
 
-  auto getVpMatrix(unsigned width, unsigned height) const noexcept {
-    auto view = glm::lookAt(position_, position_ + direction_, up_);
-    auto proj = glm::perspective(fov_, static_cast<float>(width) / height,
-                                 z_near_clip_, z_far_clip_);
-    return proj * view;
+  auto getLookAt() const noexcept {
+    return glm::lookAt(position_, position_ + direction_, up_);
+  }
+
+  auto getPerspective(unsigned width, unsigned height) const noexcept {
+    return glm::perspective(fov_, static_cast<float>(width) / height,
+                            z_near_clip_, z_far_clip_);
   }
 
  private:
