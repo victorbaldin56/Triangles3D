@@ -43,15 +43,15 @@ int main(int argc, char** argv) try {
     auto shaders_path =
         std::filesystem::absolute(__FILE__).parent_path().append("shaders");
     std::vector<glhpp::Shader> triangles_shaders;
-    triangles_shaders.emplace_back(shaders_path.append("triangles.vert"),
+    triangles_shaders.emplace_back(shaders_path / "triangles.vert",
                                    GL_VERTEX_SHADER);
-    triangles_shaders.emplace_back(shaders_path.append("triangles.frag"),
+    triangles_shaders.emplace_back(shaders_path / "triangles.frag",
                                    GL_FRAGMENT_SHADER);
 
     std::vector<glhpp::Shader> shadow_shaders;
-    shadow_shaders.emplace_back(shaders_path.append("shadow_map.vert"),
+    shadow_shaders.emplace_back(shaders_path / "shadow_map.vert",
                                 GL_VERTEX_SHADER);
-    shadow_shaders.emplace_back(shaders_path.append("shadow_map.frag"),
+    shadow_shaders.emplace_back(shaders_path / "shadow_map.frag",
                                 GL_FRAGMENT_SHADER);
 
     triangles_gl::Scene scene(triangles, indices);
