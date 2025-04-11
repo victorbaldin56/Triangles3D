@@ -5,6 +5,7 @@
 #include "driver/cmd_parser.hh"
 #include "geom/octree.hh"
 #include "geom/triangle3d.hh"
+#include "glhpp/gl.hh"
 #include "triangles_gl/window.hh"
 
 int main(int argc, char** argv) try {
@@ -32,8 +33,9 @@ int main(int argc, char** argv) try {
   geometry::Octree<double> octree(triangles.cbegin(), triangles.cend());
   auto res = octree.getIntersections();
   if (cfg.draw) {
+    glhpp::init();
     triangles_gl::Window wnd(700, 700, "Triangles3D");
-    wnd.handleEvents();
+    wnd.pollInLoop();
   } else {
     std::copy(res.begin(), res.end(),
               std::ostream_iterator<std::size_t>(std::cout, "\n"));
