@@ -42,7 +42,7 @@ class Renderer final {
     resize(wnd_width, wnd_height);
 
     texture_.setUniformShadowMap(program_.id());
-    texture_.setUniformShadowMap(program_.id());
+    texture_.setUniformLightDirection(program_.id());
     setUniformColors();
   }
 
