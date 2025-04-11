@@ -10,10 +10,9 @@ class Program final {
 
  public:
   Program(const std::vector<Shader>& shaders)
-      : handle_(GLHPP_DETAIL_ERROR_HANDLER(glCreateProgram)),
-        shaders_(shaders) {
+      : handle_(GLHPP_DETAIL_ERROR_HANDLER(glCreateProgram)) {
     auto id = handle_.get();
-    std::for_each(shaders_.begin(), shaders_.end(), [&](auto&& s) {
+    std::for_each(shaders.begin(), shaders.end(), [&](auto&& s) {
       GLHPP_DETAIL_ERROR_HANDLER(glAttachShader, id, s.id());
     });
     GLHPP_DETAIL_ERROR_HANDLER(glLinkProgram, id);
@@ -29,7 +28,6 @@ class Program final {
 
  private:
   Handle handle_;
-  std::vector<Shader> shaders_;
 };
 
 }

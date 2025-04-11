@@ -21,7 +21,7 @@ class Texture final {
 
  public:
   Texture(const Light& light, std::size_t vcount,
-          const std::vector<Shader> shaders, int figure_type)
+          const std::vector<Shader>& shaders, int figure_type)
       : handle_(genTexture()),
         program_(shaders),
         light_dir_(light.dir),
