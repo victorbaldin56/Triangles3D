@@ -11,7 +11,8 @@ class Window final {
 
  public:
   Window(unsigned width, unsigned height, const std::string& title)
-      : wnd_(sf::VideoMode(width, height), title) {}
+      : wnd_(sf::VideoMode(width, height), title, sf::Style::Default,
+             sf::ContextSettings(24, 8, 0, 3, 3)) {}
 
   auto getSize() const noexcept { return wnd_.getSize(); }
 
