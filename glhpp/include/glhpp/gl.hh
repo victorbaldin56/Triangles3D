@@ -5,6 +5,7 @@
 namespace glhpp {
 
 inline auto init() {
+  glewExperimental = GL_TRUE;
   if (glewInit() != GLEW_OK) {
     throw Error("glewInit failed");
   }

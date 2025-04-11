@@ -37,6 +37,7 @@ int main(int argc, char** argv) try {
   if (cfg.draw) {
     constexpr auto kWindowWidth = 700u;
     constexpr auto kWindowHeight = 700u;
+    triangles_gl::Window wnd(kWindowWidth, kWindowHeight, "Triangles3D");
 
     glhpp::init();
     auto shaders_path =
@@ -60,7 +61,6 @@ int main(int argc, char** argv) try {
 
     triangles_gl::Camera camera;
 
-    triangles_gl::Window wnd(kWindowWidth, kWindowHeight, "Triangles3D");
     wnd.pollInLoop(renderer, camera);
   } else {
     std::copy(indices.begin(), indices.end(),
