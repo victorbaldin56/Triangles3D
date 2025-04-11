@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <cstddef>
 #include <memory>
 
@@ -84,6 +85,7 @@ class ShadowMap final {
     setUniformDepthMvp(light);
 
     GLHPP_DETAIL_ERROR_HANDLER(glViewport, 0, 0, width_, height_);
+    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
     GLHPP_DETAIL_ERROR_HANDLER(glClear,
                                GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, figure_type, 0, vertex_count_);
@@ -110,6 +112,7 @@ class ShadowMap final {
     glm::mat4 depth_model_matrix(1.f);
     depth_mvp_ =
         light.projection_matrix * depth_view_matrix * depth_model_matrix;
+    GLHPP_DETAIL_ERROR_HANDLER(glUseProgram, program_.id());
     GLHPP_DETAIL_ERROR_HANDLER(
         glUniformMatrix4fv,
         GLHPP_DETAIL_ERROR_HANDLER(glGetUniformLocation, program_.id(),
