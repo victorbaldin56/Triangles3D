@@ -1,0 +1,16 @@
+#pragma once
+
+#include "GL/glew.h"
+#include "geom/vector3d.hh"
+
+namespace glhpp {
+
+struct Vertex final {
+  using Point = geometry::Vector3D<GLfloat>;
+
+  Point point;
+  Point normal;
+  GLbyte color;
+};
+
+}

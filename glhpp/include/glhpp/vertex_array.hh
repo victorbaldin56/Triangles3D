@@ -6,17 +6,9 @@
 #include "GL/glew.h"
 #include "detail/error_handler.hh"
 #include "detail/object_deleter.hh"
-#include "geom/vector3d.hh"
+#include "vertex.hh"
 
 namespace glhpp {
-
-struct Vertex final {
-  using Point = geometry::Vector3D<GLfloat>;
-
-  Point point;
-  Point normal;
-  GLbyte color;
-};
 
 class VertexArray final {
   static void deleteVao(GLuint p) noexcept { glDeleteVertexArrays(1, &p); }
