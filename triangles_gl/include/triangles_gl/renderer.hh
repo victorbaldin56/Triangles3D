@@ -1,31 +1,30 @@
 #pragma once
 
-#include "light.hh"
-#include "program.hh"
-#include "texture.hh"
-#include "vertex_array.hh"
+#include "glhpp/light.hh"
+#include "glhpp/program.hh"
+#include "glhpp/texture.hh"
+#include "glhpp/vertex_array.hh"
 
-namespace glhpp {
+namespace triangles_gl {
 
 class Renderer final {
  public:
-  Renderer(const std::vector<Shader>& main_shaders,
-           const std::vector<Shader>& shadow_shaders,
-           const std::vector<Vertex>& vertices, const Light& light,
-           unsigned wnd_width, unsigned wnd_height, int figure_type)
+  Renderer(const std::vector<glhpp::Shader>& main_shaders,
+           const std::vector<glhpp::Shader>& shadow_shaders,
+           const std::vector<glhpp::Vertex>& vertices,
+           const glhpp::Light& light, unsigned wnd_width, unsigned wnd_height)
       : program_(main_shaders),
         vertex_array_(vertices),
-        texture_(light, vertices.size(), shadow_shaders, figure_type) {}
+        texture_(light, vertices.size(), shadow_shaders, GL_TRIANGLES) {}
 
-  auto render(const glm::mat4& perspective, const glm::mat4& look_at,
-              int figure_type) const {
+  auto render(const glm::mat4& perspective, const glm::mat4& look_at) const {
     setUniformMvp(perspective, look_at);
     texture_.setUniformDepthBiasMvp(program_.id());
     GLHPP_DETAIL_ERROR_HANDLER(glClear,
                                GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    renderCw(figure_type);
-    renderCcw(figure_type);
+    renderCw();
+    renderCcw();
   }
 
   auto resize(unsigned width, unsigned height) const {
@@ -37,7 +36,7 @@ class Renderer final {
   }
 
  private:
-  void init(const std::vector<Vertex>& vertices, Light& light,
+  void init(const std::vector<glhpp::Vertex>& vertices, glhpp::Light& light,
             unsigned wnd_width, unsigned wnd_height) {
     GLHPP_DETAIL_ERROR_HANDLER(glUseProgram, program_.id());
     resize(wnd_width, wnd_height);
@@ -76,23 +75,23 @@ class Renderer final {
         is_cw);
   }
 
-  void renderCw(int figure_type) const {
+  void renderCw() const {
     GLHPP_DETAIL_ERROR_HANDLER(glFrontFace, GL_CW);
     setUniformIsCw(true);
-    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, figure_type, 0,
+    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, GL_TRIANGLES, 0,
                                texture_.vertexCount());
   }
 
-  void renderCcw(int figure_type) const {
+  void renderCcw() const {
     GLHPP_DETAIL_ERROR_HANDLER(glFrontFace, GL_CCW);
     setUniformIsCw(false);
-    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, figure_type, 0,
+    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, GL_TRIANGLES, 0,
                                texture_.vertexCount());
   }
 
  private:
-  Program program_;
-  VertexArray vertex_array_;
-  Texture texture_;
+  glhpp::Program program_;
+  glhpp::VertexArray vertex_array_;
+  glhpp::Texture texture_;
 };
-}
+}  // namespace triangles_gl

@@ -6,6 +6,7 @@
 #include "geom/octree.hh"
 #include "geom/triangle3d.hh"
 #include "glhpp/gl.hh"
+#include "glhpp/shader.hh"
 #include "triangles_gl/window.hh"
 
 int main(int argc, char** argv) try {
@@ -34,6 +35,15 @@ int main(int argc, char** argv) try {
   auto res = octree.getIntersections();
   if (cfg.draw) {
     glhpp::init();
+    auto shaders_path =
+        std::filesystem::absolute(__FILE__).parent_path().append("shaders");
+    std::vector<glhpp::Shader> triangles_shaders{
+        {shaders_path.append("triangles.vert"), GL_VERTEX_SHADER},
+        {shaders_path.append("triangles.frag"), GL_FRAGMENT_SHADER}};
+    std::vector<glhpp::Shader> shadow_shaders{
+        {shaders_path.append("shadow_map.vert"), GL_VERTEX_SHADER},
+        {shaders_path.append("shadow_map.frag"), GL_FRAGMENT_SHADER}};
+
     triangles_gl::Window wnd(700, 700, "Triangles3D");
     wnd.pollInLoop();
   } else {
