@@ -41,12 +41,18 @@ int main(int argc, char** argv) try {
     glhpp::init();
     auto shaders_path =
         std::filesystem::absolute(__FILE__).parent_path().append("shaders");
-    std::vector<glhpp::Shader> triangles_shaders{
-        {shaders_path.append("triangles.vert"), GL_VERTEX_SHADER},
-        {shaders_path.append("triangles.frag"), GL_FRAGMENT_SHADER}};
-    std::vector<glhpp::Shader> shadow_shaders{
-        {shaders_path.append("shadow_map.vert"), GL_VERTEX_SHADER},
-        {shaders_path.append("shadow_map.frag"), GL_FRAGMENT_SHADER}};
+    std::vector<glhpp::Shader> triangles_shaders;
+    triangles_shaders.emplace_back(shaders_path.append("triangles.vert"),
+                                   GL_VERTEX_SHADER);
+    triangles_shaders.emplace_back(shaders_path.append("triangles.frag"),
+                                   GL_FRAGMENT_SHADER);
+
+    std::vector<glhpp::Shader> shadow_shaders;
+    shadow_shaders.emplace_back(shaders_path.append("shadow_map.vert"),
+                                GL_VERTEX_SHADER);
+    shadow_shaders.emplace_back(shaders_path.append("shadow_map.frag"),
+                                GL_FRAGMENT_SHADER);
+
     triangles_gl::Scene scene(triangles, indices);
     triangles_gl::Renderer renderer(triangles_shaders, shadow_shaders,
                                     scene.getVertices(), {}, kWindowWidth,
