@@ -64,7 +64,7 @@ class Texture final {
     GLHPP_DETAIL_ERROR_HANDLER(
         glUniformMatrix4fv,
         GLHPP_DETAIL_ERROR_HANDLER(glGetUniformLocation, program_id,
-                                   "depth_bias_MVP"),
+                                   "depth_bias_mvp"),
         1, GL_FALSE, &depth_bias_mvp[0][0]);
   }
 
