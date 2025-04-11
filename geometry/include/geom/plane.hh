@@ -27,8 +27,7 @@ class Plane final {
 
   // getters
  public:
-  const Vector3D<T>& normal() const& noexcept { return n_; }
-  Vector3D<T>&& normal() && noexcept { return n_; }
+  const Vector3D<T>& normal() const noexcept { return n_; }
   T distance() const noexcept { return d_; }
 
  public:

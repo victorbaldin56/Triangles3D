@@ -7,6 +7,7 @@
 #include "geom/triangle3d.hh"
 #include "glhpp/gl.hh"
 #include "glhpp/shader.hh"
+#include "triangles_gl/scene.hh"
 #include "triangles_gl/window.hh"
 
 int main(int argc, char** argv) try {
@@ -23,17 +24,20 @@ int main(int argc, char** argv) try {
     throw std::runtime_error("Unexpected EOF");
   }
 
-  std::vector<geometry::Triangle3D<double>> triangles(
-      (std::istream_iterator<geometry::Triangle3D<double>>(std::cin)),
-      (std::istream_iterator<geometry::Triangle3D<double>>()));
+  std::vector<geometry::Triangle3D<float>> triangles(
+      (std::istream_iterator<geometry::Triangle3D<float>>(std::cin)),
+      (std::istream_iterator<geometry::Triangle3D<float>>()));
   if (triangles.size() != count) {
     throw std::runtime_error(
         "Number of inputted triangles and initially inputted count mismatch");
   }
 
-  geometry::Octree<double> octree(triangles.cbegin(), triangles.cend());
-  auto res = octree.getIntersections();
+  geometry::Octree<float> octree(triangles.cbegin(), triangles.cend());
+  auto indices = octree.getIntersections();
   if (cfg.draw) {
+    constexpr auto kWindowWidth = 700u;
+    constexpr auto kWindowHeight = 700u;
+
     glhpp::init();
     auto shaders_path =
         std::filesystem::absolute(__FILE__).parent_path().append("shaders");
@@ -43,11 +47,17 @@ int main(int argc, char** argv) try {
     std::vector<glhpp::Shader> shadow_shaders{
         {shaders_path.append("shadow_map.vert"), GL_VERTEX_SHADER},
         {shaders_path.append("shadow_map.frag"), GL_FRAGMENT_SHADER}};
+    triangles_gl::Scene scene(triangles, indices);
+    triangles_gl::Renderer renderer(triangles_shaders, shadow_shaders,
+                                    scene.getVertices(), {}, kWindowWidth,
+                                    kWindowHeight);
 
-    triangles_gl::Window wnd(700, 700, "Triangles3D");
-    wnd.pollInLoop();
+    triangles_gl::Camera camera;
+
+    triangles_gl::Window wnd(kWindowWidth, kWindowHeight, "Triangles3D");
+    wnd.pollInLoop(renderer, camera);
   } else {
-    std::copy(res.begin(), res.end(),
+    std::copy(indices.begin(), indices.end(),
               std::ostream_iterator<std::size_t>(std::cout, "\n"));
   }
   return 0;

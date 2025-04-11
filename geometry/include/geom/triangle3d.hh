@@ -83,6 +83,9 @@ struct Triangle3D final {
     return contains(seg.begin_) || contains(seg.end_) || intersectsEdges(seg);
   }
 
+  auto getPlane() const noexcept { return Plane<T>(a_, b_, c_); }
+  auto normal() const noexcept { return getPlane().normal(); }
+
   bool intersects(const Triangle3D<T>& other) const noexcept {
     auto this_p = Plane<T>(a_, b_, c_);
     auto other_p = Plane<T>(other.a_, other.b_, other.c_);
