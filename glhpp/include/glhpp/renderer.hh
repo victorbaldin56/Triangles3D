@@ -1,30 +1,31 @@
 #pragma once
 
-#include "glhpp/light.hh"
-#include "glhpp/program.hh"
-#include "glhpp/shadow_map.hh"
-#include "glhpp/vertex_array.hh"
+#include "light.hh"
+#include "program.hh"
+#include "shadow_map.hh"
+#include "vertex_array.hh"
 
-namespace triangles_gl {
+namespace glhpp {
 
 class Renderer final {
  public:
-  Renderer(const std::vector<glhpp::Shader>& main_shaders,
-           const std::vector<glhpp::Shader>& shadow_shaders,
-           const std::vector<glhpp::Vertex>& vertices,
-           const glhpp::Light& light, unsigned wnd_width, unsigned wnd_height)
+  Renderer(const std::vector<Shader>& main_shaders,
+           const std::vector<Shader>& shadow_shaders,
+           const std::vector<Vertex>& vertices, const Light& light,
+           unsigned wnd_width, unsigned wnd_height, int figure_type)
       : program_(main_shaders),
         vertex_array_(vertices),
-        texture_(light, vertices.size(), shadow_shaders, GL_TRIANGLES) {}
+        shadow_map_(light, vertices.size(), shadow_shaders, figure_type) {}
 
-  auto render(const glm::mat4& perspective, const glm::mat4& look_at) const {
+  auto render(const glm::mat4& perspective, const glm::mat4& look_at,
+              int figure_type) const {
     setUniformMvp(perspective, look_at);
-    texture_.setUniformDepthBiasMvp(program_.id());
+    shadow_map_.setUniformDepthBiasMvp(program_.id());
     GLHPP_DETAIL_ERROR_HANDLER(glClear,
                                GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    renderCw();
-    renderCcw();
+    renderCw(figure_type);
+    renderCcw(figure_type);
   }
 
   auto resize(unsigned width, unsigned height) const {
@@ -36,13 +37,13 @@ class Renderer final {
   }
 
  private:
-  void init(const std::vector<glhpp::Vertex>& vertices, glhpp::Light& light,
+  void init(const std::vector<Vertex>& vertices, Light& light,
             unsigned wnd_width, unsigned wnd_height) {
     GLHPP_DETAIL_ERROR_HANDLER(glUseProgram, program_.id());
     resize(wnd_width, wnd_height);
 
-    texture_.setUniformShadowMap(program_.id());
-    texture_.setUniformLightDirection(program_.id());
+    shadow_map_.setUniformShadowMap(program_.id());
+    shadow_map_.setUniformLightDirection(program_.id());
     setUniformColors();
   }
 
@@ -75,23 +76,23 @@ class Renderer final {
         is_cw);
   }
 
-  void renderCw() const {
+  void renderCw(int figure_type) const {
     GLHPP_DETAIL_ERROR_HANDLER(glFrontFace, GL_CW);
     setUniformIsCw(true);
-    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, GL_TRIANGLES, 0,
-                               texture_.vertexCount());
+    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, figure_type, 0,
+                               shadow_map_.vertexCount());
   }
 
-  void renderCcw() const {
+  void renderCcw(int figure_type) const {
     GLHPP_DETAIL_ERROR_HANDLER(glFrontFace, GL_CCW);
     setUniformIsCw(false);
-    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, GL_TRIANGLES, 0,
-                               texture_.vertexCount());
+    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, figure_type, 0,
+                               shadow_map_.vertexCount());
   }
 
  private:
-  glhpp::Program program_;
-  glhpp::VertexArray vertex_array_;
-  glhpp::ShadowMap texture_;
+  Program program_;
+  VertexArray vertex_array_;
+  ShadowMap shadow_map_;
 };
-}  // namespace triangles_gl
+}

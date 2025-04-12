@@ -2,7 +2,7 @@
 
 #include "SFML/Window.hpp"
 #include "camera.hh"
-#include "renderer.hh"
+#include "glhpp/renderer.hh"
 
 namespace triangles_gl {
 
@@ -16,7 +16,7 @@ class Window final {
 
   auto getSize() const noexcept { return wnd_.getSize(); }
 
-  auto pollInLoop(const Renderer& renderer, Camera& camera) {
+  auto pollInLoop(const glhpp::Renderer& renderer, Camera& camera) {
     while (wnd_.isOpen()) {
       sf::Event event;
       while (wnd_.pollEvent(event)) {
@@ -27,13 +27,14 @@ class Window final {
       }
 
       auto [width, height] = getSize();
-      renderer.render(camera.getPerspective(width, height), camera.getLookAt());
+      renderer.render(camera.getPerspective(width, height), camera.getLookAt(),
+                      GL_TRIANGLES);
       wnd_.display();
     }
   }
 
  private:
-  void handleEvent(const sf::Event& evt, const Renderer& renderer,
+  void handleEvent(const sf::Event& evt, const glhpp::Renderer& renderer,
                    Camera& camera) {
     auto size = getSize();
     switch (evt.type) {

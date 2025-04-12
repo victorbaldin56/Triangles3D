@@ -55,9 +55,9 @@ int main(int argc, char** argv) try {
                                 GL_FRAGMENT_SHADER);
 
     triangles_gl::Scene scene(triangles, indices);
-    triangles_gl::Renderer renderer(triangles_shaders, shadow_shaders,
-                                    scene.getVertices(), {}, kWindowWidth,
-                                    kWindowHeight);
+    glhpp::Renderer renderer(triangles_shaders, shadow_shaders,
+                             scene.getVertices(), {}, kWindowWidth,
+                             kWindowHeight, GL_TRIANGLES);
 
     triangles_gl::Camera camera;
 
