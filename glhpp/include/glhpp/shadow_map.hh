@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <memory>
 
+#include "gl_assert.hh"
 #include "light.hh"
 #include "program.hh"
 #include "shader.hh"
@@ -73,6 +74,8 @@ class ShadowMap final {
     bind();
     auto fbo = setFbo();  // to prolong framebuffer lifetime to the end
                           // of this function
+    GLHPP_ASSERT_EQ(glCheckFramebufferStatus(GL_FRAMEBUFFER),
+                    GL_FRAMEBUFFER_COMPLETE);
 
     setUniformDepthMvp(light);
 
