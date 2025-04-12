@@ -51,6 +51,7 @@ class Renderer final {
                      const glm::mat4& look_at) const {
     glm::mat4 model(1.f);
     auto mvp = perspective * look_at * model;
+    GLHPP_DETAIL_ERROR_HANDLER(glUseProgram, program_.id());
     GLHPP_DETAIL_ERROR_HANDLER(
         glUniformMatrix4fv,
         GLHPP_DETAIL_ERROR_HANDLER(glGetUniformLocation, program_.id(), "mvp"),
