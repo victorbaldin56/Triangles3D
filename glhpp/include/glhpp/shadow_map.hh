@@ -83,7 +83,7 @@ class ShadowMap final {
     GLHPP_DETAIL_ERROR_HANDLER(glBindFramebuffer, GL_FRAMEBUFFER, 0);
   }
 
-  void bind() {
+  void bind() const {
     GLHPP_DETAIL_ERROR_HANDLER(glBindTexture, GL_TEXTURE_2D, handle_.get());
     GLHPP_DETAIL_ERROR_HANDLER(glTexImage2D, GL_TEXTURE_2D, 0,
                                GL_DEPTH_COMPONENT, width_, height_, 0,
@@ -111,7 +111,7 @@ class ShadowMap final {
         1, GL_FALSE, &depth_mvp_[0][0]);
   }
 
-  Fbo setFbo() {
+  Fbo setFbo() const {
     Fbo fbo(genFbo());
     GLHPP_DETAIL_ERROR_HANDLER(glBindFramebuffer, GL_FRAMEBUFFER, fbo.get());
     GLHPP_DETAIL_ERROR_HANDLER(glDrawBuffer, GL_NONE);
