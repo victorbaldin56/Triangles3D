@@ -13,7 +13,7 @@
                    << std::hex << "0x" << a << "), and " #b " (" << std::hex \
                    << "0x" << b << "), "                                     \
                    << "function " << __FUNCTION__ << ", file " << __FILE__   \
-                   << ", line " << __LINE__ << "." << std::endl              \
+                   << ", line " << std::dec << __LINE__ << "." << std::endl  \
                    << std::endl,                                             \
          std::abort(), 0)                                                    \
       : 1
