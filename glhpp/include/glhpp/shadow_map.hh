@@ -74,18 +74,12 @@ class ShadowMap final {
  private:
   void drawShadows(const Light& light, int figure_type) {
     bind();
-    Framebuffer fb(genFramebuffer());
-    GLHPP_DETAIL_ERROR_HANDLER(glBindFramebuffer, GL_FRAMEBUFFER, fb.get());
-    GLHPP_DETAIL_ERROR_HANDLER(glDrawBuffer, GL_NONE);
-    GLHPP_DETAIL_ERROR_HANDLER(glReadBuffer, GL_NONE);
-    GLHPP_DETAIL_ERROR_HANDLER(glFramebufferTexture2D, GL_FRAMEBUFFER,
-                               GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-                               handle_.get(), 0);
+    auto fb = setFramebuffer();  // to prolong framebuffer lifetime to the end
+                                 // of this function
 
     setUniformDepthMvp(light);
 
     GLHPP_DETAIL_ERROR_HANDLER(glViewport, 0, 0, width_, height_);
-    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
     GLHPP_DETAIL_ERROR_HANDLER(glClear,
                                GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, figure_type, 0, vertex_count_);
@@ -118,6 +112,17 @@ class ShadowMap final {
         GLHPP_DETAIL_ERROR_HANDLER(glGetUniformLocation, program_.id(),
                                    "depth_mvp"),
         1, GL_FALSE, &depth_mvp_[0][0]);
+  }
+
+  Framebuffer setFramebuffer() {
+    Framebuffer fb(genFramebuffer());
+    GLHPP_DETAIL_ERROR_HANDLER(glBindFramebuffer, GL_FRAMEBUFFER, fb.get());
+    GLHPP_DETAIL_ERROR_HANDLER(glDrawBuffer, GL_NONE);
+    GLHPP_DETAIL_ERROR_HANDLER(glReadBuffer, GL_NONE);
+    GLHPP_DETAIL_ERROR_HANDLER(glFramebufferTexture2D, GL_FRAMEBUFFER,
+                               GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+                               handle_.get(), 0);
+    return fb;
   }
 
   static GLuint genTexture() {
