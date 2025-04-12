@@ -14,11 +14,8 @@ class ShadowMap final {
   static void deleteHandle(GLuint p) noexcept { glDeleteTextures(1, &p); }
   using Handle = std::unique_ptr<void, detail::ObjectDeleter<deleteHandle>>;
 
-  static void deleteFramebuffer(GLuint p) noexcept {
-    glDeleteFramebuffers(1, &p);
-  }
-  using Framebuffer =
-      std::unique_ptr<void, detail::ObjectDeleter<deleteFramebuffer>>;
+  static void deleteFbo(GLuint p) noexcept { glDeleteFramebuffers(1, &p); }
+  using Fbo = std::unique_ptr<void, detail::ObjectDeleter<deleteFbo>>;
 
  public:
   ShadowMap(const Light& light, std::size_t vcount,
@@ -74,8 +71,8 @@ class ShadowMap final {
  private:
   void drawShadows(const Light& light, int figure_type) {
     bind();
-    auto fb = setFramebuffer();  // to prolong framebuffer lifetime to the end
-                                 // of this function
+    auto fbo = setFbo();  // to prolong framebuffer lifetime to the end
+                          // of this function
 
     setUniformDepthMvp(light);
 
@@ -114,15 +111,15 @@ class ShadowMap final {
         1, GL_FALSE, &depth_mvp_[0][0]);
   }
 
-  Framebuffer setFramebuffer() {
-    Framebuffer fb(genFramebuffer());
-    GLHPP_DETAIL_ERROR_HANDLER(glBindFramebuffer, GL_FRAMEBUFFER, fb.get());
+  Fbo setFbo() {
+    Fbo fbo(genFbo());
+    GLHPP_DETAIL_ERROR_HANDLER(glBindFramebuffer, GL_FRAMEBUFFER, fbo.get());
     GLHPP_DETAIL_ERROR_HANDLER(glDrawBuffer, GL_NONE);
     GLHPP_DETAIL_ERROR_HANDLER(glReadBuffer, GL_NONE);
     GLHPP_DETAIL_ERROR_HANDLER(glFramebufferTexture2D, GL_FRAMEBUFFER,
                                GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
                                handle_.get(), 0);
-    return fb;
+    return fbo;
   }
 
   static GLuint genTexture() {
@@ -131,7 +128,7 @@ class ShadowMap final {
     return ret;
   }
 
-  static GLuint genFramebuffer() {
+  static GLuint genFbo() {
     GLuint ret;
     GLHPP_DETAIL_ERROR_HANDLER(glGenFramebuffers, 1, &ret);
     return ret;
