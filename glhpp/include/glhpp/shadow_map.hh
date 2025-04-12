@@ -14,11 +14,11 @@ class ShadowMap final {
   static void deleteHandle(GLuint p) noexcept { glDeleteTextures(1, &p); }
   using Handle = std::unique_ptr<void, detail::ObjectDeleter<deleteHandle>>;
 
-  static void deleteFrameBuffer(GLuint p) noexcept {
+  static void deleteFramebuffer(GLuint p) noexcept {
     glDeleteFramebuffers(1, &p);
   }
   using Framebuffer =
-      std::unique_ptr<void, detail::ObjectDeleter<deleteFrameBuffer>>;
+      std::unique_ptr<void, detail::ObjectDeleter<deleteFramebuffer>>;
 
  public:
   ShadowMap(const Light& light, std::size_t vcount,
