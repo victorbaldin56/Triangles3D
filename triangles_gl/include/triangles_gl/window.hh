@@ -26,8 +26,8 @@ class Window final {
         handleEvent(event, renderer, camera);
       }
 
-      auto [width, height] = getSize();
-      renderer.render(camera.getPerspective(width, height), camera.getLookAt(),
+      auto size = getSize();
+      renderer.render(camera.getPerspective(size.x, size.y), camera.getLookAt(),
                       GL_TRIANGLES);
       wnd_.display();
     }
