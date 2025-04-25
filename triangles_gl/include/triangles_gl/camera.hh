@@ -7,9 +7,8 @@ namespace triangles_gl {
 
 class Camera final {
  public:
-  Camera(const glm::vec3& pos = {0, 0, 25}, const glm::vec3& dir = {0, 0, -1},
-         const glm::vec3& up = {0, 1, 0}, float fov = glm::radians(45.f),
-         float z_near_clip = 0.1f, float z_far_clip = 1000.f) noexcept
+  Camera(const glm::vec3& pos, const glm::vec3& dir, const glm::vec3& up,
+         float fov, float z_near_clip, float z_far_clip) noexcept
       : position_(pos),
         direction_(glm::normalize(dir)),
         up_(glm::normalize(up)),

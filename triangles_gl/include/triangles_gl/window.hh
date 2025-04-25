@@ -40,6 +40,30 @@ class Window final {
     switch (evt.type) {
       case sf::Event::Resized:
         renderer.resize(size.x, size.y);
+      case sf::Event::KeyPressed:
+        handleKey(evt.key.code, renderer, camera);
+      default:
+        break;
+    }
+  }
+
+  void handleKey(sf::Keyboard::Key code, const glhpp::Renderer& renderer,
+                 Camera& camera) {
+    auto right = camera.getSideways();
+    auto direction = camera.getDirection();
+    switch (code) {
+      case sf::Keyboard::A:
+        camera.translate(-right);
+        break;
+      case sf::Keyboard::D:
+        camera.translate(right);
+        break;
+      case sf::Keyboard::W:
+        camera.translate(direction);
+        break;
+      case sf::Keyboard::S:
+        camera.translate(-direction);
+        break;
       default:
         break;
     }
