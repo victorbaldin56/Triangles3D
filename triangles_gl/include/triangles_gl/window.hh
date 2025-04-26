@@ -6,8 +6,20 @@
 
 namespace triangles_gl {
 
+struct Mouse final {
+  float rotate_speed = 0.f;
+  bool is_active = false;
+  bool is_centered = false;
+  sf::Vector2i pos = {0, 0};
+  sf::Vector2i step = {0, 0};
+
+  static constexpr auto kMaxRotateSpeed = 0.005f;
+  static constexpr auto kDeltaSpeedRotate = 0.001f;
+};
+
 class Window final {
   sf::Window wnd_;
+  Mouse mouse_;
 
  public:
   Window(unsigned width, unsigned height, const std::string& title)
@@ -42,6 +54,8 @@ class Window final {
         renderer.resize(size.x, size.y);
       case sf::Event::KeyPressed:
         handleKey(evt.key.code, renderer, camera);
+      case sf::Event::MouseWheelScrolled:
+        handleScroll(camera);
       default:
         break;
     }
@@ -66,6 +80,29 @@ class Window final {
         break;
       default:
         break;
+    }
+  }
+
+  void handleScroll(Camera& camera) {
+    auto mouse_pos = sf::Mouse::getPosition(wnd_);
+    if (mouse_.is_active) {
+      if (!mouse_.is_centered) {
+        auto delta = mouse_pos - mouse_.pos;
+        auto yaw = -mouse_.rotate_speed * delta.x;
+        auto pitch = -mouse_.rotate_speed * delta.y;
+        auto q_yaw =
+            glm::angleAxis(glm::radians(yaw), glm::vec3(0.f, 1.f, 0.f));
+        auto q_pitch =
+            glm::angleAxis(glm::radians(pitch), glm::vec3(1.f, 0.f, 0.f));
+        camera.rotate(glm::normalize(q_pitch * q_yaw));
+        mouse_.step = delta;
+
+        if (std::abs(mouse_.step.x) + std::abs(mouse_.step.y)) {
+          mouse_.rotate_speed =
+              std::min(Mouse::kMaxRotateSpeed,
+                       mouse_.rotate_speed + Mouse::kDeltaSpeedRotate);
+        }
+      }
     }
   }
 };
