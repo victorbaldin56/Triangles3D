@@ -3,6 +3,7 @@
 #include "SFML/Window.hpp"
 #include "camera.hh"
 #include "glhpp/renderer.hh"
+#include "spdlog/spdlog.h"
 
 namespace triangles_gl {
 
@@ -33,11 +34,11 @@ class Window final {
       sf::Event event;
       while (wnd_.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
+          wnd_.close();
           return;
         }
         handleEvent(event, renderer, camera);
       }
-
       auto size = getSize();
       renderer.render(camera.getPerspective(size.x, size.y), camera.getLookAt(),
                       GL_TRIANGLES);
@@ -52,10 +53,13 @@ class Window final {
     switch (evt.type) {
       case sf::Event::Resized:
         renderer.resize(size.x, size.y);
+        break;
       case sf::Event::KeyPressed:
         handleKey(evt.key.code, renderer, camera);
-      case sf::Event::MouseWheelScrolled:
-        handleScroll(camera);
+        break;
+      case sf::Event::MouseMoved:
+        handleMouseMove(camera);
+        break;
       default:
         break;
     }
@@ -83,25 +87,26 @@ class Window final {
     }
   }
 
-  void handleScroll(Camera& camera) {
+  void handleMouseMove(Camera& camera) {
     auto mouse_pos = sf::Mouse::getPosition(wnd_);
-    if (mouse_.is_active) {
-      if (!mouse_.is_centered) {
-        auto delta = mouse_pos - mouse_.pos;
-        auto yaw = -mouse_.rotate_speed * delta.x;
-        auto pitch = -mouse_.rotate_speed * delta.y;
-        auto q_yaw =
-            glm::angleAxis(glm::radians(yaw), glm::vec3(0.f, 1.f, 0.f));
-        auto q_pitch =
-            glm::angleAxis(glm::radians(pitch), glm::vec3(1.f, 0.f, 0.f));
-        camera.rotate(glm::normalize(q_pitch * q_yaw));
-        mouse_.step = delta;
+    if (!mouse_.is_centered) {
+      auto delta = mouse_pos - mouse_.pos;
+      auto yaw = -mouse_.rotate_speed * delta.x;
+      auto pitch = -mouse_.rotate_speed * delta.y;
+      auto q_yaw = glm::angleAxis(glm::radians(yaw), glm::vec3(0.f, 1.f, 0.f));
+      auto q_pitch =
+          glm::angleAxis(glm::radians(pitch), glm::vec3(1.f, 0.f, 0.f));
+      auto rotation = glm::normalize(q_pitch * q_yaw);
+      SPDLOG_TRACE("rotation: ({}, {}, {}, {})", rotation.w, rotation.x,
+                   rotation.y, rotation.z);
 
-        if (std::abs(mouse_.step.x) + std::abs(mouse_.step.y)) {
-          mouse_.rotate_speed =
-              std::min(Mouse::kMaxRotateSpeed,
-                       mouse_.rotate_speed + Mouse::kDeltaSpeedRotate);
-        }
+      camera.rotate(rotation);
+      mouse_.step = delta;
+
+      if (std::abs(mouse_.step.x) + std::abs(mouse_.step.y)) {
+        mouse_.rotate_speed =
+            std::min(Mouse::kMaxRotateSpeed,
+                     mouse_.rotate_speed + Mouse::kDeltaSpeedRotate);
       }
     }
   }

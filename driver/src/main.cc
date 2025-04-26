@@ -65,8 +65,8 @@ int main(int argc, char** argv) try {
          .projection_matrix = glm::ortho<float>(-1.4, 1.4, -1.4, 1.4, 0.1, 5)},
         kWindowWidth, kWindowHeight, GL_TRIANGLES);
 
-    triangles_gl::Camera camera({0.f, 0.f, 0.f}, {0.f, 0.f, 1.f},
-                                {0.f, 1.f, 0.0}, glm::radians(45.f), 0.1f,
+    triangles_gl::Camera camera({0.f, 0.f, 0.f}, {0.f, 0.f, 0.1f},
+                                {0.f, 0.1f, 0.0}, glm::radians(45.f), 0.1f,
                                 70.f);
 
     wnd.pollInLoop(renderer, camera);
