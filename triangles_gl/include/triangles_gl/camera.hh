@@ -23,7 +23,7 @@ class Camera final {
     direction_ = q * direction_;
     up_ = q * up_;
   }
-  auto scale(float factor) noexcept { z_far_clip_ *= factor; }
+  auto scale(float factor) noexcept { position_ += direction_ * factor; };
 
   const auto& getDirection() const noexcept { return direction_; }
   const auto& getUp() const noexcept { return up_; }

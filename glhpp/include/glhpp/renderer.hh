@@ -34,6 +34,7 @@ class Renderer final {
     GLHPP_DETAIL_ERROR_HANDLER(glLoadIdentity);
     GLHPP_DETAIL_ERROR_HANDLER(glOrtho, 0, width, 0, height, -1.0, 1.0);
     GLHPP_DETAIL_ERROR_HANDLER(glMatrixMode, GL_MODELVIEW);
+    GLHPP_DETAIL_ERROR_HANDLER(glLoadIdentity);
   }
 
  private:
