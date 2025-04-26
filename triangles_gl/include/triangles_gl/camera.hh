@@ -19,11 +19,11 @@ class Camera final {
   auto translate(const glm::vec3& translation) noexcept {
     position_ += translation;
   }
-
   auto rotate(const glm::quat& q) noexcept {
-    direction_ = direction_ * q;
-    up_ = up_ * q;
+    direction_ = q * direction_;
+    up_ = q * up_;
   }
+  auto scale(float factor) noexcept { position_ *= factor; }
 
   const auto& getDirection() const noexcept { return direction_; }
   const auto& getUp() const noexcept { return up_; }
