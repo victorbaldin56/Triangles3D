@@ -1,0 +1,7 @@
+add_library(glhpp INTERFACE)
+target_include_directories(glhpp INTERFACE include)
+target_link_libraries(glhpp INTERFACE opengl::opengl)
+target_link_libraries(glhpp INTERFACE GLEW::GLEW)
+target_link_libraries(glhpp INTERFACE glm::glm)
+target_link_libraries(glhpp INTERFACE geometry)
+target_compile_features(glhpp INTERFACE cxx_std_17)

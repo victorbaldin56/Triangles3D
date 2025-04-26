@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.14) # For GoogleTest
-
-add_executable(triangles main.cc)
+add_executable(triangles src/main.cc src/cmd_parser.cc)
 target_link_libraries(triangles geometry)
+target_link_libraries(triangles Boost::program_options)
+target_link_libraries(triangles triangles_gl)
+target_include_directories(triangles PRIVATE include)

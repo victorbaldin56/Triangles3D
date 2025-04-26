@@ -43,7 +43,7 @@ class Octree final {
         node_stack.pop();
 
         SPDLOG_TRACE("current_node.get() = {}",
-                     static_cast<void*>(current_node.get()));
+                     static_cast<void*>(current_node));
 
         auto begin_size = current_node->triangles_.size();
         if (begin_size <= kMinSize) {
