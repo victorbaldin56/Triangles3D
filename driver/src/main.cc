@@ -59,8 +59,8 @@ int main(int argc, char** argv) try {
         triangles_shaders, shadow_shaders, scene.getVertices(),
         {.width = 2048,
          .height = 2048,
-         .dir = {-1, -1, -1},
-         .pos = {2, 2, 2},
+         .dir = {1, 1, 1},
+         .pos = {-2, -2, -2},
          .up = {0, 1, 0},
          .projection_matrix = glm::ortho<float>(-1.4, 1.4, -1.4, 1.4, 0.1, 5)},
         kWindowWidth, kWindowHeight, GL_TRIANGLES);
