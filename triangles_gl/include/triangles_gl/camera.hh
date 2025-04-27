@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "glm/glm.hpp"
 #include "glm/gtc/quaternion.hpp"
 
@@ -24,7 +26,11 @@ class Camera final {
     up_ = q * up_;
   }
   auto scale(float factor) noexcept {
-    fov_ = glm::clamp(fov_ * factor, 1.0f, 120.0f);
+    if (factor > 0.f) {
+      fov_ = std::min(glm::radians(90.f), fov_ * 1.1f);
+    } else {
+      fov_ = std::max(glm::radians(0.f), fov_ / 1.1f);
+    }
   };
 
   const auto& getDirection() const noexcept { return direction_; }
