@@ -74,7 +74,7 @@ class Window final {
 
   void handleKey(sf::Keyboard::Key code, const glhpp::Renderer& renderer,
                  Camera& camera) {
-    auto right = camera.getSideways();
+    auto right = camera.getRight();
     auto direction = camera.getDirection();
     switch (code) {
       case sf::Keyboard::A:

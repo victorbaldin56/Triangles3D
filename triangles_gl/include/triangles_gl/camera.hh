@@ -23,11 +23,13 @@ class Camera final {
     direction_ = q * direction_;
     up_ = q * up_;
   }
-  auto scale(float factor) noexcept { position_ += direction_ * factor; };
+  auto scale(float factor) noexcept {
+    fov_ = glm::clamp(fov_ * factor, 1.0f, 120.0f);
+  };
 
   const auto& getDirection() const noexcept { return direction_; }
   const auto& getUp() const noexcept { return up_; }
-  auto getSideways() const noexcept { return glm::cross(direction_, up_); }
+  auto getRight() const noexcept { return glm::cross(direction_, up_); }
   auto getLookAt() const noexcept {
     return glm::lookAt(position_, position_ + direction_, up_);
   }
