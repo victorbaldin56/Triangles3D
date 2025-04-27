@@ -13,8 +13,8 @@ struct Mouse final {
   bool is_centered = false;
   sf::Vector2i pos = {0, 0};
 
-  static constexpr auto kMaxRotateSpeed = 1e-1;
-  static constexpr auto kDeltaSpeedRotate = 5e-1;
+  static constexpr auto kMaxRotateSpeed = 0.2f;
+  static constexpr auto kDeltaSpeedRotate = 1.f;
 };
 
 struct Keyboard final {
