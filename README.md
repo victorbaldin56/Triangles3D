@@ -67,7 +67,16 @@ After installing dependencies listed above, follow these steps:
 1. Build:
 
    ```sh
+   cd build
    cmake --build . -j
+   ```
+
+   *Note*: if you are using multi-config generator
+   (Visual Studio, Ninja Multiconfig, etc),
+   replace the last command with:
+
+   ```sh
+   cmake --build . --config Release -j
    ```
 
 ## Usage
