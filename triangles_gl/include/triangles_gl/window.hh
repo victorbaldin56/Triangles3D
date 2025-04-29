@@ -15,7 +15,7 @@ struct Mouse final {
   float zoom_speed = 0.05f;
 
   static constexpr auto kMaxRotateSpeed = 0.2f;
-  static constexpr auto kDeltaSpeedRotate = 1.f;
+  static constexpr auto kDeltaRotateSpeed = 1.f;
 };
 
 struct Keyboard final {
@@ -101,15 +101,14 @@ class Window final {
 
       auto yaw = mouse_.rotate_speed * delta.x;
       auto pitch = mouse_.rotate_speed * delta.y;
-      glm::vec3 right =
-          glm::normalize(glm::cross(camera.getDirection(), camera.getUp()));
+      glm::vec3 right = camera.getRight();
       auto q_yaw = glm::angleAxis(glm::radians(-yaw), glm::vec3(0.f, 1.f, 0.f));
       auto q_pitch = glm::angleAxis(glm::radians(-pitch), right);
       auto rotation = glm::normalize(q_pitch * q_yaw);
       camera.rotate(rotation);
       mouse_.rotate_speed =
           std::min(Mouse::kMaxRotateSpeed,
-                   mouse_.rotate_speed + Mouse::kDeltaSpeedRotate);
+                   mouse_.rotate_speed + Mouse::kDeltaRotateSpeed);
       mouse_.pos = mouse_pos;
     }
   }
