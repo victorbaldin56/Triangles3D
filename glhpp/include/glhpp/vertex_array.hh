@@ -52,9 +52,9 @@ class VertexArray final {
     GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribPointer, 0, 3, GL_FLOAT, GL_FALSE,
                                sizeof(Vertex), point_offset);
     GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribPointer, 1, 3, GL_FLOAT, GL_FALSE,
-                               sizeof(Vertex), point_offset);
+                               sizeof(Vertex), normal_offset);
     GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribIPointer, 2, 1, GL_BYTE,
-                               sizeof(Vertex), point_offset);
+                               sizeof(Vertex), color_offset);
   }
 
   static GLuint genVao() {

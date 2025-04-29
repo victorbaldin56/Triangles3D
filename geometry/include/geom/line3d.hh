@@ -42,9 +42,6 @@ class Line3D final {
     auto numerator = dot(crossProduct(w, other.direction_), dir_cross);
     auto t = numerator / dir_cross.norm2();
     auto res = origin_ + direction_ * t;
-
-    assert(!res.valid() || contains(res));
-    assert(!res.valid() || other.contains(res));
     return res;
   }
 

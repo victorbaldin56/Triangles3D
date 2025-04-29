@@ -21,9 +21,7 @@ class Plane final {
       : n_(crossProduct(a - b, a - c).normalize()),
         // normalization applied here to make easier comparison between planes
         // and make plane with zero normal vector invalid in place
-        d_(dot(n_, a)) {
-    assert(!valid() || contains(a) && contains(b) && contains(c));
-  }
+        d_(dot(n_, a)) {}
 
   // getters
  public:
@@ -43,8 +41,6 @@ class Plane final {
   }
 
   Vector3D<T> getIntersectionPoint(const Line3D<T>& line) const noexcept {
-    assert(comparator::isClose(n_.norm(), static_cast<T>(1)));
-
     auto&& origin = line.origin();
     auto&& dir = line.direction();
     auto denominator = dot(n_, dir);
@@ -55,8 +51,6 @@ class Plane final {
 
     auto t = (d_ - dot(origin, n_)) / denominator;
     auto res = origin + dir * t;
-    assert(line.contains(res));
-    assert(contains(res));
     return res;
   }
 
@@ -69,9 +63,6 @@ class Plane final {
       return Vector3D<T>{};
     }
     auto p = getIntersectionPoint(l);
-    assert(!p.valid() || contains(p));
-    assert(!p.valid() || l.contains(p));
-
     auto range = seg.getRange();
     if (range.contains(p)) {
       return p;

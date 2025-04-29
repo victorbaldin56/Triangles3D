@@ -7,14 +7,14 @@ namespace comparator {
 template <typename T>
 inline constexpr auto kAbsTol = static_cast<T>(0);
 template <>
-inline constexpr auto kAbsTol<float> = 1e-4f;
+inline constexpr auto kAbsTol<float> = 1e-7f;
 template <>
-inline constexpr auto kAbsTol<double> = 1e-5;
+inline constexpr auto kAbsTol<double> = 1e-7;
 
 template <typename T>
 inline constexpr auto kRelTol = static_cast<T>(0);
 template <>
-inline constexpr auto kRelTol<float> = 1e-4f;
+inline constexpr auto kRelTol<float> = 1e-7f;
 template <>
 inline constexpr auto kRelTol<double> = 1e-8;
 
