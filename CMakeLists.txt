@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14) # For GoogleTest
 project("Triangles3D")
 
 find_package(Boost REQUIRED)
-find_package(ImGui-SFML REQUIRED)
+find_package(SFML REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(opengl_system REQUIRED)
 find_package(glm REQUIRED)
