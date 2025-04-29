@@ -26,7 +26,7 @@ class Camera final {
     up_ = q * up_;
   }
   auto scale(float factor) noexcept {
-    fov_ = glm::clamp(fov_ * (1.f - factor), glm::radians(1.f),
+    fov_ = std::clamp(fov_ * (1.f - factor), glm::radians(1.f),
                       glm::radians(120.f));
   };
 
