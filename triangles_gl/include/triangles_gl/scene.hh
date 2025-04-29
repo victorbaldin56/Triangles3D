@@ -8,6 +8,7 @@
 #include "glhpp/light.hh"
 #include "glhpp/renderer.hh"
 #include "glhpp/vertex_array.hh"
+#include "vertex.hh"
 
 namespace triangles_gl {
 
@@ -30,12 +31,12 @@ class Scene final {
   }
 
   void setupRenderer(const glhpp::Renderer& renderer) const {
-    renderer.setAttribute(0, 3, GL_FLOAT, GL_FALSE, sizeof(glhpp::Vertex),
-                          offsetof(glhpp::Vertex, point));
-    renderer.setAttribute(1, 3, GL_FLOAT, GL_FALSE, sizeof(glhpp::Vertex),
-                          offsetof(glhpp::Vertex, normal));
-    renderer.setAttribute(2, 1, GL_INT, GL_FALSE, sizeof(glhpp::Vertex),
-                          offsetof(glhpp::Vertex, color_index));
+    renderer.setAttribute(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          offsetof(Vertex, point));
+    renderer.setAttribute(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          offsetof(Vertex, normal));
+    renderer.setAttribute(2, 1, GL_INT, GL_FALSE, sizeof(Vertex),
+                          offsetof(Vertex, color_index));
   }
   const auto& getVertices() const noexcept { return vertices_; }
 
@@ -51,6 +52,6 @@ class Scene final {
   }
 
  private:
-  std::vector<glhpp::Vertex> vertices_;
+  std::vector<Vertex> vertices_;
 };
 }

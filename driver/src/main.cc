@@ -65,8 +65,8 @@ int main(int argc, char** argv) try {
     auto&& vertices = scene.getVertices();
     auto vcount = vertices.size();
     glhpp::Renderer renderer(triangles_shaders, shadow_shaders, vertices.data(),
-                             vcount * sizeof(glhpp::Vertex), vcount, light,
-                             kWindowWidth, kWindowHeight, GL_TRIANGLES);
+                             vcount * sizeof(triangles_gl::Vertex), vcount,
+                             light, kWindowWidth, kWindowHeight, GL_TRIANGLES);
     scene.setupRenderer(renderer);
 
     triangles_gl::Camera camera({0.f, 0.f, 0.f}, {0.f, 0.f, 1.f},
