@@ -43,7 +43,9 @@ After installing dependencies listed above, follow these steps:
 1. Install Conan requirements and toolchain:
 
    ```sh
-   conan install . --output-folder=build --build=missing
+   conan install . --output-folder=build --build=missing \
+   --lockfile-partial -c tools.system.package_manager:mode=install \
+   -c tools.system.package_manager:sudo=True
    ```
 
 1. Configure CMake:
