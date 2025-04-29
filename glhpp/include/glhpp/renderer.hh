@@ -15,7 +15,9 @@ class Renderer final {
            unsigned wnd_width, unsigned wnd_height, int figure_type)
       : program_(main_shaders),
         vertex_array_(vertices),
-        shadow_map_(light, vertices.size(), shadow_shaders, figure_type) {}
+        shadow_map_(light, vertices.size(), shadow_shaders, figure_type) {
+    init(vertices, light, wnd_width, wnd_height);
+  }
 
   auto render(const glm::mat4& perspective, const glm::mat4& look_at,
               int figure_type) const {
@@ -38,7 +40,7 @@ class Renderer final {
   }
 
  private:
-  void init(const std::vector<Vertex>& vertices, Light& light,
+  void init(const std::vector<Vertex>& vertices, const Light& light,
             unsigned wnd_width, unsigned wnd_height) {
     GLHPP_DETAIL_ERROR_HANDLER(glUseProgram, program_.id());
     resize(wnd_width, wnd_height);

@@ -54,16 +54,17 @@ int main(int argc, char** argv) try {
     shadow_shaders.emplace_back(shaders_path / "shadow_map.frag",
                                 GL_FRAGMENT_SHADER);
 
-    triangles_gl::Scene scene(triangles, indices);
-    glhpp::Renderer renderer(
-        triangles_shaders, shadow_shaders, scene.getVertices(),
-        {.width = 2048,
-         .height = 2048,
-         .dir = {1, 1, 1},
-         .pos = {-2, -2, -2},
-         .up = {0, 1, 0},
-         .projection_matrix = glm::ortho<float>(-1.4, 1.4, -1.4, 1.4, 0.1, 5)},
-        kWindowWidth, kWindowHeight, GL_TRIANGLES);
+    glhpp::Light light{
+        .width = 2048,
+        .height = 2048,
+        .dir = {1, 1, 1},
+        .pos = {-2, -2, -2},
+        .up = {0, 1, 0},
+        .projection_matrix = glm::ortho<float>(-1.4, 1.4, -1.4, 1.4, 0.1, 5)};
+    triangles_gl::Scene scene(triangles, indices, light);
+    glhpp::Renderer renderer(triangles_shaders, shadow_shaders,
+                             scene.getVertices(), light, kWindowWidth,
+                             kWindowHeight, GL_TRIANGLES);
 
     triangles_gl::Camera camera({0.f, 0.f, 0.f}, {0.f, 0.f, 1.f},
                                 {0.f, 0.1f, 0.0}, glm::radians(45.f), 0.1f,

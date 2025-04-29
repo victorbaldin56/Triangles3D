@@ -10,8 +10,8 @@ uniform mat4 mvp;
 uniform mat4 depth_bias_mvp;
 uniform int is_cw;
 
-out vec3  v_color;
-out vec4  shadow_coord_;
+out vec3 v_color;
+out vec4 shadow_coord_;
 out float is_dark_side;
 out float light_angle;
 

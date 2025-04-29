@@ -1,7 +1,7 @@
 #version 330 core
 
-in vec3  v_color;
-in vec4  shadow_coord_;
+in vec3 v_color;
+in vec4 shadow_coord_;
 in float is_dark_side;
 in float light_angle;
 
