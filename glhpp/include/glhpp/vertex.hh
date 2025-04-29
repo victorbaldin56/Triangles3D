@@ -10,7 +10,7 @@ struct Vertex final {
 
   Point point;
   Point normal;
-  GLbyte color;
+  GLint color_index;  // to reduce memory usage
 };
 
 }

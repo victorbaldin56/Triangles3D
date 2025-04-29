@@ -2,7 +2,7 @@
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
-layout(location = 2) in int color;
+layout(location = 2) in int color_index;
 
 uniform vec3 light_dir;
 uniform vec3 colors[2];
@@ -17,7 +17,7 @@ out float light_angle;
 
 void main() {
   gl_Position = mvp * vec4(position, 1.0);
-  v_color = colors[color];
+  v_color = colors[color_index];
   shadow_coord_ = depth_bias_mvp * vec4(position, 1.0);
   light_angle = dot(light_dir, normal);
   is_dark_side = float(is_cw);

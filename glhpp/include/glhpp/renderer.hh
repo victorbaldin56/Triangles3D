@@ -12,31 +12,26 @@ class Renderer final {
   Renderer(const std::vector<Shader>& main_shaders,
            const std::vector<Shader>& shadow_shaders,
            const std::vector<Vertex>& vertices, const Light& light,
-           unsigned wnd_width, unsigned wnd_height, int figure_type)
+           unsigned wnd_width, unsigned wnd_height, GLenum figure_type)
       : program_(main_shaders),
         vertex_array_(vertices),
-        shadow_map_(light, vertices.size(), shadow_shaders, figure_type) {
+        shadow_map_(light, vertices.size(), shadow_shaders, figure_type),
+        figure_type_(figure_type) {
     init(vertices, light, wnd_width, wnd_height);
   }
 
-  auto render(const glm::mat4& perspective, const glm::mat4& look_at,
-              int figure_type) const {
+  auto render(const glm::mat4& perspective, const glm::mat4& look_at) const {
     setUniformMvp(perspective, look_at);
     shadow_map_.setUniformDepthBiasMvp(program_.id());
     GLHPP_DETAIL_ERROR_HANDLER(glClear,
                                GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    renderCw(figure_type);
-    renderCcw(figure_type);
+    renderCw();
+    renderCcw();
   }
 
   auto resize(unsigned width, unsigned height) const {
     GLHPP_DETAIL_ERROR_HANDLER(glViewport, 0, 0, width, height);
-    GLHPP_DETAIL_ERROR_HANDLER(glMatrixMode, GL_PROJECTION);
-    GLHPP_DETAIL_ERROR_HANDLER(glLoadIdentity);
-    GLHPP_DETAIL_ERROR_HANDLER(glOrtho, 0, width, 0, height, -1.0, 1.0);
-    GLHPP_DETAIL_ERROR_HANDLER(glMatrixMode, GL_MODELVIEW);
-    GLHPP_DETAIL_ERROR_HANDLER(glLoadIdentity);
   }
 
  private:
@@ -62,11 +57,12 @@ class Renderer final {
   }
 
   void setUniformColors() const {
-    glm::vec3 colors[2] = {{0.f, 0.f, 1.f}, {1.f, 0.f, 0.f}};
+    glm::vec3 colors[2]{{0.f, 0.f, 1.f},   // blue
+                        {1.f, 0.f, 0.f}};  // red
     GLHPP_DETAIL_ERROR_HANDLER(
         glUniform3fv,
         GLHPP_DETAIL_ERROR_HANDLER(glGetUniformLocation, program_.id(),
-                                   "color"),
+                                   "colors"),
         2, &colors[0][0]);
   }
 
@@ -80,17 +76,17 @@ class Renderer final {
         is_cw);
   }
 
-  void renderCw(int figure_type) const {
+  void renderCw() const {
     GLHPP_DETAIL_ERROR_HANDLER(glFrontFace, GL_CW);
     setUniformIsCw(true);
-    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, figure_type, 0,
+    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, figure_type_, 0,
                                shadow_map_.vertexCount());
   }
 
-  void renderCcw(int figure_type) const {
+  void renderCcw() const {
     GLHPP_DETAIL_ERROR_HANDLER(glFrontFace, GL_CCW);
     setUniformIsCw(false);
-    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, figure_type, 0,
+    GLHPP_DETAIL_ERROR_HANDLER(glDrawArrays, figure_type_, 0,
                                shadow_map_.vertexCount());
   }
 
@@ -98,5 +94,7 @@ class Renderer final {
   Program program_;
   VertexArray vertex_array_;
   ShadowMap shadow_map_;
+
+  GLenum figure_type_;
 };
 }

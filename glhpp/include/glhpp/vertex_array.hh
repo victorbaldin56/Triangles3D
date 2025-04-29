@@ -44,16 +44,15 @@ class VertexArray final {
     GLHPP_DETAIL_ERROR_HANDLER(glEnableVertexAttribArray, 1);
     GLHPP_DETAIL_ERROR_HANDLER(glEnableVertexAttribArray, 2);
 
-    // OpenGL forces to do this
     auto point_offset = reinterpret_cast<void*>(offsetof(Vertex, point));
     auto normal_offset = reinterpret_cast<void*>(offsetof(Vertex, normal));
-    auto color_offset = reinterpret_cast<void*>(offsetof(Vertex, color));
+    auto color_offset = reinterpret_cast<void*>(offsetof(Vertex, color_index));
 
     GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribPointer, 0, 3, GL_FLOAT, GL_FALSE,
                                sizeof(Vertex), point_offset);
     GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribPointer, 1, 3, GL_FLOAT, GL_FALSE,
                                sizeof(Vertex), normal_offset);
-    GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribIPointer, 2, 1, GL_BYTE,
+    GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribIPointer, 2, 1, GL_INT,
                                sizeof(Vertex), color_offset);
   }
 

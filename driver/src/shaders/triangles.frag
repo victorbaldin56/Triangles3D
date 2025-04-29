@@ -15,10 +15,14 @@ void main() {
   float visibility_from_another = 0.3;
   float bias = 0.05;
 
-  if ((texture(shadow_map, shadow_coord.xy).r < shadow_coord.z - bias) || (is_dark_side > 0.5)) {
+  if ((texture(shadow_map, shadow_coord.xy).r < shadow_coord.z - bias) ||
+      (is_dark_side > 0.5)) {
     visibility = visibility_from_another;
   } else {
-    visibility = abs(light_angle) * (visibility - visibility_from_another) / visibility + visibility_from_another;
+    visibility =
+        abs(light_angle) * (visibility - visibility_from_another)
+                           / visibility
+        + visibility_from_another;
   }
 
   frag_color = vec4(v_color * visibility, 1.0);

@@ -17,7 +17,7 @@ class Scene final {
     auto triangles_count = triangles.size();
     vertices_.reserve(triangles_count * 3);
     for (std::size_t i = 0; i < triangles_count; ++i) {
-      GLbyte color = red_indices.count(i);
+      GLint color = red_indices.count(i);
       auto triangle = triangles[i];
       auto normal = triangle.normal();
       setOrientation(triangle, light.dir);
