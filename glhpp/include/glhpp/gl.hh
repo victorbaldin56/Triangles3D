@@ -15,6 +15,6 @@ inline auto init() {
   GLHPP_DETAIL_ERROR_HANDLER(glCullFace, GL_BACK);
   GLHPP_DETAIL_ERROR_HANDLER(glDepthFunc, GL_LESS);
   GLHPP_DETAIL_ERROR_HANDLER(glDepthMask, GL_TRUE);
-  GLHPP_DETAIL_ERROR_HANDLER(glClearColor, 0.3f, 0.3f, 0.3f, 0.0f);
+  GLHPP_DETAIL_ERROR_HANDLER(glClearColor, 0.f, 0.f, 0.f, 0.f);
 }
 }

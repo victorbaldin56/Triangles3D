@@ -11,14 +11,14 @@ uniform mat4 depth_bias_mvp;
 uniform int is_cw;
 
 out vec3 v_color;
-out vec4 shadow_coord_;
+out vec4 shadow_coord;
 out float is_dark_side;
 out float light_angle;
 
 void main() {
   gl_Position = mvp * vec4(position, 1.0);
   v_color = colors[color_index];
-  shadow_coord_ = depth_bias_mvp * vec4(position, 1.0);
+  shadow_coord = depth_bias_mvp * vec4(position, 1.0);
   light_angle = dot(light_dir, normal);
   is_dark_side = float(is_cw);
 }
