@@ -26,11 +26,8 @@ class Camera final {
     up_ = q * up_;
   }
   auto scale(float factor) noexcept {
-    if (factor > 0.f) {
-      fov_ = std::min(glm::radians(90.f), fov_ * 1.1f);
-    } else {
-      fov_ = std::max(glm::radians(0.f), fov_ / 1.1f);
-    }
+    fov_ = glm::clamp(fov_ * (1.f - factor), glm::radians(1.f),
+                      glm::radians(120.f));
   };
 
   const auto& getDirection() const noexcept { return direction_; }

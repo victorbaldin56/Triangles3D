@@ -12,6 +12,7 @@ struct Mouse final {
   bool is_active = false;
   bool is_centered = false;
   sf::Vector2i pos = {0, 0};
+  float zoom_speed = 0.05f;
 
   static constexpr auto kMaxRotateSpeed = 0.2f;
   static constexpr auto kDeltaSpeedRotate = 1.f;
@@ -111,7 +112,9 @@ class Window final {
     mouse_.pos = mouse_pos;
   }
 
-  void handleMouseScroll(float delta, Camera& camera) { camera.scale(delta); }
+  void handleMouseScroll(float delta, Camera& camera) noexcept {
+    camera.scale(delta * mouse_.zoom_speed);
+  }
 };
 
 }
