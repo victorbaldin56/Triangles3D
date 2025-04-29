@@ -23,10 +23,6 @@ struct Keyboard final {
 };
 
 class Window final {
-  sf::Window wnd_;
-  Mouse mouse_;
-  Keyboard keyboard_;
-
  public:
   Window(unsigned width, unsigned height, const std::string& title)
       : wnd_(sf::VideoMode(width, height), title, sf::Style::Default,
@@ -66,6 +62,9 @@ class Window final {
       case sf::Event::MouseMoved:
         handleMouseMove(camera);
         break;
+      case sf::Event::MouseButtonPressed:
+        mouse_control_active_ = !mouse_control_active_;
+        break;
       case sf::Event::MouseWheelScrolled:
         handleMouseScroll(evt.mouseWheelScroll.delta, camera);
       default:
@@ -96,25 +95,33 @@ class Window final {
   }
 
   void handleMouseMove(Camera& camera) {
-    auto mouse_pos = sf::Mouse::getPosition(wnd_);
-    auto delta = mouse_pos - mouse_.pos;
+    if (wnd_.hasFocus() && mouse_control_active_) {
+      auto mouse_pos = sf::Mouse::getPosition(wnd_);
+      auto delta = mouse_pos - mouse_.pos;
 
-    auto yaw = mouse_.rotate_speed * delta.x;
-    auto pitch = mouse_.rotate_speed * delta.y;
-    glm::vec3 right =
-        glm::normalize(glm::cross(camera.getDirection(), camera.getUp()));
-    auto q_yaw = glm::angleAxis(glm::radians(-yaw), glm::vec3(0.f, 1.f, 0.f));
-    auto q_pitch = glm::angleAxis(glm::radians(-pitch), right);
-    auto rotation = glm::normalize(q_pitch * q_yaw);
-    camera.rotate(rotation);
-    mouse_.rotate_speed = std::min(
-        Mouse::kMaxRotateSpeed, mouse_.rotate_speed + Mouse::kDeltaSpeedRotate);
-    mouse_.pos = mouse_pos;
+      auto yaw = mouse_.rotate_speed * delta.x;
+      auto pitch = mouse_.rotate_speed * delta.y;
+      glm::vec3 right =
+          glm::normalize(glm::cross(camera.getDirection(), camera.getUp()));
+      auto q_yaw = glm::angleAxis(glm::radians(-yaw), glm::vec3(0.f, 1.f, 0.f));
+      auto q_pitch = glm::angleAxis(glm::radians(-pitch), right);
+      auto rotation = glm::normalize(q_pitch * q_yaw);
+      camera.rotate(rotation);
+      mouse_.rotate_speed =
+          std::min(Mouse::kMaxRotateSpeed,
+                   mouse_.rotate_speed + Mouse::kDeltaSpeedRotate);
+      mouse_.pos = mouse_pos;
+    }
   }
 
   void handleMouseScroll(float delta, Camera& camera) noexcept {
     camera.scale(delta * mouse_.zoom_speed);
   }
-};
 
+ private:
+  sf::Window wnd_;
+  Mouse mouse_;
+  Keyboard keyboard_;
+  bool mouse_control_active_ = true;
+};
 }
