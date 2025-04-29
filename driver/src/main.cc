@@ -62,9 +62,12 @@ int main(int argc, char** argv) try {
         .up = {0, 1, 0},
         .projection_matrix = glm::ortho<float>(-1.4, 1.4, -1.4, 1.4, 0.1, 5)};
     triangles_gl::Scene scene(triangles, indices, light);
-    glhpp::Renderer renderer(triangles_shaders, shadow_shaders,
-                             scene.getVertices(), light, kWindowWidth,
-                             kWindowHeight, GL_TRIANGLES);
+    auto&& vertices = scene.getVertices();
+    auto vcount = vertices.size();
+    glhpp::Renderer renderer(triangles_shaders, shadow_shaders, vertices.data(),
+                             vcount * sizeof(glhpp::Vertex), vcount, light,
+                             kWindowWidth, kWindowHeight, GL_TRIANGLES);
+    scene.setupRenderer(renderer);
 
     triangles_gl::Camera camera({0.f, 0.f, 0.f}, {0.f, 0.f, 1.f},
                                 {0.f, 0.1f, 0.0}, glm::radians(45.f), 0.1f,

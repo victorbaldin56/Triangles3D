@@ -10,14 +10,14 @@ namespace glhpp {
 class Renderer final {
  public:
   Renderer(const std::vector<Shader>& main_shaders,
-           const std::vector<Shader>& shadow_shaders,
-           const std::vector<Vertex>& vertices, const Light& light,
+           const std::vector<Shader>& shadow_shaders, const void* buffer,
+           std::size_t size, std::size_t indices_count, const Light& light,
            unsigned wnd_width, unsigned wnd_height, GLenum figure_type)
       : program_(main_shaders),
-        vertex_array_(vertices),
-        shadow_map_(light, vertices.size(), shadow_shaders, figure_type),
+        vertex_array_(buffer, size),
+        shadow_map_(light, indices_count, shadow_shaders, figure_type),
         figure_type_(figure_type) {
-    init(vertices, light, wnd_width, wnd_height);
+    init(wnd_width, wnd_height);
   }
 
   auto render(const glm::mat4& perspective, const glm::mat4& look_at) const {
@@ -34,9 +34,14 @@ class Renderer final {
     GLHPP_DETAIL_ERROR_HANDLER(glViewport, 0, 0, width, height);
   }
 
+  void setAttribute(GLuint index, GLsizei size, GLenum type,
+                    GLboolean normalized, GLsizei stride,
+                    std::size_t offset) const {
+    vertex_array_.setAttribute(index, size, type, normalized, stride, offset);
+  }
+
  private:
-  void init(const std::vector<Vertex>& vertices, const Light& light,
-            unsigned wnd_width, unsigned wnd_height) {
+  void init(unsigned wnd_width, unsigned wnd_height) {
     GLHPP_DETAIL_ERROR_HANDLER(glUseProgram, program_.id());
     resize(wnd_width, wnd_height);
 

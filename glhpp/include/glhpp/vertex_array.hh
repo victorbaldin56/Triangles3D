@@ -18,20 +18,27 @@ class VertexArray final {
   using Vbo = std::unique_ptr<void, detail::ObjectDeleter<deleteVbo>>;
 
  public:
-  VertexArray(const std::vector<Vertex>& vertices)
+  VertexArray(const void* buffer, std::size_t size)
       : vao_(genVao()), vbo_(genVbo()) {
-    init(vertices);
+    init(buffer, size);
   }
   VertexArray(VertexArray&& other) noexcept = default;
   VertexArray& operator=(VertexArray&& rhs) noexcept = default;
 
+  void setAttribute(GLuint index, GLsizei size, GLenum type,
+                    GLboolean normalized, GLsizei stride,
+                    std::size_t offset) const {
+    GLHPP_DETAIL_ERROR_HANDLER(glEnableVertexAttribArray, index);
+    GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribPointer, index, size, type,
+                               normalized, stride,
+                               reinterpret_cast<GLvoid*>(offset));
+  }
+
  private:
-  void init(const std::vector<Vertex>& vertices) {
+  void init(const void* buffer, std::size_t size) {
     bind();
-    GLHPP_DETAIL_ERROR_HANDLER(glBufferData, GL_ARRAY_BUFFER,
-                               vertices.size() * sizeof(Vertex),
-                               vertices.data(), GL_STATIC_DRAW);
-    setVao();
+    GLHPP_DETAIL_ERROR_HANDLER(glBufferData, GL_ARRAY_BUFFER, size, buffer,
+                               GL_STATIC_DRAW);
   }
 
   void bind() {

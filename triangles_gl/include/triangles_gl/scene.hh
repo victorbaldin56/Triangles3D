@@ -6,6 +6,7 @@
 
 #include "geom/triangle3d.hh"
 #include "glhpp/light.hh"
+#include "glhpp/renderer.hh"
 #include "glhpp/vertex_array.hh"
 
 namespace triangles_gl {
@@ -28,6 +29,14 @@ class Scene final {
     }
   }
 
+  void setupRenderer(const glhpp::Renderer& renderer) const {
+    renderer.setAttribute(0, 3, GL_FLOAT, GL_FALSE, sizeof(glhpp::Vertex),
+                          offsetof(glhpp::Vertex, point));
+    renderer.setAttribute(1, 3, GL_FLOAT, GL_FALSE, sizeof(glhpp::Vertex),
+                          offsetof(glhpp::Vertex, normal));
+    renderer.setAttribute(2, 1, GL_INT, GL_FALSE, sizeof(glhpp::Vertex),
+                          offsetof(glhpp::Vertex, color_index));
+  }
   const auto& getVertices() const noexcept { return vertices_; }
 
  private:
