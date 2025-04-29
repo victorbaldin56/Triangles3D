@@ -1,8 +1,11 @@
 #pragma once
 
-#include "SFML/Window.hpp"
+#include "SFML/Graphics/RenderWindow.hpp"
+#include "SFML/Window/Event.hpp"
 #include "camera.hh"
 #include "glhpp/renderer.hh"
+#include "imgui-SFML.h"
+#include "imgui.h"
 #include "spdlog/spdlog.h"
 
 namespace triangles_gl {
@@ -28,6 +31,9 @@ class Window final {
       : wnd_(sf::VideoMode(width, height), title, sf::Style::Default,
              sf::ContextSettings(24, 8, 0, 3, 3)) {
     wnd_.setVerticalSyncEnabled(true);
+    if (!ImGui::SFML::Init(wnd_)) {
+      throw std::runtime_error{"Failed to initialize ImGui"};
+    }
   }
 
   auto getSize() const noexcept { return wnd_.getSize(); }
@@ -119,7 +125,7 @@ class Window final {
   }
 
  private:
-  sf::Window wnd_;
+  sf::RenderWindow wnd_;
   Mouse mouse_;
   Keyboard keyboard_;
   bool mouse_control_active_ = true;

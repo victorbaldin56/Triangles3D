@@ -2,7 +2,7 @@
 boost/1.83.0
 glm/1.0.1
 glew/2.2.0
-sfml/2.6.0
+imgui-sfml/2.6.1
 spdlog/1.15.1
 
 [test_requires]
