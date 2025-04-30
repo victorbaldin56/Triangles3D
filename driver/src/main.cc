@@ -74,6 +74,7 @@ int main(int argc, char** argv) try {
                                 70.f);
 
     wnd.pollInLoop(renderer, camera);
+    ImGui::SFML::Shutdown();
   } else {
     std::copy(indices.begin(), indices.end(),
               std::ostream_iterator<std::size_t>(std::cout, "\n"));
