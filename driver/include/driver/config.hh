@@ -5,7 +5,7 @@
 namespace cmd {
 
 struct Config {
-  bool draw;
+  bool draw = false;
 };
 
 }  // namespace cmd

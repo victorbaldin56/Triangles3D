@@ -6,7 +6,6 @@
 #include "GL/glew.h"
 #include "detail/error_handler.hh"
 #include "detail/object_deleter.hh"
-#include "vertex.hh"
 
 namespace glhpp {
 
@@ -18,43 +17,32 @@ class VertexArray final {
   using Vbo = std::unique_ptr<void, detail::ObjectDeleter<deleteVbo>>;
 
  public:
-  VertexArray(const std::vector<Vertex>& vertices)
+  VertexArray(const void* buffer, std::size_t size)
       : vao_(genVao()), vbo_(genVbo()) {
-    init(vertices);
+    init(buffer, size);
   }
   VertexArray(VertexArray&& other) noexcept = default;
   VertexArray& operator=(VertexArray&& rhs) noexcept = default;
 
+  void setAttribute(GLuint index, GLsizei size, GLenum type,
+                    GLboolean normalized, GLsizei stride,
+                    std::size_t offset) const {
+    GLHPP_DETAIL_ERROR_HANDLER(glEnableVertexAttribArray, index);
+    GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribPointer, index, size, type,
+                               normalized, stride,
+                               reinterpret_cast<GLvoid*>(offset));
+  }
+
  private:
-  void init(const std::vector<Vertex>& vertices) {
+  void init(const void* buffer, std::size_t size) {
     bind();
-    GLHPP_DETAIL_ERROR_HANDLER(glBufferData, GL_ARRAY_BUFFER,
-                               vertices.size() * sizeof(Vertex),
-                               vertices.data(), GL_STATIC_DRAW);
-    setVao();
+    GLHPP_DETAIL_ERROR_HANDLER(glBufferData, GL_ARRAY_BUFFER, size, buffer,
+                               GL_STATIC_DRAW);
   }
 
   void bind() {
     GLHPP_DETAIL_ERROR_HANDLER(glBindVertexArray, vao_.get());
     GLHPP_DETAIL_ERROR_HANDLER(glBindBuffer, GL_ARRAY_BUFFER, vbo_.get());
-  }
-
-  void setVao() {
-    GLHPP_DETAIL_ERROR_HANDLER(glEnableVertexAttribArray, 0);
-    GLHPP_DETAIL_ERROR_HANDLER(glEnableVertexAttribArray, 1);
-    GLHPP_DETAIL_ERROR_HANDLER(glEnableVertexAttribArray, 2);
-
-    // OpenGL forces to do this
-    auto point_offset = reinterpret_cast<void*>(offsetof(Vertex, point));
-    auto normal_offset = reinterpret_cast<void*>(offsetof(Vertex, normal));
-    auto color_offset = reinterpret_cast<void*>(offsetof(Vertex, color));
-
-    GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribPointer, 0, 3, GL_FLOAT, GL_FALSE,
-                               sizeof(Vertex), point_offset);
-    GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribPointer, 1, 3, GL_FLOAT, GL_FALSE,
-                               sizeof(Vertex), point_offset);
-    GLHPP_DETAIL_ERROR_HANDLER(glVertexAttribIPointer, 2, 1, GL_BYTE,
-                               sizeof(Vertex), point_offset);
   }
 
   static GLuint genVao() {

@@ -44,6 +44,9 @@ jobs:
         -pr=ci/profiles/${{ matrix.compiler }}_${{ matrix.build_type }}.profile
         --output-folder=build
         --build=missing
+        -c tools.system.package_manager:mode=install
+        -c tools.system.package_manager:sudo=True
+        --lockfile-partial
 
     - name: Configure CMake
       run: >

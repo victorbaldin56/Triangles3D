@@ -3,14 +3,14 @@
 #include "GL/glew.h"
 #include "geom/vector3d.hh"
 
-namespace glhpp {
+namespace triangles_gl {
 
 struct Vertex final {
   using Point = geometry::Vector3D<GLfloat>;
 
   Point point;
   Point normal;
-  GLbyte color;
+  GLint color_index;  // to reduce memory usage
 };
 
 }

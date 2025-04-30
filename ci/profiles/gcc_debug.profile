@@ -12,6 +12,7 @@ CC=/usr/bin/gcc-11
 CXX=/usr/bin/g++-11
 
 [conf]
+tools.build:cflags=["-fsanitize=address,leak,undefined"]
 tools.build:cxxflags=["-fsanitize=address,leak,undefined"]
 tools.build:exelinkflags=["-fsanitize=address,leak,undefined"]
 tools.build:sharedlinkflags=["-fsanitize=address,leak,undefined"]

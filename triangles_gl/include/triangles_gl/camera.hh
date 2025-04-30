@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "glm/glm.hpp"
 #include "glm/gtc/quaternion.hpp"
 
@@ -23,11 +25,14 @@ class Camera final {
     direction_ = q * direction_;
     up_ = q * up_;
   }
-  auto scale(float factor) noexcept { z_far_clip_ *= factor; }
+  auto scale(float factor) noexcept {
+    fov_ = std::clamp(fov_ * (1.f - factor), glm::radians(1.f),
+                      glm::radians(120.f));
+  };
 
   const auto& getDirection() const noexcept { return direction_; }
   const auto& getUp() const noexcept { return up_; }
-  auto getSideways() const noexcept { return glm::cross(direction_, up_); }
+  auto getRight() const noexcept { return glm::cross(direction_, up_); }
   auto getLookAt() const noexcept {
     return glm::lookAt(position_, position_ + direction_, up_);
   }

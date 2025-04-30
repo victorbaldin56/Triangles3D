@@ -43,7 +43,9 @@ After installing dependencies listed above, follow these steps:
 1. Install Conan requirements and toolchain:
 
    ```sh
-   conan install . --output-folder=build --build=missing
+   conan install . --output-folder=build --build=missing \
+   --lockfile-partial -c tools.system.package_manager:mode=install \
+   -c tools.system.package_manager:sudo=True
    ```
 
 1. Configure CMake:
@@ -67,12 +69,44 @@ After installing dependencies listed above, follow these steps:
 1. Build:
 
    ```sh
+   cd build
    cmake --build . -j
    ```
 
+   *Note*: if you are using multi-config generator
+   (Visual Studio, Ninja Multiconfig, etc),
+   replace the last command with:
+
+   ```sh
+   cmake --build . --config Release -j
+   ```
+
 ## Usage
+
+### Command line interface
 
 Input:
 
 * $N$ - the number of triangles
 * $3N$ points, coordinates are single-precision floating point numbers.
+
+### Visual mode
+
+To run in visual mode using OpenGL add command line argument `--opengl` to program
+invocation, e. g.:
+
+```sh
+./driver/triangles --opengl < [input_file]
+```
+
+Format of input file remains the same.
+
+In visual mode triangles that have intersections are drawn in red, others in blue,
+as shown on example screenshot below. The example scene has been loaded from
+[this](tests/e2e/bench/input/test_1.in) file.
+
+![Alt text](media/window.png)
+
+Navigation keys W, S, A, D supported. Mouse scroll changes view angle of the camera
+between $1$ and $120^{\circ}$. Mouse move rotates camera, single mouse button click
+switches on/off mouse following.
