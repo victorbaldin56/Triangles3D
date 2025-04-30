@@ -12,6 +12,4 @@ CC=/usr/bin/clang-14
 CXX=/usr/bin/clang++-14
 
 [conf]
-tools.build:cxxflags=["-fsanitize=address,leak"]
-tools.build:exelinkflags=["-fsanitize=address,leak"]
-tools.build:sharedlinkflags=["-fsanitize=address,leak"]
+tools.build:cxxflags=["-fsanitize=address,leak,undefined"]
