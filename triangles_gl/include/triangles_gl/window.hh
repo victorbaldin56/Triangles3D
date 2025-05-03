@@ -1,8 +1,11 @@
 #pragma once
 
+#include "SFML/Graphics/RenderWindow.hpp"
 #include "SFML/Window.hpp"
 #include "camera.hh"
 #include "glhpp/renderer.hh"
+#include "imgui-SFML.h"
+#include "imgui.h"
 #include "spdlog/spdlog.h"
 
 namespace triangles_gl {
@@ -28,19 +31,33 @@ class Window final {
       : wnd_(sf::VideoMode(width, height), title, sf::Style::Default,
              sf::ContextSettings(24, 8, 0, 3, 3)) {
     wnd_.setVerticalSyncEnabled(true);
+    if (!ImGui::SFML::Init(wnd_)) {
+      throw std::runtime_error{"Failed to initialize ImGui"};
+    }
   }
 
   auto getSize() const noexcept { return wnd_.getSize(); }
 
   auto pollInLoop(const glhpp::Renderer& renderer, Camera& camera) {
+    sf::Clock delta_clock;
     while (wnd_.isOpen()) {
       sf::Event event;
       while (wnd_.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
           return;
         }
+        ImGui::SFML::ProcessEvent(wnd_, event);
         handleEvent(event, renderer, camera);
       }
+
+      ImGui::SFML::Update(wnd_, delta_clock.restart());
+
+      ImGui::Begin("Performance");
+      ImGui::Text("FPS: %f", ImGui::GetIO().Framerate);
+      ImGui::End();
+
+      wnd_.clear();
+      ImGui::SFML::Render(wnd_);
       auto size = getSize();
       renderer.render(camera.getPerspective(size.x, size.y),
                       camera.getLookAt());
@@ -118,7 +135,7 @@ class Window final {
   }
 
  private:
-  sf::Window wnd_;
+  sf::RenderWindow wnd_;
   Mouse mouse_;
   Keyboard keyboard_;
   bool mouse_control_active_ = true;
