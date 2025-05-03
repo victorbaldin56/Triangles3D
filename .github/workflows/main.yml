@@ -9,39 +9,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    container: victorbaldin56/linux_dev:9296cfaf74bb3462f2130eed8db62094d723a565
 
     strategy:
       fail-fast: false
       matrix:
-        compiler: [gcc, clang]
+        compiler: [clang]
         build_type: [debug, release]
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set reusable strings
-      # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
-      id: strings
-      shell: bash
-      run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-
-    - name: Install system packages
-      run: |
-          sudo apt-get -y update &&
-          sudo apt-get install python3 pip g++-12 clang-14
-
-    - name: Install conan and set venv
-      run: python3 -m venv .venv;
-           source .venv/bin/activate;
-           echo PATH=$PATH >> $GITHUB_ENV;
-           pip install conan==2.12.1;
-
     - name: Install conan requirements
       run: >
         conan profile detect --force;
         conan install .
-        -pr=ci/profiles/${{ matrix.compiler }}_${{ matrix.build_type }}.profile
+        -pr:a=ci/profiles/${{ matrix.compiler }}_${{ matrix.build_type }}.profile
         --output-folder=build
         --build=missing
         -c tools.system.package_manager:mode=install
