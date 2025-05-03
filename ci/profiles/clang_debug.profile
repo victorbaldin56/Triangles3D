@@ -8,5 +8,5 @@ compiler.cppstd=gnu17
 build_type=Debug
 
 [buildenv]
-CC=/usr/bin/clang-14
-CXX=/usr/bin/clang++-14
+CC=clang
+CXX=clang++
