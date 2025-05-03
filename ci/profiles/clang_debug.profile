@@ -7,6 +7,5 @@ compiler.libcxx=libstdc++
 compiler.cppstd=gnu17
 build_type=Debug
 
-[buildenv]
-CC=clang
-CXX=clang++
+[conf]
+tools.build:compiler_executables={"cpp": "clang++", "c": "clang", "rc": "clang"}
