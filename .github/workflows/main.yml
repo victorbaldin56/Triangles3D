@@ -40,10 +40,3 @@ jobs:
 
     - name: Test
       run: ctest --output-on-failure --test-dir build -j --no-tests=error
-
-    - name: Benchmark
-      if: ${{ matrix.build_type == 'release' }}
-      run: |
-        export APP=${{ github.workspace }}/build/driver/triangles
-        pushd ${{ github.workspace }}/tests/e2e/bench/
-        bash benchmark.sh
